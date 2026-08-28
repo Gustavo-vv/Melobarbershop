@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Melobarbershop.Application/Melobarbershop.Application.csproj" />
+  <Project Path="Melobarbershop.Domain/Melobarbershop.Domain.csproj" />
+  <Project Path="Melobarbershop.Infrastructure/Melobarbershop.Infrastructure.csproj" />
+  <Project Path="Melobarbershop.UI/Melobarbershop.UI.csproj" />
+  <Project Path="Melobarbershop/Melobarbershop.API.csproj" />
+</Solution>
