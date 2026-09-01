@@ -11,4 +11,11 @@
     <PackageReference Include="FluentValidation" Version="12.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\" />
+    <Folder Include="Mapeamentos\" />
+    <Folder Include="Servicos\Implementacoes\" />
+    <Folder Include="Servicos\Interfaces\" />
+  </ItemGroup>
+
 </Project>
