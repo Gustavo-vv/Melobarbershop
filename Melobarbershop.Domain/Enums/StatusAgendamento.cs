@@ -1,10 +1,11 @@
-﻿namespace Melobarbershop.Domain.Enums
+﻿namespace Barbearia.Domain.Enums;
+
+public enum StatusAgendamento
 {
-    public enum StatusAgendamento
-    {
-        Pendente = 1,   // Cliente solicitou o agendamento
-        Confirmado = 2, // Barbeiro ou Admin confirmou o horÃ¡rio
-        Concluido = 3,  // Atendimento realizado com sucesso
-        Cancelado = 4   // Agendamento cancelado
-    }
+    Pendente = 1,
+    Confirmado = 2,
+    EmAtendimento = 3,
+    Concluido = 4,
+    Cancelado = 5,
+    NaoCompareceu = 6
 }
