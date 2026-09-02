@@ -1,22 +1,54 @@
+using Melobarbershop.Infrastructure.Data;
+using Melobarbershop.Infrastructure.Extensions;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorPages();
+// ==========================================
+// SERVICES
+// ==========================================
+
+// Infrastructure: DbContext + Identity (com Roles) + Repositories
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// Controllers
+builder.Services.AddControllers();
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// ==========================================
+// SEED: Roles e Admin padrão
+// ==========================================
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Error");
+    var services = scope.ServiceProvider;
+
+    // Aplica migrations pendentes automaticamente em desenvolvimento
+    var db = services.GetRequiredService<BarbeariaDbContext>();
+    await db.Database.MigrateAsync();
+
+    // Cria roles e usuário admin inicial
+    await DbSeeder.SeedAsync(services);
 }
 
-app.UseRouting();
+// ==========================================
+// PIPELINE
+// ==========================================
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
-app.MapRazorPages()
-   .WithStaticAssets();
+app.MapControllers();
 
 app.Run();

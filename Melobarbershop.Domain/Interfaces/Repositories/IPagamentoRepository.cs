@@ -1,7 +1,7 @@
-﻿namespace Melobarbershop.Domain.Interfaces.Repositories;
-
-using Barbearia.Domain.Enums;
 using Melobarbershop.Domain.Entidades;
+using Melobarbershop.Domain.Enums;
+
+namespace Melobarbershop.Domain.Interfaces.Repositories;
 
 public interface IPagamentoRepository
 {

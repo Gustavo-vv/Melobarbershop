@@ -1,4 +1,4 @@
-﻿namespace Barbearia.Domain.Enums;
+namespace Melobarbershop.Domain.Enums;
 
 public enum StatusAgendamento
 {
