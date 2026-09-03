@@ -32,5 +32,16 @@ public class MappingProfile : Profile
         // Movimentação de Estoque
         CreateMap<MovimentacaoEstoque, MovimentacaoEstoqueDto>()
             .ForMember(dest => dest.NomeProduto, opt => opt.MapFrom(src => src.Produto != null ? src.Produto.Nome : string.Empty));
+
+        // Agendamento
+        CreateMap<Agendamento, AgendamentoDto>()
+            .ForMember(dest => dest.NomeCliente, opt => opt.MapFrom(src => src.Cliente != null ? src.Cliente.Nome : string.Empty))
+            .ForMember(dest => dest.TelefoneCliente, opt => opt.MapFrom(src => src.Cliente != null ? src.Cliente.PhoneNumber : null))
+            .ForMember(dest => dest.NomeBarbeiro, opt => opt.MapFrom(src => src.Barbeiro != null ? src.Barbeiro.Nome : string.Empty))
+            .ForMember(dest => dest.ValorTotal, opt => opt.MapFrom(src => src.Itens != null ? src.Itens.Sum(i => i.PrecoCobrado) : 0m));
+
+        // Agendamento Item
+        CreateMap<AgendamentoItem, AgendamentoItemDto>()
+            .ForMember(dest => dest.NomeServico, opt => opt.MapFrom(src => src.Servico != null ? src.Servico.Nome : string.Empty));
     }
 }

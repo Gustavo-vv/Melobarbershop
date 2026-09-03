@@ -21,6 +21,7 @@ public static class ApplicationServiceExtensions
         // Serviços de Aplicação
         services.AddScoped<IServicoService, ServicoService>();
         services.AddScoped<IProdutoService, ProdutoService>();
+        services.AddScoped<IAgendamentoService, AgendamentoService>();
 
         return services;
     }
