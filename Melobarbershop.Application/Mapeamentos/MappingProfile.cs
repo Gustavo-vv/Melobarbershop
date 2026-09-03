@@ -43,5 +43,19 @@ public class MappingProfile : Profile
         // Agendamento Item
         CreateMap<AgendamentoItem, AgendamentoItemDto>()
             .ForMember(dest => dest.NomeServico, opt => opt.MapFrom(src => src.Servico != null ? src.Servico.Nome : string.Empty));
+
+        // Venda
+        CreateMap<Venda, VendaDto>()
+            .ForMember(dest => dest.NomeCliente, opt => opt.MapFrom(src => src.Cliente != null ? src.Cliente.Nome : null))
+            .ForMember(dest => dest.ValorPago, opt => opt.MapFrom(src => src.Pagamentos != null ? src.Pagamentos.Sum(p => p.Valor) : 0m));
+
+        // Venda Item
+        CreateMap<VendaItem, VendaItemDto>()
+            .ForMember(dest => dest.NomeServico, opt => opt.MapFrom(src => src.Servico != null ? src.Servico.Nome : null))
+            .ForMember(dest => dest.NomeProduto, opt => opt.MapFrom(src => src.Produto != null ? src.Produto.Nome : null))
+            .ForMember(dest => dest.NomeBarbeiro, opt => opt.MapFrom(src => src.Barbeiro != null ? src.Barbeiro.Nome : null));
+
+        // Pagamento
+        CreateMap<Pagamento, PagamentoDto>();
     }
 }
