@@ -4,6 +4,7 @@ using Melobarbershop.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Melobarbershop.Infrastructure.Migrations
 {
     [DbContext(typeof(BarbeariaDbContext))]
-    partial class BarbeariaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260903232712_AddPercentualComissaoToUsuario")]
+    partial class AddPercentualComissaoToUsuario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

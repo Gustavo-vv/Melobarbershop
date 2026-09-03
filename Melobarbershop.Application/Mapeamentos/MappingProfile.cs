@@ -57,5 +57,14 @@ public class MappingProfile : Profile
 
         // Pagamento
         CreateMap<Pagamento, PagamentoDto>();
+
+        // Usuario
+        CreateMap<ApplicationUser, UsuarioDto>()
+            .ForMember(dest => dest.Roles, opt => opt.Ignore());
+
+        // Avaliacao
+        CreateMap<Avaliacao, AvaliacaoDto>()
+            .ForMember(dest => dest.NomeCliente, opt => opt.MapFrom(src => src.Cliente != null ? src.Cliente.Nome : string.Empty))
+            .ForMember(dest => dest.NomeBarbeiro, opt => opt.MapFrom(src => src.Barbeiro != null ? src.Barbeiro.Nome : string.Empty));
     }
 }

@@ -19,6 +19,9 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 
         builder.Property(u => u.FotoUrl)
             .HasMaxLength(500);
+
+        builder.Property(u => u.PercentualComissao)
+            .HasPrecision(5, 2);
     }
 }
 
