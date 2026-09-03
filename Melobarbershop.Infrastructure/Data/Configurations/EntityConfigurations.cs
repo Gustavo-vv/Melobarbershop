@@ -8,6 +8,8 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 {
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
+        builder.ToTable("Usuarios");
+
         builder.Property(u => u.Nome)
             .HasMaxLength(150)
             .IsRequired();

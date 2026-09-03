@@ -29,6 +29,15 @@ public class BarbeariaDbContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(modelBuilder);
 
+        // Mapeamento das tabelas padrão do ASP.NET Identity para português
+        modelBuilder.Entity<ApplicationUser>(b => b.ToTable("Usuarios"));
+        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityRole>(b => b.ToTable("Perfis"));
+        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityUserRole<string>>(b => b.ToTable("UsuarioPerfis"));
+        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityUserClaim<string>>(b => b.ToTable("UsuarioClaims"));
+        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>>(b => b.ToTable("PerfilClaims"));
+        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityUserLogin<string>>(b => b.ToTable("UsuarioLogins"));
+        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityUserToken<string>>(b => b.ToTable("UsuarioTokens"));
+
         // Aplica todas as classes IEntityTypeConfiguration<T> da camada de Infrastructure
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(BarbeariaDbContext).Assembly);
     }
