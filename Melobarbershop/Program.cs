@@ -1,3 +1,4 @@
+using Melobarbershop.Application.Extensions;
 using Melobarbershop.Infrastructure.Data;
 using Melobarbershop.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Infrastructure: DbContext + Identity (com Roles) + Repositories
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Application: AutoMapper + Serviços de Domínio/Aplicação
+builder.Services.AddApplication();
 
 // Controllers
 builder.Services.AddControllers();

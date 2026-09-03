@@ -34,9 +34,9 @@ public static class DbSeeder
             {
                 var result = await roleManager.CreateAsync(new IdentityRole(role));
                 if (result.Succeeded)
-                    logger.LogInformation("Role '{Role}' criada com sucesso.", role);
+                    logger.LogInformation($"Role '{role}' criada com sucesso.");
                 else
-                    logger.LogError("Erro ao criar role '{Role}': {Errors}", role, string.Join(", ", result.Errors.Select(e => e.Description)));
+                    logger.LogError($"Erro ao criar role '{role}': {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
         }
 
@@ -63,11 +63,11 @@ public static class DbSeeder
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(adminUser, Roles.Admin);
-                logger.LogInformation("Usuário Admin criado: {Email}", adminEmail);
+                logger.LogInformation($"Usuário Admin criado: {adminEmail}");
             }
             else
             {
-                logger.LogError("Erro ao criar Admin: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
+                logger.LogError($"Erro ao criar Admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
         }
     }

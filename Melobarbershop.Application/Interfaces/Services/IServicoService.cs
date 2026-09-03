@@ -12,4 +12,5 @@ public interface IServicoService
     Task<ServicoDto> AtualizarAsync(int id, AtualizarServicoDto dto, CancellationToken cancellationToken = default);
     Task DesativarAsync(int id, CancellationToken cancellationToken = default);
     Task AtivarAsync(int id, CancellationToken cancellationToken = default);
+    Task RemoverPermanentementeAsync(int id, CancellationToken cancellationToken = default);
 }

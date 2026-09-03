@@ -1,4 +1,4 @@
-﻿namespace Melobarbershop.Domain.Interfaces.Repositories;
+namespace Melobarbershop.Domain.Interfaces.Repositories;
 
 using Melobarbershop.Domain.Entidades;
 
@@ -13,4 +13,5 @@ public interface IProdutoRepository
     Task AtualizarAsync(Produto produto, CancellationToken cancellationToken = default);
     Task AdicionarMovimentacaoEstoqueAsync(MovimentacaoEstoque movimentacao, CancellationToken cancellationToken = default);
     Task<IEnumerable<MovimentacaoEstoque>> ObterMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null, CancellationToken cancellationToken = default);
+    Task RemoverAsync(Produto produto, CancellationToken cancellationToken = default);
 }

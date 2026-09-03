@@ -83,4 +83,10 @@ public class ProdutoRepository : IProdutoRepository
             .OrderByDescending(m => m.DataHora)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task RemoverAsync(Produto produto, CancellationToken cancellationToken = default)
+    {
+        _context.Produtos.Remove(produto);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
 }

@@ -16,4 +16,5 @@ public interface IProdutoService
     Task<bool> PossuiEstoqueAsync(int produtoId, int quantidade, CancellationToken cancellationToken = default);
     Task DesativarAsync(int id, CancellationToken cancellationToken = default);
     Task AtivarAsync(int id, CancellationToken cancellationToken = default);
+    Task RemoverPermanentementeAsync(int id, CancellationToken cancellationToken = default);
 }
