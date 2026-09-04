@@ -74,102 +74,159 @@ public class UsuarioService : IUsuarioService
         if (!string.IsNullOrWhiteSpace(dto.TelefoneWhatsApp) && await _usuarioRepo.ExisteTelefoneAsync(dto.TelefoneWhatsApp))
             throw new InvalidOperationException($"Ja existe um usuario com o telefone '{dto.TelefoneWhatsApp}'.");
 
-        var usuario = new ApplicationUser
+        try
         {
-            UserName = dto.Email,
-            Email = dto.Email,
-            Nome = dto.Nome,
-            PhoneNumber = dto.TelefoneWhatsApp,
-            DataNascimento = dto.DataNascimento,
-            PreferenciasNotas = dto.PreferenciasNotas,
-            FotoUrl = dto.FotoUrl,
-            PercentualComissao = dto.PercentualComissao,
-            DataCadastro = DateTime.UtcNow,
-            Ativo = true
-        };
+            var usuario = new ApplicationUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                Nome = dto.Nome,
+                PhoneNumber = dto.TelefoneWhatsApp,
+                DataNascimento = dto.DataNascimento,
+                PreferenciasNotas = dto.PreferenciasNotas,
+                FotoUrl = dto.FotoUrl,
+                PercentualComissao = dto.PercentualComissao,
+                DataCadastro = DateTime.UtcNow,
+                Ativo = true
+            };
 
-        var result = await _userManager.CreateAsync(usuario, dto.Senha);
-        if (!result.Succeeded)
-            throw new InvalidOperationException($"Erro ao criar usuario: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            var result = await _userManager.CreateAsync(usuario, dto.Senha);
+            if (!result.Succeeded)
+                throw new InvalidOperationException($"Erro ao criar usuario: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-        var roleValida = dto.Role is "Cliente" or "Barbeiro" or "Admin" ? dto.Role : "Cliente";
-        await _userManager.AddToRoleAsync(usuario, roleValida);
+            var roleValida = dto.Role is "Cliente" or "Barbeiro" or "Admin" ? dto.Role : "Cliente";
+            await _userManager.AddToRoleAsync(usuario, roleValida);
 
-        var resultDto = _mapper.Map<UsuarioDto>(usuario);
-        resultDto.Roles = [roleValida];
-        return resultDto;
+            var resultDto = _mapper.Map<UsuarioDto>(usuario);
+            resultDto.Roles = [roleValida];
+            return resultDto;
+        }
+        catch (InvalidOperationException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao criar usuario.", ex);
+        }
     }
 
     public async Task<UsuarioDto> AtualizarAsync(string id, AtualizarUsuarioDto dto, CancellationToken cancellationToken = default)
     {
-        var usuario = await _usuarioRepo.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Usuario '{id}' nao encontrado.");
+        try
+        {
+            var usuario = await _usuarioRepo.ObterPorIdAsync(id, cancellationToken);
+            if (usuario == null)
+                throw new KeyNotFoundException($"Usuario '{id}' nao encontrado.");
 
-        if (!string.IsNullOrWhiteSpace(dto.TelefoneWhatsApp) && await _usuarioRepo.ExisteTelefoneAsync(dto.TelefoneWhatsApp, id))
-            throw new InvalidOperationException($"Ja existe outro usuario com o telefone '{dto.TelefoneWhatsApp}'.");
+            if (!string.IsNullOrWhiteSpace(dto.TelefoneWhatsApp) && await _usuarioRepo.ExisteTelefoneAsync(dto.TelefoneWhatsApp, id))
+                throw new InvalidOperationException($"Ja existe outro usuario com o telefone '{dto.TelefoneWhatsApp}'.");
 
-        usuario.Nome = dto.Nome;
-        usuario.PhoneNumber = dto.TelefoneWhatsApp;
-        usuario.DataNascimento = dto.DataNascimento;
-        usuario.PreferenciasNotas = dto.PreferenciasNotas;
-        usuario.FotoUrl = dto.FotoUrl;
-        usuario.PercentualComissao = dto.PercentualComissao;
-        usuario.Ativo = dto.Ativo;
+            usuario.Nome = dto.Nome;
+            usuario.PhoneNumber = dto.TelefoneWhatsApp;
+            usuario.DataNascimento = dto.DataNascimento;
+            usuario.PreferenciasNotas = dto.PreferenciasNotas;
+            usuario.FotoUrl = dto.FotoUrl;
+            usuario.PercentualComissao = dto.PercentualComissao;
+            usuario.Ativo = dto.Ativo;
 
-        await _usuarioRepo.AtualizarAsync(usuario, cancellationToken);
+            await _usuarioRepo.AtualizarAsync(usuario, cancellationToken);
 
-        var resultDto = _mapper.Map<UsuarioDto>(usuario);
-        resultDto.Roles = (await _userManager.GetRolesAsync(usuario)).ToList();
-        return resultDto;
+            var resultDto = _mapper.Map<UsuarioDto>(usuario);
+            resultDto.Roles = (await _userManager.GetRolesAsync(usuario)).ToList();
+            return resultDto;
+        }
+        catch (KeyNotFoundException) { throw; }
+        catch (InvalidOperationException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao atualizar usuario '{id}'.", ex);
+        }
     }
 
     public async Task DesativarAsync(string id, CancellationToken cancellationToken = default)
     {
-        var usuario = await _usuarioRepo.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Usuario '{id}' nao encontrado.");
-        usuario.Ativo = false;
-        await _usuarioRepo.AtualizarAsync(usuario, cancellationToken);
+        try
+        {
+            var usuario = await _usuarioRepo.ObterPorIdAsync(id, cancellationToken);
+            if (usuario == null)
+                throw new KeyNotFoundException($"Usuario '{id}' nao encontrado.");
+
+            usuario.Ativo = false;
+            await _usuarioRepo.AtualizarAsync(usuario, cancellationToken);
+        }
+        catch (KeyNotFoundException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao desativar usuario '{id}'.", ex);
+        }
     }
 
     public async Task AtivarAsync(string id, CancellationToken cancellationToken = default)
     {
-        var usuario = await _usuarioRepo.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Usuario '{id}' nao encontrado.");
-        usuario.Ativo = true;
-        await _usuarioRepo.AtualizarAsync(usuario, cancellationToken);
+        try
+        {
+            var usuario = await _usuarioRepo.ObterPorIdAsync(id, cancellationToken);
+            if (usuario == null)
+                throw new KeyNotFoundException($"Usuario '{id}' nao encontrado.");
+
+            usuario.Ativo = true;
+            await _usuarioRepo.AtualizarAsync(usuario, cancellationToken);
+        }
+        catch (KeyNotFoundException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao ativar usuario '{id}'.", ex);
+        }
     }
 
     public async Task<BloqueioAgendaDto> AdicionarBloqueioAgendaAsync(CriarBloqueioAgendaDto dto, CancellationToken cancellationToken = default)
     {
-        var barbeiro = await _usuarioRepo.ObterPorIdAsync(dto.BarbeiroId, cancellationToken)
-            ?? throw new KeyNotFoundException($"Barbeiro '{dto.BarbeiroId}' nao encontrado.");
-
-        var bloqueio = new BloqueioAgenda
+        try
         {
-            BarbeiroId = dto.BarbeiroId,
-            DataHoraInicio = dto.DataHoraInicio,
-            DataHoraFim = dto.DataHoraFim,
-            Motivo = dto.Motivo
-        };
+            var barbeiro = await _usuarioRepo.ObterPorIdAsync(dto.BarbeiroId, cancellationToken);
+            if (barbeiro == null)
+                throw new KeyNotFoundException($"Barbeiro '{dto.BarbeiroId}' nao encontrado.");
 
-        await _usuarioRepo.AdicionarBloqueioAsync(bloqueio, cancellationToken);
+            var bloqueio = new BloqueioAgenda
+            {
+                BarbeiroId = dto.BarbeiroId,
+                DataHoraInicio = dto.DataHoraInicio,
+                DataHoraFim = dto.DataHoraFim,
+                Motivo = dto.Motivo
+            };
 
-        return new BloqueioAgendaDto
+            await _usuarioRepo.AdicionarBloqueioAsync(bloqueio, cancellationToken);
+
+            return new BloqueioAgendaDto
+            {
+                Id = bloqueio.Id,
+                BarbeiroId = bloqueio.BarbeiroId,
+                NomeBarbeiro = barbeiro.Nome,
+                DataHoraInicio = bloqueio.DataHoraInicio,
+                DataHoraFim = bloqueio.DataHoraFim,
+                Motivo = bloqueio.Motivo
+            };
+        }
+        catch (KeyNotFoundException) { throw; }
+        catch (Exception ex)
         {
-            Id = bloqueio.Id,
-            BarbeiroId = bloqueio.BarbeiroId,
-            NomeBarbeiro = barbeiro.Nome,
-            DataHoraInicio = bloqueio.DataHoraInicio,
-            DataHoraFim = bloqueio.DataHoraFim,
-            Motivo = bloqueio.Motivo
-        };
+            throw new InvalidOperationException("Erro ao adicionar bloqueio de agenda.", ex);
+        }
     }
 
     public async Task RemoverBloqueioAgendaAsync(int bloqueioId, CancellationToken cancellationToken = default)
     {
-        var bloqueio = await _usuarioRepo.ObterBloqueioPorIdAsync(bloqueioId, cancellationToken)
-            ?? throw new KeyNotFoundException($"Bloqueio '{bloqueioId}' nao encontrado.");
-        await _usuarioRepo.RemoverBloqueioAsync(bloqueio, cancellationToken);
+        try
+        {
+            var bloqueio = await _usuarioRepo.ObterBloqueioPorIdAsync(bloqueioId, cancellationToken);
+            if (bloqueio == null)
+                throw new KeyNotFoundException($"Bloqueio '{bloqueioId}' nao encontrado.");
+
+            await _usuarioRepo.RemoverBloqueioAsync(bloqueio, cancellationToken);
+        }
+        catch (KeyNotFoundException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao remover bloqueio '{bloqueioId}'.", ex);
+        }
     }
 
     public async Task<IEnumerable<BloqueioAgendaDto>> ListarBloqueiosBarbeiroAsync(string barbeiroId, DateTime inicio, DateTime fim, CancellationToken cancellationToken = default)
