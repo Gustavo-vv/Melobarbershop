@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
@@ -28,26 +28,47 @@ public class AgendamentoService : IAgendamentoService
 
     public async Task<AgendamentoDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(id, cancellationToken);
-        return agendamento == null ? null : _mapper.Map<AgendamentoDto>(agendamento);
+        try
+        {
+            var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(id, cancellationToken);
+            return agendamento == null ? null : _mapper.Map<AgendamentoDto>(agendamento);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao obter agendamento com ID {id}.", ex);
+        }
     }
 
     public async Task<IEnumerable<AgendamentoDto>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim, string? barbeiroId = null, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Agendamento> agendamentos;
+        try
+        {
+            IEnumerable<Agendamento> agendamentos;
 
-        if (!string.IsNullOrWhiteSpace(barbeiroId))
-            agendamentos = await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicio, fim, cancellationToken);
-        else
-            agendamentos = await _agendamentoRepository.ObterPorPeriodoAsync(inicio, fim, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(barbeiroId))
+                agendamentos = await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicio, fim, cancellationToken);
+            else
+                agendamentos = await _agendamentoRepository.ObterPorPeriodoAsync(inicio, fim, cancellationToken);
 
-        return _mapper.Map<IEnumerable<AgendamentoDto>>(agendamentos);
+            return _mapper.Map<IEnumerable<AgendamentoDto>>(agendamentos);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao listar agendamentos por periodo.", ex);
+        }
     }
 
     public async Task<IEnumerable<AgendamentoDto>> ListarPorClienteAsync(string clienteId, CancellationToken cancellationToken = default)
     {
-        var agendamentos = await _agendamentoRepository.ObterPorClienteAsync(clienteId, cancellationToken);
-        return _mapper.Map<IEnumerable<AgendamentoDto>>(agendamentos);
+        try
+        {
+            var agendamentos = await _agendamentoRepository.ObterPorClienteAsync(clienteId, cancellationToken);
+            return _mapper.Map<IEnumerable<AgendamentoDto>>(agendamentos);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao listar agendamentos do cliente '{clienteId}'.", ex);
+        }
     }
 
     public async Task ConfirmarAsync(int agendamentoId, CancellationToken cancellationToken = default)
@@ -98,14 +119,14 @@ public class AgendamentoService : IAgendamentoService
 
     public async Task<AgendamentoDto> CriarAsync(CriarAgendamentoDto dto, CancellationToken cancellationToken = default)
     {
-        if (dto.ServicoIds == null || !dto.ServicoIds.Any())
-            throw new ArgumentException("Pelo menos um servico deve ser selecionado para o agendamento.", nameof(dto.ServicoIds));
-
-        if (dto.DataHoraInicio < DateTime.UtcNow.AddMinutes(-5))
-            throw new ArgumentException("A data e hora do agendamento nao pode ser no passado.", nameof(dto.DataHoraInicio));
-
         try
         {
+            if (dto.ServicoIds == null || !dto.ServicoIds.Any())
+                throw new ArgumentException("Pelo menos um servico deve ser selecionado para o agendamento.", nameof(dto.ServicoIds));
+
+            if (dto.DataHoraInicio < DateTime.UtcNow.AddMinutes(-5))
+                throw new ArgumentException("A data e hora do agendamento nao pode ser no passado.", nameof(dto.DataHoraInicio));
+
             var servicos = (await _servicoRepository.ObterPorIdsAsync(dto.ServicoIds, cancellationToken))
                 .Where(s => s.Ativo)
                 .ToList();
@@ -196,41 +217,48 @@ public class AgendamentoService : IAgendamentoService
 
     public async Task<IEnumerable<DateTime>> ListarHorariosDisponiveisAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds, CancellationToken cancellationToken = default)
     {
-        var servicos = (await _servicoRepository.ObterPorIdsAsync(servicoIds, cancellationToken))
-            .Where(s => s.Ativo)
-            .ToList();
-
-        var duracaoTotalMinutos = servicos.Any() ? servicos.Sum(s => s.DuracaoMinutos) : 30;
-
-        var inicioExpediente = data.Date.AddHours(8);
-        var fimExpediente = data.Date.AddHours(19);
-        var inicioDia = data.Date;
-        var fimDia = data.Date.AddDays(1);
-
-        var agendamentosExistentes = (await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicioDia, fimDia, cancellationToken))
-            .Where(a => a.Status != StatusAgendamento.Cancelado && a.Status != StatusAgendamento.NaoCompareceu)
-            .ToList();
-
-        var bloqueios = (await _usuarioRepository.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicioDia, fimDia, cancellationToken))
-            .ToList();
-
-        var horariosDisponiveis = new List<DateTime>();
-        var agora = DateTime.UtcNow;
-
-        for (var horario = inicioExpediente; horario.AddMinutes(duracaoTotalMinutos) <= fimExpediente; horario = horario.AddMinutes(30))
+        try
         {
-            if (horario <= agora)
-                continue;
+            var servicos = (await _servicoRepository.ObterPorIdsAsync(servicoIds, cancellationToken))
+                .Where(s => s.Ativo)
+                .ToList();
 
-            var terminoEstimado = horario.AddMinutes(duracaoTotalMinutos);
-            var temConflito = agendamentosExistentes.Any(a => a.DataHoraInicio < terminoEstimado && a.DataHoraFim > horario);
-            var temBloqueio = bloqueios.Any(b => b.DataHoraInicio < terminoEstimado && b.DataHoraFim > horario);
+            var duracaoTotalMinutos = servicos.Any() ? servicos.Sum(s => s.DuracaoMinutos) : 30;
 
-            if (!temConflito && !temBloqueio)
-                horariosDisponiveis.Add(horario);
+            var inicioExpediente = data.Date.AddHours(8);
+            var fimExpediente = data.Date.AddHours(19);
+            var inicioDia = data.Date;
+            var fimDia = data.Date.AddDays(1);
+
+            var agendamentosExistentes = (await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicioDia, fimDia, cancellationToken))
+                .Where(a => a.Status != StatusAgendamento.Cancelado && a.Status != StatusAgendamento.NaoCompareceu)
+                .ToList();
+
+            var bloqueios = (await _usuarioRepository.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicioDia, fimDia, cancellationToken))
+                .ToList();
+
+            var horariosDisponiveis = new List<DateTime>();
+            var agora = DateTime.UtcNow;
+
+            for (var horario = inicioExpediente; horario.AddMinutes(duracaoTotalMinutos) <= fimExpediente; horario = horario.AddMinutes(30))
+            {
+                if (horario <= agora)
+                    continue;
+
+                var terminoEstimado = horario.AddMinutes(duracaoTotalMinutos);
+                var temConflito = agendamentosExistentes.Any(a => a.DataHoraInicio < terminoEstimado && a.DataHoraFim > horario);
+                var temBloqueio = bloqueios.Any(b => b.DataHoraInicio < terminoEstimado && b.DataHoraFim > horario);
+
+                if (!temConflito && !temBloqueio)
+                    horariosDisponiveis.Add(horario);
+            }
+
+            return horariosDisponiveis;
         }
-
-        return horariosDisponiveis;
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao listar horarios disponiveis para o barbeiro '{barbeiroId}'.", ex);
+        }
     }
 
     private async Task ValidarEAtualizarStatusAsync(int agendamentoId, StatusAgendamento novoStatus, CancellationToken cancellationToken)

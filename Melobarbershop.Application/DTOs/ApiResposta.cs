@@ -3,7 +3,7 @@
 // Camada: Application
 // Como participa: Todas as respostas da API vao utilizar este wrapper para garantir um formato consistente de retorno.
 
-namespace SenacFlix.Application.DTOs
+namespace Melobarbershop.Application.DTOs
 {
     // Classe genérica para resposta da API
     public class ApiResposta<T>

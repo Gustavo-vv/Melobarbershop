@@ -1,10 +1,9 @@
-﻿using Melobarbershop.Application.DTOs;
+using Melobarbershop.Application.DTOs;
 using Melobarbershop.Domain.Entidades;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SenacFlix.Application.DTOs;
 
 namespace Melobarbershop.API.Controllers
 {

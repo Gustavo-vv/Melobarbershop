@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
@@ -30,20 +30,41 @@ public class VendaService : IVendaService
 
     public async Task<VendaDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var venda = await _vendaRepository.ObterPorIdCompletoAsync(id, cancellationToken);
-        return venda == null ? null : _mapper.Map<VendaDto>(venda);
+        try
+        {
+            var venda = await _vendaRepository.ObterPorIdCompletoAsync(id, cancellationToken);
+            return venda == null ? null : _mapper.Map<VendaDto>(venda);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao obter venda com ID {id}.", ex);
+        }
     }
 
     public async Task<IEnumerable<VendaDto>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim, CancellationToken cancellationToken = default)
     {
-        var vendas = await _vendaRepository.ObterPorPeriodoAsync(inicio, fim, cancellationToken);
-        return _mapper.Map<IEnumerable<VendaDto>>(vendas);
+        try
+        {
+            var vendas = await _vendaRepository.ObterPorPeriodoAsync(inicio, fim, cancellationToken);
+            return _mapper.Map<IEnumerable<VendaDto>>(vendas);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao listar vendas por periodo.", ex);
+        }
     }
 
     public async Task<IEnumerable<VendaDto>> ListarPorClienteAsync(string clienteId, CancellationToken cancellationToken = default)
     {
-        var vendas = await _vendaRepository.ObterPorClienteAsync(clienteId, cancellationToken);
-        return _mapper.Map<IEnumerable<VendaDto>>(vendas);
+        try
+        {
+            var vendas = await _vendaRepository.ObterPorClienteAsync(clienteId, cancellationToken);
+            return _mapper.Map<IEnumerable<VendaDto>>(vendas);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao listar vendas do cliente '{clienteId}'.", ex);
+        }
     }
 
     public async Task<VendaDto> IniciarVendaAsync(IniciarVendaDto dto, CancellationToken cancellationToken = default)

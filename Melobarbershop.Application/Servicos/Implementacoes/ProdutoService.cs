@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
@@ -20,57 +20,100 @@ public class ProdutoService : IProdutoService
 
     public async Task<ProdutoDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
-        return produto == null ? null : _mapper.Map<ProdutoDto>(produto);
+        try
+        {
+            var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
+            return produto == null ? null : _mapper.Map<ProdutoDto>(produto);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao obter produto com ID {id}.", ex);
+        }
     }
 
     public async Task<ProdutoDto?> ObterPorCodigoBarrasAsync(string codigoBarras, CancellationToken cancellationToken = default)
     {
-        var produto = await _produtoRepository.ObterPorCodigoBarrasAsync(codigoBarras, cancellationToken);
-        return produto == null ? null : _mapper.Map<ProdutoDto>(produto);
+        try
+        {
+            var produto = await _produtoRepository.ObterPorCodigoBarrasAsync(codigoBarras, cancellationToken);
+            return produto == null ? null : _mapper.Map<ProdutoDto>(produto);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao obter produto com codigo de barras '{codigoBarras}'.", ex);
+        }
     }
 
     public async Task<IEnumerable<ProdutoDto>> ListarAtivosAsync(CancellationToken cancellationToken = default)
     {
-        var produtos = await _produtoRepository.ObterAtivosAsync(cancellationToken);
-        return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+        try
+        {
+            var produtos = await _produtoRepository.ObterAtivosAsync(cancellationToken);
+            return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao listar produtos ativos.", ex);
+        }
     }
 
     public async Task<IEnumerable<ProdutoDto>> ListarTodosAsync(CancellationToken cancellationToken = default)
     {
-        var produtos = await _produtoRepository.ObterTodosAsync(cancellationToken);
-        return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+        try
+        {
+            var produtos = await _produtoRepository.ObterTodosAsync(cancellationToken);
+            return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao listar todos os produtos.", ex);
+        }
     }
 
     public async Task<IEnumerable<ProdutoDto>> ListarComEstoqueAbaixoDoMinimoAsync(CancellationToken cancellationToken = default)
     {
-        var produtos = await _produtoRepository.ObterComEstoqueAbaixoDoMinimoAsync(cancellationToken);
-        return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+        try
+        {
+            var produtos = await _produtoRepository.ObterComEstoqueAbaixoDoMinimoAsync(cancellationToken);
+            return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao listar produtos com estoque abaixo do minimo.", ex);
+        }
     }
 
     public async Task<ProdutoDto> CriarAsync(CriarProdutoDto dto, CancellationToken cancellationToken = default)
     {
-        var existente = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras, cancellationToken);
-        if (existente != null)
-            throw new InvalidOperationException($"Ja existe um produto cadastrado com o codigo de barras '{dto.CodigoBarras}'.");
-
-        var produto = _mapper.Map<Produto>(dto);
-        await _produtoRepository.AdicionarAsync(produto, cancellationToken);
-
-        if (dto.EstoqueInicial > 0)
+        try
         {
-            var movimentacaoInicial = new MovimentacaoEstoque
-            {
-                ProdutoId = produto.Id,
-                Quantidade = dto.EstoqueInicial,
-                Tipo = TipoMovimentacaoEstoque.Entrada,
-                Observacao = "Estoque inicial cadastrado",
-                DataHora = DateTime.UtcNow
-            };
-            await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacaoInicial, cancellationToken);
-        }
+            var existente = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras, cancellationToken);
+            if (existente != null)
+                throw new InvalidOperationException($"Ja existe um produto cadastrado com o codigo de barras '{dto.CodigoBarras}'.");
 
-        return _mapper.Map<ProdutoDto>(produto);
+            var produto = _mapper.Map<Produto>(dto);
+            await _produtoRepository.AdicionarAsync(produto, cancellationToken);
+
+            if (dto.EstoqueInicial > 0)
+            {
+                var movimentacaoInicial = new MovimentacaoEstoque
+                {
+                    ProdutoId = produto.Id,
+                    Quantidade = dto.EstoqueInicial,
+                    Tipo = TipoMovimentacaoEstoque.Entrada,
+                    Observacao = "Estoque inicial cadastrado",
+                    DataHora = DateTime.UtcNow
+                };
+                await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacaoInicial, cancellationToken);
+            }
+
+            return _mapper.Map<ProdutoDto>(produto);
+        }
+        catch (InvalidOperationException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao criar produto.", ex);
+        }
     }
 
     public async Task<ProdutoDto> AtualizarAsync(int id, AtualizarProdutoDto dto, CancellationToken cancellationToken = default)
@@ -152,16 +195,30 @@ public class ProdutoService : IProdutoService
 
     public async Task<IEnumerable<MovimentacaoEstoqueDto>> ListarMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null, CancellationToken cancellationToken = default)
     {
-        var movimentacoes = await _produtoRepository.ObterMovimentacoesPorProdutoAsync(produtoId, inicio, fim, cancellationToken);
-        return _mapper.Map<IEnumerable<MovimentacaoEstoqueDto>>(movimentacoes);
+        try
+        {
+            var movimentacoes = await _produtoRepository.ObterMovimentacoesPorProdutoAsync(produtoId, inicio, fim, cancellationToken);
+            return _mapper.Map<IEnumerable<MovimentacaoEstoqueDto>>(movimentacoes);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao listar movimentacoes do produto com ID {produtoId}.", ex);
+        }
     }
 
     public async Task<bool> PossuiEstoqueAsync(int produtoId, int quantidade, CancellationToken cancellationToken = default)
     {
-        var produto = await _produtoRepository.ObterPorIdAsync(produtoId, cancellationToken);
-        if (produto == null || !produto.Ativo)
-            return false;
-        return produto.EstoqueAtual >= quantidade;
+        try
+        {
+            var produto = await _produtoRepository.ObterPorIdAsync(produtoId, cancellationToken);
+            if (produto == null || !produto.Ativo)
+                return false;
+            return produto.EstoqueAtual >= quantidade;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao verificar estoque do produto com ID {produtoId}.", ex);
+        }
     }
 
     public async Task DesativarAsync(int id, CancellationToken cancellationToken = default)

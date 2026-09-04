@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
@@ -19,33 +19,68 @@ public class ServicoService : IServicoService
 
     public async Task<ServicoDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
-        return servico == null ? null : _mapper.Map<ServicoDto>(servico);
+        try
+        {
+            var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
+            return servico == null ? null : _mapper.Map<ServicoDto>(servico);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao obter servico com ID {id}.", ex);
+        }
     }
 
     public async Task<IEnumerable<ServicoDto>> ListarAtivosAsync(CancellationToken cancellationToken = default)
     {
-        var servicos = await _servicoRepository.ObterAtivosAsync(cancellationToken);
-        return _mapper.Map<IEnumerable<ServicoDto>>(servicos);
+        try
+        {
+            var servicos = await _servicoRepository.ObterAtivosAsync(cancellationToken);
+            return _mapper.Map<IEnumerable<ServicoDto>>(servicos);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao listar servicos ativos.", ex);
+        }
     }
 
     public async Task<IEnumerable<ServicoDto>> ListarExibidosNoSiteAsync(CancellationToken cancellationToken = default)
     {
-        var servicos = await _servicoRepository.ObterExibidosNoSiteAsync(cancellationToken);
-        return _mapper.Map<IEnumerable<ServicoDto>>(servicos);
+        try
+        {
+            var servicos = await _servicoRepository.ObterExibidosNoSiteAsync(cancellationToken);
+            return _mapper.Map<IEnumerable<ServicoDto>>(servicos);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao listar servicos exibidos no site.", ex);
+        }
     }
 
     public async Task<IEnumerable<ServicoDto>> ListarTodosAsync(CancellationToken cancellationToken = default)
     {
-        var servicos = await _servicoRepository.ObterTodosAsync(cancellationToken);
-        return _mapper.Map<IEnumerable<ServicoDto>>(servicos);
+        try
+        {
+            var servicos = await _servicoRepository.ObterTodosAsync(cancellationToken);
+            return _mapper.Map<IEnumerable<ServicoDto>>(servicos);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao listar todos os servicos.", ex);
+        }
     }
 
     public async Task<ServicoDto> CriarAsync(CriarServicoDto dto, CancellationToken cancellationToken = default)
     {
-        var servico = _mapper.Map<Servico>(dto);
-        await _servicoRepository.AdicionarAsync(servico, cancellationToken);
-        return _mapper.Map<ServicoDto>(servico);
+        try
+        {
+            var servico = _mapper.Map<Servico>(dto);
+            await _servicoRepository.AdicionarAsync(servico, cancellationToken);
+            return _mapper.Map<ServicoDto>(servico);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao criar servico.", ex);
+        }
     }
 
     public async Task<ServicoDto> AtualizarAsync(int id, AtualizarServicoDto dto, CancellationToken cancellationToken = default)
