@@ -1,9 +1,9 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Melobarbershop.Application.DTOs;
-using Melobarbershop.Application.Interfaces.Services;
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Interfaces.Repositories;
+using Melobarbershop.Application.Servicos.Services;
 
 namespace Melobarbershop.Application.Servicos.Implementacoes;
 

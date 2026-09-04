@@ -1,6 +1,6 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Melobarbershop.Application.DTOs;
-using Melobarbershop.Application.Interfaces.Services;
+using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Interfaces.Repositories;
 
@@ -50,47 +50,86 @@ public class ServicoService : IServicoService
 
     public async Task<ServicoDto> AtualizarAsync(int id, AtualizarServicoDto dto, CancellationToken cancellationToken = default)
     {
-        var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Serviço com ID {id} não encontrado.");
+        try
+        {
+            var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
+            if (servico == null)
+                throw new KeyNotFoundException($"Servico com ID {id} nao encontrado.");
 
-        _mapper.Map(dto, servico);
-        await _servicoRepository.AtualizarAsync(servico, cancellationToken);
-
-        return _mapper.Map<ServicoDto>(servico);
+            _mapper.Map(dto, servico);
+            await _servicoRepository.AtualizarAsync(servico, cancellationToken);
+            return _mapper.Map<ServicoDto>(servico);
+        }
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao atualizar servico com ID {id}.", ex);
+        }
     }
 
     public async Task DesativarAsync(int id, CancellationToken cancellationToken = default)
     {
-        var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Serviço com ID {id} não encontrado.");
+        try
+        {
+            var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
+            if (servico == null)
+                throw new KeyNotFoundException($"Servico com ID {id} nao encontrado.");
 
-        servico.Ativo = false;
-        await _servicoRepository.AtualizarAsync(servico, cancellationToken);
+            servico.Ativo = false;
+            await _servicoRepository.AtualizarAsync(servico, cancellationToken);
+        }
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao desativar servico com ID {id}.", ex);
+        }
     }
 
     public async Task AtivarAsync(int id, CancellationToken cancellationToken = default)
     {
-        var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Serviço com ID {id} não encontrado.");
+        try
+        {
+            var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
+            if (servico == null)
+                throw new KeyNotFoundException($"Servico com ID {id} nao encontrado.");
 
-        servico.Ativo = true;
-        await _servicoRepository.AtualizarAsync(servico, cancellationToken);
+            servico.Ativo = true;
+            await _servicoRepository.AtualizarAsync(servico, cancellationToken);
+        }
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao ativar servico com ID {id}.", ex);
+        }
     }
 
     public async Task RemoverPermanentementeAsync(int id, CancellationToken cancellationToken = default)
     {
-        var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Serviço com ID {id} não encontrado.");
-
         try
         {
+            var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
+            if (servico == null)
+                throw new KeyNotFoundException($"Servico com ID {id} nao encontrado.");
+
             await _servicoRepository.RemoverAsync(servico, cancellationToken);
         }
-        catch (Exception ex) when (ex.GetType().Name.Contains("DbUpdateException"))
+        catch (KeyNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
         {
             throw new InvalidOperationException(
-                "Não é possível remover este serviço permanentemente pois ele possui agendamentos, pacotes ou vendas vinculados. Recomenda-se desativá-lo em vez de excluir permanentemente.",
-                ex);
+                "Nao e possivel remover este servico permanentemente pois ele possui agendamentos, pacotes ou vendas vinculados. Recomenda-se desativa-lo em vez de excluir permanentemente.", ex);
         }
     }
 }

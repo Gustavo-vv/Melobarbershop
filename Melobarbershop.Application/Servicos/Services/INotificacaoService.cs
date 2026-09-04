@@ -1,4 +1,4 @@
-namespace Melobarbershop.Application.Interfaces.Services;
+namespace Melobarbershop.Application.Servicos.Services;
 
 public interface INotificacaoService
 {

@@ -1,5 +1,5 @@
-using Melobarbershop.Application.DTOs;
-using Melobarbershop.Application.Interfaces.Services;
+﻿using Melobarbershop.Application.DTOs;
+using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Interfaces.Repositories;
 

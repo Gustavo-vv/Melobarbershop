@@ -1,6 +1,6 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Melobarbershop.Application.DTOs;
-using Melobarbershop.Application.Interfaces.Services;
+using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Enums;
 using Melobarbershop.Domain.Interfaces.Repositories;
@@ -52,7 +52,7 @@ public class ProdutoService : IProdutoService
     {
         var existente = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras, cancellationToken);
         if (existente != null)
-            throw new InvalidOperationException($"Já existe um produto cadastrado com o código de barras '{dto.CodigoBarras}'.");
+            throw new InvalidOperationException($"Ja existe um produto cadastrado com o codigo de barras '{dto.CodigoBarras}'.");
 
         var produto = _mapper.Map<Produto>(dto);
         await _produtoRepository.AdicionarAsync(produto, cancellationToken);
@@ -75,20 +75,29 @@ public class ProdutoService : IProdutoService
 
     public async Task<ProdutoDto> AtualizarAsync(int id, AtualizarProdutoDto dto, CancellationToken cancellationToken = default)
     {
-        var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Produto com ID {id} não encontrado.");
-
-        if (!string.Equals(produto.CodigoBarras, dto.CodigoBarras, StringComparison.OrdinalIgnoreCase))
+        try
         {
-            var outroComMesmoCodigo = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras, cancellationToken);
-            if (outroComMesmoCodigo != null && outroComMesmoCodigo.Id != id)
-                throw new InvalidOperationException($"O código de barras '{dto.CodigoBarras}' já está em uso por outro produto.");
+            var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
+            if (produto == null)
+                throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
+
+            if (!string.Equals(produto.CodigoBarras, dto.CodigoBarras, StringComparison.OrdinalIgnoreCase))
+            {
+                var outroComMesmoCodigo = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras, cancellationToken);
+                if (outroComMesmoCodigo != null && outroComMesmoCodigo.Id != id)
+                    throw new InvalidOperationException($"O codigo de barras '{dto.CodigoBarras}' ja esta em uso por outro produto.");
+            }
+
+            _mapper.Map(dto, produto);
+            await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+            return _mapper.Map<ProdutoDto>(produto);
         }
-
-        _mapper.Map(dto, produto);
-        await _produtoRepository.AtualizarAsync(produto, cancellationToken);
-
-        return _mapper.Map<ProdutoDto>(produto);
+        catch (KeyNotFoundException) { throw; }
+        catch (InvalidOperationException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao atualizar produto com ID {id}.", ex);
+        }
     }
 
     public async Task MovimentarEstoqueAsync(MovimentarEstoqueDto dto, CancellationToken cancellationToken = default)
@@ -96,39 +105,49 @@ public class ProdutoService : IProdutoService
         if (dto.Quantidade <= 0)
             throw new ArgumentException("A quantidade movimentada deve ser maior que zero.", nameof(dto.Quantidade));
 
-        var produto = await _produtoRepository.ObterPorIdAsync(dto.ProdutoId, cancellationToken)
-            ?? throw new KeyNotFoundException($"Produto com ID {dto.ProdutoId} não encontrado.");
-
-        switch (dto.Tipo)
+        try
         {
-            case TipoMovimentacaoEstoque.Entrada:
-                produto.EstoqueAtual += dto.Quantidade;
-                break;
+            var produto = await _produtoRepository.ObterPorIdAsync(dto.ProdutoId, cancellationToken);
+            if (produto == null)
+                throw new KeyNotFoundException($"Produto com ID {dto.ProdutoId} nao encontrado.");
 
-            case TipoMovimentacaoEstoque.SaidaVenda:
-            case TipoMovimentacaoEstoque.UsoInternoBancada:
-            case TipoMovimentacaoEstoque.AjustePerda:
-                if (produto.EstoqueAtual < dto.Quantidade)
-                    throw new InvalidOperationException($"Estoque insuficiente. Estoque atual: {produto.EstoqueAtual}, solicitado: {dto.Quantidade}.");
+            switch (dto.Tipo)
+            {
+                case TipoMovimentacaoEstoque.Entrada:
+                    produto.EstoqueAtual += dto.Quantidade;
+                    break;
 
-                produto.EstoqueAtual -= dto.Quantidade;
-                break;
+                case TipoMovimentacaoEstoque.SaidaVenda:
+                case TipoMovimentacaoEstoque.UsoInternoBancada:
+                case TipoMovimentacaoEstoque.AjustePerda:
+                    if (produto.EstoqueAtual < dto.Quantidade)
+                        throw new InvalidOperationException($"Estoque insuficiente. Estoque atual: {produto.EstoqueAtual}, solicitado: {dto.Quantidade}.");
+                    produto.EstoqueAtual -= dto.Quantidade;
+                    break;
 
-            default:
-                throw new NotSupportedException($"Tipo de movimentação '{dto.Tipo}' não suportado.");
+                default:
+                    throw new NotSupportedException($"Tipo de movimentacao '{dto.Tipo}' nao suportado.");
+            }
+
+            var movimentacao = new MovimentacaoEstoque
+            {
+                ProdutoId = produto.Id,
+                Quantidade = dto.Quantidade,
+                Tipo = dto.Tipo,
+                Observacao = dto.Observacao,
+                DataHora = DateTime.UtcNow
+            };
+
+            await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacao, cancellationToken);
+            await _produtoRepository.AtualizarAsync(produto, cancellationToken);
         }
-
-        var movimentacao = new MovimentacaoEstoque
+        catch (KeyNotFoundException) { throw; }
+        catch (InvalidOperationException) { throw; }
+        catch (NotSupportedException) { throw; }
+        catch (Exception ex)
         {
-            ProdutoId = produto.Id,
-            Quantidade = dto.Quantidade,
-            Tipo = dto.Tipo,
-            Observacao = dto.Observacao,
-            DataHora = DateTime.UtcNow
-        };
-
-        await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacao, cancellationToken);
-        await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+            throw new InvalidOperationException("Erro ao movimentar estoque.", ex);
+        }
     }
 
     public async Task<IEnumerable<MovimentacaoEstoqueDto>> ListarMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null, CancellationToken cancellationToken = default)
@@ -142,42 +161,60 @@ public class ProdutoService : IProdutoService
         var produto = await _produtoRepository.ObterPorIdAsync(produtoId, cancellationToken);
         if (produto == null || !produto.Ativo)
             return false;
-
         return produto.EstoqueAtual >= quantidade;
     }
 
     public async Task DesativarAsync(int id, CancellationToken cancellationToken = default)
     {
-        var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Produto com ID {id} não encontrado.");
+        try
+        {
+            var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
+            if (produto == null)
+                throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
 
-        produto.Ativo = false;
-        await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+            produto.Ativo = false;
+            await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+        }
+        catch (KeyNotFoundException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao desativar produto com ID {id}.", ex);
+        }
     }
 
     public async Task AtivarAsync(int id, CancellationToken cancellationToken = default)
     {
-        var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Produto com ID {id} não encontrado.");
+        try
+        {
+            var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
+            if (produto == null)
+                throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
 
-        produto.Ativo = true;
-        await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+            produto.Ativo = true;
+            await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+        }
+        catch (KeyNotFoundException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao ativar produto com ID {id}.", ex);
+        }
     }
 
     public async Task RemoverPermanentementeAsync(int id, CancellationToken cancellationToken = default)
     {
-        var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Produto com ID {id} não encontrado.");
-
         try
         {
+            var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
+            if (produto == null)
+                throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
+
             await _produtoRepository.RemoverAsync(produto, cancellationToken);
         }
-        catch (Exception ex) when (ex.GetType().Name.Contains("DbUpdateException"))
+        catch (KeyNotFoundException) { throw; }
+        catch (Exception ex)
         {
             throw new InvalidOperationException(
-                "Não é possível remover este produto permanentemente pois ele possui vendas ou movimentações associadas. Recomenda-se desativá-lo em vez de remover permanentemente.",
-                ex);
+                "Nao e possivel remover este produto permanentemente pois ele possui vendas ou movimentacoes associadas. Recomenda-se desativa-lo em vez de remover permanentemente.", ex);
         }
     }
 }

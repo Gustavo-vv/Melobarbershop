@@ -1,6 +1,6 @@
 using Melobarbershop.Application.DTOs;
 
-namespace Melobarbershop.Application.Interfaces.Services;
+namespace Melobarbershop.Application.Servicos.Services;
 
 public interface IVendaService
 {

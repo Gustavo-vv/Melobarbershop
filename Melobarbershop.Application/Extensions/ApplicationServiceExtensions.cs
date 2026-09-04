@@ -1,9 +1,9 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using Melobarbershop.Application.Interfaces.Services;
 using Melobarbershop.Application.Mapeamentos;
 using Melobarbershop.Application.Servicos.Implementacoes;
+using Melobarbershop.Application.Servicos.Services;
 
 namespace Melobarbershop.Application.Extensions;
 
@@ -18,7 +18,7 @@ public static class ApplicationServiceExtensions
         }, NullLoggerFactory.Instance);
         services.AddSingleton<IMapper>(mapperConfig.CreateMapper());
 
-        // Serviços de Aplicação
+        // ServiÃ§os de AplicaÃ§Ã£o
         services.AddScoped<IServicoService, ServicoService>();
         services.AddScoped<IProdutoService, ProdutoService>();
         services.AddScoped<IAgendamentoService, AgendamentoService>();

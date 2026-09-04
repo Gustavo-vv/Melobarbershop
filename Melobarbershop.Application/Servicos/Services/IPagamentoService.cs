@@ -1,7 +1,7 @@
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Domain.Enums;
 
-namespace Melobarbershop.Application.Interfaces.Services;
+namespace Melobarbershop.Application.Servicos.Services;
 
 public interface IPagamentoService
 {
