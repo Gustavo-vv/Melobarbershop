@@ -41,5 +41,30 @@ namespace Melobarbershop.API.Controllers
             }
             return Ok(ApiResposta<IEnumerable<UsuarioDto>>.Ok(dtos));
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Desativar(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return BadRequest(ApiResposta<bool>.Falha("Usuario não encontrado."));
+
+            user.Ativo = false;
+            await _userManager.UpdateAsync(user);
+
+            return Ok(ApiResposta<bool>.Ok(true, "Usuario desativado com sucesso!"));
+        }
+
+        [HttpPut("{id}/ativar")]
+        public async Task<IActionResult> Ativar(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return BadRequest(ApiResposta<bool>.Falha("Usuario não encontrado."));
+
+            user.Ativo = true;
+            await _userManager.UpdateAsync(user);
+
+            return Ok(ApiResposta<bool>.Ok(true, "Usuario ativado com sucesso!"));
+        }
+
     }
 }
