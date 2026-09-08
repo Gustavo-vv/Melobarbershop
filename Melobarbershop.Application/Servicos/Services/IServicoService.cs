@@ -4,13 +4,12 @@ namespace Melobarbershop.Application.Servicos.Services;
 
 public interface IServicoService
 {
-    Task<ApiResposta<ServicoDto>> ObterPorIdAsync(int id, CancellationToken cancellationToken = default);
-    Task<IEnumerable<ServicoDto>> ListarTodosAsync(CancellationToken cancellationToken = default);
-    Task<IEnumerable<ServicoDto>> ListarAtivosAsync(CancellationToken cancellationToken = default);
-    Task<IEnumerable<ServicoDto>> ListarExibidosNoSiteAsync(CancellationToken cancellationToken = default);
-    Task<ServicoDto> CriarAsync(CriarServicoDto dto, CancellationToken cancellationToken = default);
-    Task<ServicoDto> AtualizarAsync(int id, AtualizarServicoDto dto, CancellationToken cancellationToken = default);
-    Task DesativarAsync(int id, CancellationToken cancellationToken = default);
-    Task AtivarAsync(int id, CancellationToken cancellationToken = default);
-    Task RemoverPermanentementeAsync(int id, CancellationToken cancellationToken = default);
+    Task<ApiResposta<IEnumerable<ServicoDto>>> ListarAsync(bool incluirInativos = false);
+    Task<ApiResposta<IEnumerable<ServicoDto>>> ListarPorCategoriaAsync(int categoriaId, bool incluirInativos = false);
+    Task<ApiResposta<ServicoDto>> ObterPorIdAsync(int id);
+    Task<ApiResposta<ServicoDto>> CriarAsync(CriarServicoDto dto);
+    Task<ApiResposta<ServicoDto>> AtualizarAsync(int id, AtualizarServicoDto dto);
+    Task<ApiResposta<bool>> DesativarAsync(int id);
+    Task<ApiResposta<bool>> AtivarAsync(int id);
+    Task<ApiResposta<bool>> RemoverPermanentementeAsync(int id);
 }
