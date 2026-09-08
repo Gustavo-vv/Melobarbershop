@@ -17,16 +17,20 @@ public class ServicoService : IServicoService
         _mapper = mapper;
     }
 
-    public async Task<ServicoDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<ApiResposta<ServicoDto>> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
         try
         {
             var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
-            return servico == null ? null : _mapper.Map<ServicoDto>(servico);
+            if (servico == null)
+                return ApiResposta<ServicoDto>.Falha("Serviço não encontrado.");
+
+            var dto = _mapper.Map<ServicoDto>(servico);
+            return ApiResposta<ServicoDto>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao obter servico com ID {id}.", ex);
+            return ApiResposta<ServicoDto>.Falha($"Erro ao obter a categoria: {ex.Message}");
         }
     }
 
