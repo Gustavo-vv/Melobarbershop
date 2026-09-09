@@ -19,6 +19,13 @@ namespace Melobarbershop.API.Controllers
             _mapper = mapper;            
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ObterAtivas()
+        {
+            var response = await _servicoService.ListarAsync();
+            return Ok(response);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterPorId(int id)
         {

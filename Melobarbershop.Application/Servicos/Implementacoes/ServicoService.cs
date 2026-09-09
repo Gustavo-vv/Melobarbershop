@@ -34,24 +34,6 @@ public class ServicoService : IServicoService
         }
     }
 
-    public async Task<ApiResposta<IEnumerable<ServicoDto>>> ListarPorCategoriaAsync(int categoriaId, bool incluirInativos = false)
-    {
-        try
-        {
-            var servicos = await _servicoRepository.ObterPorCategoriaAsync(categoriaId);
-
-            if (!incluirInativos)
-                servicos = servicos.Where(s => s.Ativo);
-
-            var dtos = _mapper.Map<IEnumerable<ServicoDto>>(servicos);
-            return ApiResposta<IEnumerable<ServicoDto>>.Ok(dtos);
-        }
-        catch (Exception ex)
-        {
-            return ApiResposta<IEnumerable<ServicoDto>>.Falha($"Erro ao listar serviços da categoria {categoriaId}: {ex.Message}");
-        }
-    }
-
     public async Task<ApiResposta<ServicoDto>> ObterPorIdAsync(int id)
     {
         try

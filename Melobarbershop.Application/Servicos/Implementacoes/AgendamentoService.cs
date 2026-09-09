@@ -182,7 +182,7 @@ public class AgendamentoService : IAgendamentoService
             if (!barbeiro.Ativo)
                 throw new InvalidOperationException("O barbeiro informado esta desativado no sistema.");
 
-            var servicos = (await _servicoRepository.ObterPorIdsAsync(dto.ServicoIds, cancellationToken))
+            var servicos = (await _servicoRepository.ObterPorIdAsync(dto.ServicoId))
                 .Where(s => s.Ativo)
                 .ToList();
 
@@ -290,7 +290,7 @@ public class AgendamentoService : IAgendamentoService
             if (barbeiro == null)
                 throw new KeyNotFoundException($"Barbeiro com ID '{barbeiroId}' nao encontrado.");
 
-            var servicos = (await _servicoRepository.ObterPorIdsAsync(servicoIds, cancellationToken))
+            var servicos = (await _servicoRepository.ObterPorIdAsync(servicoId))
                 .Where(s => s.Ativo)
                 .ToList();
 

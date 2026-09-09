@@ -4,13 +4,10 @@ using Melobarbershop.Domain.Entidades;
 
 public interface IServicoRepository
 {
-    Task<Servico?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Servico>> ObterPorIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Servico>> ObterTodosAsync(CancellationToken cancellationToken = default);
-    Task<IEnumerable<Servico>> ObterAtivosAsync(CancellationToken cancellationToken = default);
-    Task<IEnumerable<Servico>> ObterExibidosNoSiteAsync(CancellationToken cancellationToken = default);
-    Task<IEnumerable<Servico>> ObterPorCategoriaAsync(int categoriaId, bool incluirInativos = false, CancellationToken cancellationToken = default);
-    Task AdicionarAsync(Servico servico, CancellationToken cancellationToken = default);
-    Task AtualizarAsync(Servico servico, CancellationToken cancellationToken = default);
-    Task RemoverAsync(Servico servico, CancellationToken cancellationToken = default);
+    Task<Servico?> ObterPorIdAsync(int id);
+    Task<IEnumerable<Servico>> ObterTodosAsync();
+    Task<IEnumerable<Servico>> ObterAtivosAsync();
+    Task AdicionarAsync(Servico servico);
+    Task AtualizarAsync(Servico servico);
+    Task RemoverAsync(Servico servico);
 }

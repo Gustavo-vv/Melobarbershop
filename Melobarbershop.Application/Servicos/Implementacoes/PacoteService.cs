@@ -66,7 +66,7 @@ public class PacoteService : IPacoteService
             var servicos = new List<Servico>();
             foreach (var sid in dto.ServicoIds)
             {
-                var s = await _servicoRepo.ObterPorIdAsync(sid, cancellationToken);
+                var s = await _servicoRepo.ObterPorIdAsync(sid);
                 if (s == null)
                     throw new KeyNotFoundException($"Servico {sid} nao encontrado.");
                 servicos.Add(s);
@@ -103,7 +103,7 @@ public class PacoteService : IPacoteService
             var servicos = new List<Servico>();
             foreach (var sid in dto.ServicoIds)
             {
-                var s = await _servicoRepo.ObterPorIdAsync(sid, cancellationToken);
+                var s = await _servicoRepo.ObterPorIdAsync(sid);
                 if (s == null)
                     throw new KeyNotFoundException($"Servico {sid} nao encontrado.");
                 servicos.Add(s);

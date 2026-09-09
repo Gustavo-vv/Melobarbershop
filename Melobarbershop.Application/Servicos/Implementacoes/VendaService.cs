@@ -117,7 +117,7 @@ public class VendaService : IVendaService
             if (venda == null)
                 throw new KeyNotFoundException($"Venda com ID {vendaId} nao encontrada.");
 
-            var servico = await _servicoRepository.ObterPorIdAsync(dto.ServicoId, cancellationToken);
+            var servico = await _servicoRepository.ObterPorIdAsync(dto.ServicoId);
             if (servico == null)
                 throw new KeyNotFoundException($"Servico com ID {dto.ServicoId} nao encontrado.");
 
