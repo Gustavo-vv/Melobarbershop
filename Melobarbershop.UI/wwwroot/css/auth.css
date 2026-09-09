@@ -1,0 +1,597 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --blue: #168cff;
+    --bg: #030506;
+    --card: #090c0f;
+    --input: #07090b;
+    --border: #293139;
+    --text: #fff;
+    --muted: #9ba5ae;
+}
+
+body {
+    min-height: 100vh;
+    padding: 28px;
+
+    background:
+        radial-gradient(
+            circle at 75% 45%,
+            rgba(22, 140, 255, 0.08),
+            transparent 32%
+        ),
+        #030506;
+
+    color: var(--text);
+    font-family: "Open Sans", Arial, sans-serif;
+}
+
+/* =========================
+   PÁGINA DE AUTENTICAÇÃO
+========================= */
+
+.auth-page {
+    width: min(1320px, 100%);
+    min-height: 820px;
+
+    margin: auto;
+
+    display: grid;
+    grid-template-columns: 40% 60%;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(22, 140, 255, 0.55);
+    border-radius: 24px;
+
+    background: var(--card);
+
+    box-shadow:
+        0 0 45px rgba(22, 140, 255, 0.12);
+}
+
+/* =========================
+   LADO VISUAL
+========================= */
+
+.auth-visual {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    padding: 55px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.25),
+            rgba(0, 0, 0, 0.9)
+        ),
+        url("../img/banner1.jpg") center / cover no-repeat;
+}
+
+.auth-visual::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            transparent 20%,
+            rgba(0, 0, 0, 0.75)
+        );
+
+    pointer-events: none;
+}
+
+/* =========================
+   BOTÃO VOLTAR
+========================= */
+
+.auth-back {
+    position: absolute;
+    top: 30px;
+    left: 32px;
+    z-index: 2;
+
+    color: #fff;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.auth-back span {
+    margin-right: 8px;
+
+    color: var(--blue);
+
+    font-size: 24px;
+}
+
+.auth-visual-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* =========================
+   LOGO
+========================= */
+
+.auth-logo {
+    width: 180px;
+    max-height: 180px;
+
+    margin-bottom: 35px;
+
+    object-fit: contain;
+}
+
+/* =========================
+   TEXTO VISUAL
+========================= */
+
+.auth-eyebrow {
+    display: block;
+
+    margin-bottom: 14px;
+
+    color: var(--blue);
+
+    font-size: 13px;
+    font-weight: 900;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+}
+
+.auth-visual h1 {
+    max-width: 430px;
+
+    margin-bottom: 24px;
+
+    font-family: Oswald, Arial, sans-serif;
+
+    font-size: clamp(42px, 4vw, 64px);
+
+    line-height: 0.98;
+
+    text-transform: uppercase;
+}
+
+.auth-visual h1 span {
+    color: var(--blue);
+}
+
+.auth-visual p {
+    max-width: 440px;
+
+    color: #c3c9ce;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+}
+
+/* =========================
+   FORMULÁRIO
+========================= */
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 55px clamp(35px, 5vw, 70px);
+}
+
+.auth-header {
+    margin-bottom: 28px;
+}
+
+.auth-header .auth-eyebrow {
+    text-align: left;
+}
+
+.auth-header h2 {
+    margin-bottom: 8px;
+
+    font-family: Oswald, Arial, sans-serif;
+
+    font-size: clamp(30px, 3vw, 42px);
+
+    text-transform: uppercase;
+}
+
+.auth-header p {
+    color: var(--muted);
+
+    font-size: 14px;
+}
+
+/* =========================
+   LINHAS DO FORMULÁRIO
+========================= */
+
+.auth-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 18px;
+}
+
+.auth-field {
+    margin-bottom: 18px;
+}
+
+.auth-field label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #e8ecef;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+/* =========================
+   INPUT
+========================= */
+
+.auth-input {
+    position: relative;
+}
+
+.auth-input .icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+
+    width: 19px;
+    height: 19px;
+
+    transform: translateY(-50%);
+
+    object-fit: contain;
+
+    opacity: 0.8;
+}
+
+.auth-input input {
+    width: 100%;
+    height: 52px;
+
+    padding: 0 44px;
+
+    border: 1px solid var(--border);
+    border-radius: 9px;
+
+    outline: none;
+
+    background: var(--input);
+
+    color: #fff;
+
+    font-size: 14px;
+
+    transition: 0.25s;
+}
+
+.auth-input input::placeholder {
+    color: #707981;
+}
+
+.auth-input input:focus {
+    border-color: var(--blue);
+
+    box-shadow:
+        0 0 0 3px rgba(22, 140, 255, 0.1);
+}
+
+/* =========================
+   BOTÃO MOSTRAR SENHA
+========================= */
+
+.auth-eye {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    border: 0;
+
+    background: transparent;
+
+    color: #aeb7be;
+
+    cursor: pointer;
+
+    font-size: 16px;
+}
+
+/* =========================
+   TERMOS
+========================= */
+
+.auth-terms {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 9px;
+
+    margin: 4px 0 22px;
+
+    color: #aeb6bd;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.auth-terms input {
+    width: 16px;
+    height: 16px;
+
+    flex: 0 0 16px;
+
+    accent-color: var(--blue);
+}
+
+.auth-terms a,
+.auth-link {
+    color: var(--blue);
+
+    text-decoration: none;
+
+    font-weight: 700;
+}
+
+/* =========================
+   BOTÃO ENTRAR / CADASTRAR
+========================= */
+
+.auth-submit,
+.auth-google {
+    width: 100%;
+    height: 54px;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 900;
+
+    text-transform: uppercase;
+
+    transition: 0.25s;
+}
+
+.auth-submit {
+    border: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--blue),
+            #086cff
+        );
+
+    color: #fff;
+
+    letter-spacing: 0.6px;
+}
+
+.auth-submit:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 25px rgba(22, 140, 255, 0.38);
+}
+
+/* =========================
+   DIVISOR
+========================= */
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    margin: 22px 0;
+
+    color: #858e95;
+
+    font-size: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+
+    height: 1px;
+
+    flex: 1;
+
+    background: #30373d;
+}
+
+
+
+/* =========================
+   JÁ POSSUI CONTA
+========================= */
+
+.auth-already {
+    margin-top: 20px;
+
+    color: #9ba4ab;
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+/* =========================
+   MENSAGEM
+========================= */
+
+.auth-message {
+    min-height: 20px;
+
+    margin-top: 12px;
+
+    color: #56aaff;
+
+    text-align: center;
+
+    font-size: 13px;
+}
+
+/* =========================
+   PROGRESSO
+========================= */
+
+.auth-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 15px;
+
+    margin-bottom: 45px;
+}
+
+.auth-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 8px;
+
+    color: #737b82;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.auth-step.active {
+    color: var(--blue);
+}
+
+.auth-step-number {
+    width: 46px;
+    height: 46px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #3a4249;
+    border-radius: 50%;
+
+    color: #8f989f;
+
+    font-size: 18px;
+}
+
+.auth-step.active .auth-step-number {
+    border-color: var(--blue);
+
+    color: var(--blue);
+
+    box-shadow:
+        0 0 18px rgba(22, 140, 255, 0.25);
+}
+
+.auth-line {
+    width: 65px;
+    height: 1px;
+
+    margin-top: -20px;
+
+    background: #394148;
+}
+
+/* =========================
+   RESPONSIVIDADE - 900PX
+========================= */
+
+@media (max-width: 900px) {
+    body {
+        padding: 15px;
+    }
+
+    .auth-page {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-visual {
+        min-height: 360px;
+
+        padding: 35px;
+    }
+
+    .auth-form {
+        padding: 45px 30px;
+    }
+}
+
+/* =========================
+   RESPONSIVIDADE - 560PX
+========================= */
+
+@media (max-width: 560px) {
+    .auth-page {
+        border-radius: 16px;
+    }
+
+    .auth-visual {
+        min-height: 330px;
+
+        padding: 30px 24px;
+    }
+
+    .auth-logo {
+        width: 130px;
+
+        margin-bottom: 22px;
+    }
+
+    .auth-visual h1 {
+        font-size: 34px;
+    }
+
+    .auth-form {
+        padding: 35px 20px;
+    }
+
+    .auth-row {
+        grid-template-columns: 1fr;
+
+        gap: 0;
+    }
+
+    .auth-progress {
+        gap: 8px;
+    }
+
+    .auth-line {
+        width: 30px;
+    }
+}

@@ -1,8 +1,448 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<section aria-label="Apresentação" class="hero">
+ <img alt="Ambiente e estilo da Melo Barber Shop" class="hero-bg" src="~/img/banner1.jpg"/>
+ <div class="hero-overlay">
+ </div>
+ <div class="container hero-content">
+  <span class="eyebrow">
+   Melo Barber Shop
+  </span>
+  <h1>
+   Seu estilo começa
+   <span>
+    aqui.
+   </span>
+  </h1>
+  <p>
+   Estilo, atitude e confiança. Do corte ao acabamento, uma experiência pensada para deixar você no seu melhor.
+  </p>
+  <div class="hero-actions">
+   <a class="btn btn-primary" href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20um%20hor%C3%A1rio%20na%20Melo%20Barber%20Shop." rel="noopener" target="_blank">
+    Agendar agora
+    <img src="~/img/icons/calendario.svg" alt="" class="icon-svg">
+   </a>
+   <a class="btn btn-ghost" href="#servicos">
+    Ver serviços
+    <img src="~/img/icons/arrow-down.svg" alt="" class="icon-svg">
+   </a>
+  </div>
+  <div class="hero-trust">
+   <span>
+    <img src="~/img/icons/check-circle.svg" alt="" class="icon-svg">
+    Atendimento de qualidade
+   </span>
+   <span>
+    <img src="~/img/icons/check-circle.svg" alt="" class="icon-svg">
+    Ambiente confortável
+   </span>
+  </div>
+ </div>
+</section>
+<div class="destaques">
+ <div class="container">
+  <div class="destaques-conteudo">
+   <div class="destaques-item">
+    <img src="~/img/icons/relogio.svg" alt="" class="icon-svg">
+    <h6>
+     10h às 21h
+    </h6>
+    <p>
+     horário de atendimento
+    </p>
+   </div>
+   <div class="destaques-item">
+    <img src="~/img/icons/user.png" alt="" class="destaque-icon">
+    <h6>
+     20+
+    </h6>
+    <p>
+     clientes por dia
+    </p>
+   </div>
+   <div class="destaques-item">
+    <img src="~/img/icons/calendario.svg" alt="" class="icon-svg">
+    <h6>
+     2024
+    </h6>
+    <p>
+     ano de fundação
+    </p>
+   </div>
+  </div>
+ </div>
 </div>
+<section class="section about" id="sobre">
+ <div class="container about-grid">
+  <div class="about-gallery">
+   <div class="about-photo">
+    <img alt="Corte masculino na Melo Barber Shop" loading="lazy" src="~/img/corte-cabelo.webp"/>
+   </div>
+   <div class="about-photo">
+    <img alt="Corte masculino na Melo Barber Shop" loading="lazy" src="~/img/corte-cabelo2.webp"/>
+   </div>
+   <div class="about-photo">
+    <img alt="Corte masculino na Melo Barber Shop" loading="lazy" src="~/img/corte-cabelo3.webp"/>
+   </div>
+   <div class="about-photo">
+    <img alt="Corte masculino na Melo Barber Shop" loading="lazy" src="~/img/corte-cabelo4.webp"/>
+   </div>
+  </div>
+  <div class="section-copy about-copy">
+   <span class="eyebrow">
+    Sobre nós
+   </span>
+   <h2>
+    Mais que um corte.
+    <br/>
+    <span>
+     Uma experiência.
+    </span>
+   </h2>
+   <p>
+    Na Melo Barber Shop, técnica e estilo caminham juntos. Cada atendimento é pensado para valorizar seu visual, com atenção aos detalhes e um ambiente confortável.
+   </p>
+   <div class="check-list about-check-list">
+    <span>
+     <img src="~/img/icons/check.svg" alt="" class="icon-svg">
+     Acabamento cuidadoso
+    </span>
+    <span>
+     <img src="~/img/icons/check.svg" alt="" class="icon-svg">
+     Atendimento personalizado
+    </span>
+    <span>
+     <img src="~/img/icons/check.svg" alt="" class="icon-svg">
+     Ambiente climatizado
+    </span>
+   </div>
+   <a class="btn-experiencia" href="#experiencia">
+    Conheça nossa experiência
+    <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
+   </a>
+  </div>
+ </div>
+</section>
+<section class="section experience" id="experiencia">
+ <div class="container experience-grid">
+  <div class="section-copy">
+   <span class="eyebrow">
+    Experiência Melo
+   </span>
+   <h2>
+    Detalhes que fazem
+    <span>
+     a diferença.
+    </span>
+   </h2>
+   <p>
+    Mais do que sair com um corte novo: a ideia é você se sentir bem do começo ao fim do atendimento.
+   </p>
+   <div class="features">
+    <article>
+     <img src="~/img/icons/Brilho.svg" alt="" class="icon-svg">
+     <div>
+      <h3>
+       Tratamento exclusivo
+      </h3>
+      <p>
+       Todo o foco dedicado a você.
+      </p>
+     </div>
+    </article>
+    <article>
+     <img src="~/img/icons/vento.svg" alt="" class="icon-svg">
+     <div>
+      <h3>
+       Ambiente climatizado
+      </h3>
+      <p>
+       Conforto durante todo o atendimento.
+      </p>
+     </div>
+    </article>
+    <article>
+     <img src="~/img/king.png" alt="" class="icon-svg">
+     <div>
+      <h3>
+       Produtos de qualidade
+      </h3>
+      <p>
+       Escolhas pensadas para o seu visual.
+      </p>
+     </div>
+    </article>
+    <article>
+     <img src="~/img/icons/shield-check.svg" alt="" class="icon-svg">
+     <div>
+      <h3>
+       Higiene e segurança
+      </h3>
+      <p>
+       Cuidado em cada etapa.
+      </p>
+     </div>
+    </article>
+   </div>
+  </div>
+  <div class="feature-image">
+   <video id="videoMelo" playsinline="" poster="~/img/corte-plus.webp" preload="metadata">
+    <source src="~/img/video.mp4" type="video/mp4"/>
+    Seu navegador não suporta vídeos.
+   </video>
+   <button aria-label="Reproduzir vídeo" class="video-play" id="playVideo" type="button">
+    <img src="~/img/icons/play.svg" alt="" class="icon-svg">
+   </button>
+  </div>
+ </div>
+</section>
+<section class="section services" id="servicos">
+ <div class="container">
+  <div class="section-heading centered">
+   <span class="eyebrow">
+    Serviços
+   </span>
+   <h2>
+    O que fazemos de
+    <span>
+     melhor.
+    </span>
+   </h2>
+   <p>
+    Escolha o serviço ideal para o seu estilo e fale com a gente para confirmar o horário.
+   </p>
+  </div>
+  <div class="service-grid" id="precos">
+   <article class="service-card featured">
+    <div class="service-icon">
+     <img src="~/img/icons/tesoura.svg" alt="" class="icon-svg">
+    </div>
+    <span class="service-tag">
+     Mais procurado
+    </span>
+    <h3>
+     Corte masculino
+    </h3>
+    <p>
+     Corte personalizado com acabamento impecável.
+    </p>
+    <strong>
+     R$ 50,00
+    </strong>
+    <a href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20quero%20agendar%20um%20Corte%20masculino." rel="noopener" target="_blank">
+     Agendar serviço
+     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
+    </a>
+   </article>
+   <article class="service-card">
+    <div class="service-icon">
+     <img src="~/img/icons/Bigode.svg" alt="" class="icon-svg">
+    </div>
+    <h3>
+     Barba
+    </h3>
+    <p>
+     Alinhamento e acabamento para deixar o visual bem definido.
+    </p>
+    <strong>
+     R$ 50,00
+    </strong>
+    <a href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20quero%20agendar%20o%20servi%C3%A7o%20de%20Barba." rel="noopener" target="_blank">
+     Agendar serviço
+     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
+    </a>
+   </article>
+   <article class="service-card">
+    <div class="service-icon">
+     <img src="~/img/icons/corte_barba.svg" alt="Corte e barba" class="icon-svg">
+    </div>
+    <h3>
+     Corte + Barba
+    </h3>
+    <p>
+     Combo completo para renovar o visual de uma vez.
+    </p>
+    <strong>
+     R$ 90,00
+    </strong>
+    <a href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20quero%20agendar%20Corte%20%2B%20Barba." rel="noopener" target="_blank">
+     Agendar serviço
+     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
+    </a>
+   </article>
+   <article class="service-card">
+    <div class="service-icon">
+     <img src="~/img/icons/sobrancelha.svg" alt="" class="icon-svg">
+    </div>
+    <h3>
+     Sobrancelha
+    </h3>
+    <p>
+     Acabamento discreto para harmonizar o visual.
+    </p>
+    <strong>
+     Consulte
+    </strong>
+    <a href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20o%20valor%20da%20Sobrancelha." rel="noopener" target="_blank">
+     Consultar
+     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
+    </a>
+   </article>
+   <article class="service-card">
+    <div class="service-icon">
+     <img src="~/img/icons/star.svg" alt="" class="icon-svg">
+    </div>
+    <h3>
+     Acabamento
+    </h3>
+    <p>
+     Retoques e detalhes para manter o corte em dia.
+    </p>
+    <strong>
+     Consulte
+    </strong>
+    <a href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20sobre%20o%20servi%C3%A7o%20de%20Acabamento." rel="noopener" target="_blank">
+     Consultar
+     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
+    </a>
+   </article>
+   <article class="service-card">
+    <div class="service-icon">
+     <img src="~/img/icons/mensagem.svg" alt="" class="icon-svg">
+    </div>
+    <h3>
+     Outro serviço
+    </h3>
+    <p>
+     Tem uma ideia diferente? Fale com a equipe.
+    </p>
+    <strong>
+     Consulte
+    </strong>
+    <a href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20gostaria%20de%20consultar%20um%20servi%C3%A7o." rel="noopener" target="_blank">
+     Falar no WhatsApp
+     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
+    </a>
+   </article>
+  </div>
+ </div>
+</section>
+<section class="section gallery" id="galeria">
+ <div class="container">
+  <div class="section-heading">
+   <span class="eyebrow">
+    Galeria
+   </span>
+   <h2>
+    Seu próximo visual
+    <span>
+     começa aqui.
+    </span>
+   </h2>
+   <p>
+    Alguns registros para você conhecer melhor o estilo da Melo Barber Shop.
+   </p>
+  </div>
+  <div class="gallery-carousel" aria-label="Carrossel de fotos da galeria">
+   <button class="gallery-nav gallery-prev" type="button" aria-label="Ver fotos anteriores">‹</button>
+   <div class="gallery-viewport">
+    <div class="gallery-track">
+     <button class="gallery-item" type="button" aria-label="Ampliar foto de corte masculino">
+      <img src="~/img/corte-cabelo.webp" alt="Corte masculino moderno na Melo Barber Shop" loading="lazy" width="900" height="1124">
+     </button>
+     <button class="gallery-item" type="button" aria-label="Ampliar foto de corte masculino 2">
+      <img src="~/img/corte-cabelo4.webp" alt="Corte masculino com acabamento profissional" loading="lazy" width="900" height="1125">
+     </button>
+     <button class="gallery-item" type="button" aria-label="Ampliar foto de corte masculino 3">
+      <img src="~/img/corte-cabelo3.webp" alt="Corte masculino realizado na barbearia" loading="lazy" width="900" height="1200">
+     </button>
+     <button class="gallery-item" type="button" aria-label="Ampliar foto de corte masculino 4">
+      <img src="~/img/corte-cabelo2.webp" alt="Detalhe de corte masculino na Melo Barber Shop" loading="lazy" width="900" height="1200">
+     </button>
+    </div>
+   </div>
+   <button class="gallery-nav gallery-next" type="button" aria-label="Ver próximas fotos">›</button>
+   <div class="gallery-dots" aria-label="Navegação da galeria"></div>
+  </div>
+ </div>
+</section>
+<section class="cta-section">
+ <div class="container cta-box">
+  <div>
+   <span class="eyebrow">
+    Pronto para renovar?
+   </span>
+   <h2>
+    Seu próximo corte está a um clique.
+   </h2>
+   <p>
+    Chame no WhatsApp e confirme disponibilidade e horário.
+   </p>
+  </div>
+  <a class="btn btn-primary" href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20um%20hor%C3%A1rio%20na%20Melo%20Barber%20Shop." rel="noopener" target="_blank">
+   Agendar pelo WhatsApp
+   <img src="~/img/whatsapp.svg" alt="" class="icon-svg">
+  </a>
+ </div>
+</section>
+<section class="section location" id="contato">
+ <div class="container location-grid">
+  <div class="section-copy">
+   <span class="eyebrow">
+    Contato
+   </span>
+   <h2>
+    Onde nos
+    <span>
+     encontrar.
+    </span>
+   </h2>
+   <p>
+    Estamos prontos para receber você. Confira endereço, horário e canais de contato.
+   </p>
+   <div class="contact-list">
+    <a href="https://www.google.com/maps/search/?api=1&amp;query=R.%20Vicente%20Cust%C3%B3dio%20da%20Silva%2C%20713%20-%20Jardim%20Freire%2C%20Ferraz%20de%20Vasconcelos%20-%20SP" rel="noopener" target="_blank">
+     <img src="~/img/icons/icon.svg.svg" alt="" class="icon-svg">
+     <span>
+      <b>
+       Endereço
+      </b>
+      R. Vicente Custódio da Silva, 713
+      <br/>
+      Jardim Freire — Ferraz de Vasconcelos/SP
+     </span>
+    </a>
+    <a href="tel:+5511966470949">
+     <img src="~/img/call.png" alt="" class="icon-svg">
+     <span>
+      <b>
+       Telefone &amp; WhatsApp
+      </b>
+      (11) 96647-0949
+     </span>
+    </a>
+    <div>
+     <img src="~/img/icons/relogio.svg" alt="" class="icon-svg">
+     <span>
+      <b>
+       Horário
+      </b>
+      Segunda a sexta: 10h às 21h
+      <br/>
+      Sábado: 10h às 18h
+     </span>
+    </div>
+   </div>
+   <a class="btn btn-primary contact-btn" href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20um%20hor%C3%A1rio." rel="noopener" target="_blank">
+    Falar no WhatsApp
+    <img src="~/img/whatsapp.svg" alt="" class="icon-svg">
+   </a>
+  </div>
+  <div class="map-wrap">
+   <iframe allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3658.391096913053!2d-46.37476212400025!3d-23.518431878829336!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce64c602e7a641%3A0xc12965d367cf7914!2sR.%20Vicente%20Cust%C3%B3dio%20da%20Silva%2C%20713%20-%20Jardim%20Freire%2C%20Ferraz%20de%20Vasconcelos%20-%20SP%2C%2008543-050!5e0!3m2!1spt-BR!2sbr!4v1782167363780!5m2!1spt-BR!2sbr" title="Mapa da Melo Barber Shop">
+   </iframe>
+  </div>
+ </div>
+</section>

@@ -1,50 +1,110 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Melobarbershop.UI</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Melobarbershop.UI.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - Melo Barber Shop</title>
+    <meta content="Melo Barber Shop — cortes, barba e acabamento com estilo, conforto e atendimento de qualidade." name="description" />
+    <meta content="#08090b" name="theme-color" />
+    
+    <link href="~/img/logo.png" rel="icon" type="image/png" />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&family=Sedgwick+Ave&display=swap" rel="stylesheet" />
+    
+    <link href="~/css/style.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/media.css" rel="stylesheet" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Melobarbershop.UI</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+    <header class="header" id="inicio">
+        <div class="container topo">
+            <a aria-label="Melo Barber Shop - início" class="brand" href="/">
+                <img alt="Melo Barber Shop" class="logo" src="~/img/logo.png" />
+            </a>
+            <nav aria-label="Navegação principal" id="navegacao">
+                <button aria-controls="menu" aria-expanded="false" aria-label="Abrir menu" id="btn-mobile" type="button">
+                    <span class="menu-hamburger"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+                <ul class="menu" id="menu">
+                    <li><a href="/#sobre">Sobre</a></li>
+                    <li><a href="/#servicos">Serviços</a></li>
+                    <li><a href="/#precos">Preços</a></li>
+                    <li><a href="/#galeria">Galeria</a></li>
+                    <li><a href="/#contato">Contato</a></li>
+                </ul>
+            </nav>
+            <a class="header-cta" href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20um%20hor%C3%A1rio%20na%20Melo%20Barber%20Shop." rel="noopener" target="_blank">
+                Agendar
+                <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
+            </a>
+            <a href="/Login" class="login-icon" aria-label="Entrar">
+                <img src="~/img/icons/user.png" alt="" class="">
+            </a>
+        </div>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer class="footer" id="contato">
+        <div class="container footer-grid">
+            <div class="brand-footer">
+                <img alt="Melo Barber Shop" src="~/img/logo.png" />
+                <p>Estilo e confiança, do corte ao acabamento.</p>
+            </div>
+            <div>
+                <h3>Navegação</h3>
+                <ul>
+                    <li><a href="/#inicio">Início</a></li>
+                    <li><a href="/#sobre">Sobre</a></li>
+                    <li><a href="/#servicos">Serviços</a></li>
+                    <li><a href="/#galeria">Galeria</a></li>
+                    <li><a href="/#contato">Contato</a></li>
+                    <li><a href="/Login">Entrar</a></li>
+                    <li><a href="/Cadastro">Criar conta</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Contato</h3>
+                <ul>
+                    <li><a href="tel:+5511966470949">(11) 96647-0949</a></li>
+                    <li>R. Vicente Custódio da Silva, 713</li>
+                    <li>Jardim Freire — Ferraz de Vasconcelos/SP</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Siga e fale</h3>
+                <div class="socials">
+                    <a aria-label="WhatsApp" class="social whatsapp" href="https://wa.me/5511966470949" rel="noopener" target="_blank">
+                        <img alt="WhatsApp" src="~/img/whatsapp.svg" />
+                    </a>
+                    <a aria-label="Instagram" class="social" href="https://www.instagram.com/">
+                        <img alt="Instagram" src="~/img/instagram.svg" />
+                    </a>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Melobarbershop.UI - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+        <div class="copy">
+            <p>&copy; 2026 Melo Barber Shop. Todos os direitos reservados.</p>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <div aria-hidden="true" class="lightbox" id="lightbox">
+        <button aria-label="Fechar imagem" class="lightbox-close" type="button">&times;</button>
+        <button aria-label="Foto anterior" class="lightbox-nav lightbox-prev" type="button">‹</button>
+        <div class="lightbox-frame">
+            <img alt="" id="lightbox-image" src="" />
+        </div>
+        <button aria-label="Próxima foto" class="lightbox-nav lightbox-next" type="button">›</button>
+    </div>
+
+    <a aria-label="Agendar pelo WhatsApp" class="floating-whatsapp" href="https://wa.me/5511966470949?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20um%20hor%C3%A1rio." rel="noopener" target="_blank">
+        <img alt="" src="~/img/whatsapp.svg" />
+    </a>
+
+    <script src="~/js/script.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
