@@ -1,0 +1,235 @@
+/* Configurações Globais da Tela de Autenticação */
+.auth-body {
+    background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
+                url('../img/banner1.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 420px;
+}
+
+.auth-card {
+    background-color: #181818;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    padding: 40px 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.auth-header h2 {
+    color: #1956a5; 
+    font-size: 28px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.auth-header p {
+    color: #aaaaaa;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Formulário e Campos */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-group label {
+    color: #dddddd;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.input-group input {
+    background-color: #262626;
+    border: 1px solid #444444;
+    border-radius: 4px;
+    padding: 12px 14px;
+    color: #ffffff;
+    font-size: 14px;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #1956a5;
+    background-color: #2d2d2d;
+}
+
+.input-group input::placeholder {
+    color: #777777;
+}
+
+/* Opções adicionais (Lembrar-me / Esqueceu a senha) */
+.auth-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #cccccc;
+    cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+    accent-color: #1956a5;
+}
+
+.forgot-password {
+    color: #1956a5;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+    color: #1956a5;
+}
+
+/* Botão de Ação */
+.btn-auth {
+    background-color: #1956a5;
+    color: #121212;
+    border: none;
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    margin-top: 10px;
+}
+
+.btn-auth:hover {
+    background-color: #1956a5;
+}
+
+.btn-auth:active {
+    transform: scale(0.98);
+}
+
+/* Rodapé do Card */
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #2a2a2a;
+}
+
+.auth-footer p {
+    color: #888888;
+    font-size: 14px;
+    margin: 0;
+}
+
+.auth-footer a {
+    color: #1956a5;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+.auth-body {
+    background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.88)), url('../img/banner1.jpg') center/cover fixed;
+}
+
+.auth-container {
+    max-width: 460px;
+}
+
+.auth-home {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: #35a1ff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.auth-card {
+    border-radius: 18px;
+    border-color: rgba(53, 161, 255, 0.22);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, .55), 0 0 35px rgba(53, 161, 255, .08);
+}
+
+.auth-header h2,
+.btn-auth,
+.forgot-password,
+.auth-footer a {
+    color: #35a1ff;
+}
+
+.btn-auth {
+    background: #087cff;
+    color: #fff;
+    border-radius: 10px;
+}
+
+.btn-auth:hover {
+    background: #35a1ff;
+}
+
+.input-group input {
+    border-radius: 10px;
+}
+
+.auth-message {
+    min-height: 20px;
+    margin-top: -8px;
+    text-align: center;
+    color: #35a1ff;
+    font-size: 12px;
+}
+
+.auth-brand {
+    display: inline-block;
+    color: #35a1ff;
+    font-family: Oswald, sans-serif;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+
+/* Modern Login Theme */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cabinet+Grotesk:wght@700;800;900&display=swap');
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #060709;
+}
+.font-brand { font-family: 'Cabinet Grotesk', 'Plus Jakarta Sans', sans-serif; }
+.glass-panel-login {
+  background: rgba(17, 19, 27, 0.7);
+  backdrop-filter: blur(16px);
+}

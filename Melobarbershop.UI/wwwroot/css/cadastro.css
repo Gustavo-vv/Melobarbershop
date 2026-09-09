@@ -1,0 +1,926 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --blue: #0795ff;
+    --blue2: #087cff;
+    --bg: #030506;
+    --panel: #080b0d;
+    --input: #07090b;
+    --border: #30373d;
+    --muted: #9aa3ab;
+    --white: #f7f9fb;
+}
+
+html {
+    min-height: 100%;
+    background: var(--bg);
+}
+
+body.register-body {
+    min-height: 100vh;
+    padding: 40px;
+    background:
+        radial-gradient(
+            circle at 74% 45%,
+            rgba(0, 145, 255, 0.10),
+            transparent 30%
+        ),
+        #030506;
+    color: var(--white);
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.register-page {
+    width: min(1330px, 100%);
+    min-height: calc(100vh - 80px);
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: 40% 60%;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(7, 149, 255, 0.65);
+    border-radius: 24px;
+
+    background: var(--panel);
+
+    box-shadow:
+        0 0 45px rgba(0, 126, 255, 0.13),
+        inset 0 0 40px rgba(255, 255, 255, 0.015);
+}
+
+/* =========================
+   LADO VISUAL
+========================= */
+
+.register-visual {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 60px 54px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.20),
+            rgba(0, 0, 0, 0.86)
+        ),
+        url("../img/banner1.jpg") center / cover no-repeat;
+}
+
+.register-visual::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.05) 10%,
+            rgba(0, 0, 0, 0.78) 100%
+        );
+
+    pointer-events: none;
+}
+
+.register-back {
+    position: absolute;
+    top: 48px;
+    left: 42px;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: #fff;
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.register-back svg {
+    width: 23px;
+    height: 23px;
+
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.register-back:hover {
+    color: var(--blue);
+}
+
+.register-visual-content {
+    position: relative;
+    z-index: 1;
+
+    width: 100%;
+    max-width: 430px;
+
+    margin-top: 72px;
+
+    text-align: center;
+}
+
+.register-logo {
+    display: block;
+
+    width: 180px;
+    height: auto;
+
+    margin: 0 auto 28px;
+
+    object-fit: contain;
+
+    filter: drop-shadow(
+        0 10px 16px rgba(0, 0, 0, 0.35)
+    );
+}
+
+.register-eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    margin-bottom: 15px;
+
+    color: var(--blue);
+
+    font-size: 13px;
+    font-weight: 900;
+
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.register-eyebrow svg {
+    width: 22px;
+    height: 22px;
+
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 1.7;
+    stroke-linecap: round;
+}
+
+.register-visual h1 {
+    margin-bottom: 18px;
+
+    font-family:
+        "Arial Narrow",
+        Impact,
+        "Segoe UI",
+        sans-serif;
+
+    font-size: clamp(46px, 4.3vw, 62px);
+    font-weight: 900;
+
+    line-height: 0.94;
+    letter-spacing: -1px;
+
+    text-transform: uppercase;
+}
+
+.register-visual h1 span {
+    color: var(--blue);
+}
+
+.register-accent {
+    width: 64px;
+    height: 4px;
+
+    margin: 0 auto 22px;
+
+    border-radius: 99px;
+
+    background: var(--blue);
+
+    box-shadow:
+        0 0 12px rgba(7, 149, 255, 0.45);
+}
+
+.register-visual p {
+    max-width: 430px;
+
+    margin: 0 auto;
+
+    color: #c4cbd1;
+
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+/* =========================
+   LADO DO FORMULÁRIO
+========================= */
+
+.register-form-side {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 44px 50px 34px;
+}
+
+/* =========================
+   PROGRESSO
+========================= */
+
+.register-progress {
+    width: 100%;
+    max-width: 570px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 15px;
+
+    margin: 0 auto 48px;
+}
+
+.register-step {
+    min-width: 80px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 9px;
+
+    color: #747d85;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.6px;
+
+    white-space: nowrap;
+}
+
+.register-step.active {
+    color: var(--blue);
+}
+
+.register-step-number {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #3d454c;
+    border-radius: 50%;
+
+    color: #9099a1;
+
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.register-step.active .register-step-number {
+    border: 1.5px solid var(--blue);
+
+    color: var(--blue);
+
+    box-shadow:
+        0 0 18px rgba(7, 149, 255, 0.20);
+}
+
+.register-line {
+    width: 64px;
+    height: 1px;
+
+    margin-top: -23px;
+
+    background: #3b4349;
+}
+
+.register-line.active {
+    background:
+        linear-gradient(
+            90deg,
+            var(--blue),
+            #234f72
+        );
+}
+
+/* =========================
+   FORMULÁRIO
+========================= */
+
+#registerForm {
+    width: 100%;
+    max-width: 720px;
+
+    margin: 0 auto;
+}
+
+.register-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 20px;
+}
+
+.register-field {
+    margin-bottom: 20px;
+}
+
+.register-field label {
+    display: block;
+
+    margin-bottom: 9px;
+
+    color: #e8ecef;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+}
+
+.register-input {
+    position: relative;
+}
+
+.register-input > svg {
+    position: absolute;
+    left: 17px;
+    top: 50%;
+
+    width: 20px;
+    height: 20px;
+
+    transform: translateY(-50%);
+
+    fill: none;
+    stroke: #dce3e8;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    opacity: 0.82;
+
+    pointer-events: none;
+}
+
+.register-input input {
+    width: 100%;
+    height: 60px;
+
+    padding: 0 50px;
+
+    border: 1px solid #30383e;
+    border-radius: 8px;
+
+    outline: none;
+
+    background: rgba(6, 8, 10, 0.86);
+
+    color: #fff;
+
+    font-size: 15px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.register-input input::placeholder {
+    color: #7a838b;
+}
+
+.register-input input:focus {
+    border-color: var(--blue);
+
+    background: #080b0e;
+
+    box-shadow:
+        0 0 0 3px rgba(7, 149, 255, 0.10);
+}
+
+.register-input input[type="date"] {
+    color: #aeb7bf;
+}
+
+/* =========================
+   BOTÃO MOSTRAR SENHA
+========================= */
+
+.register-eye {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+
+    width: 28px;
+    height: 28px;
+
+    display: grid;
+    place-items: center;
+
+    transform: translateY(-50%);
+
+    border: 0;
+
+    background: transparent;
+
+    color: #cdd5db;
+
+    cursor: pointer;
+}
+
+.register-eye svg {
+    width: 22px;
+    height: 22px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.register-eye:hover {
+    color: #fff;
+}
+
+/* =========================
+   TERMOS
+========================= */
+
+.register-terms {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 10px;
+
+    margin: 0 0 25px;
+
+    color: #aeb7be;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    cursor: pointer;
+}
+
+.register-terms input {
+    width: 19px;
+    height: 19px;
+
+    flex: 0 0 19px;
+
+    margin-top: 1px;
+
+    accent-color: var(--blue);
+
+    cursor: pointer;
+}
+
+.register-terms a {
+    color: var(--blue);
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+.register-terms a:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   BOTÃO CADASTRAR
+========================= */
+
+.register-submit {
+    width: 100%;
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    border: 0;
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #0795ff,
+            #086cff
+        );
+
+    color: #fff;
+
+    cursor: pointer;
+
+    font-size: 15px;
+    font-weight: 900;
+
+    letter-spacing: 0.5px;
+
+    text-transform: uppercase;
+
+    box-shadow:
+        0 8px 22px rgba(0, 110, 255, 0.10);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+.register-submit svg {
+    width: 22px;
+    height: 22px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.register-submit:hover {
+    transform: translateY(-2px);
+
+    filter: brightness(1.05);
+
+    box-shadow:
+        0 10px 28px rgba(0, 110, 255, 0.28);
+}
+
+/* =========================
+   DIVISOR
+========================= */
+
+.register-divider {
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    margin: 22px 0;
+
+    color: #8b949b;
+
+    font-size: 13px;
+
+    text-transform: lowercase;
+}
+
+.register-divider::before,
+.register-divider::after {
+    content: "";
+
+    height: 1px;
+
+    flex: 1;
+
+    background: #343c42;
+}
+
+/* =========================
+   GOOGLE
+========================= */
+
+.register-google {
+    width: 100%;
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    border: 1px solid #667078;
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #f4f6f8;
+
+    cursor: pointer;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.register-google:hover {
+    border-color: #aab3ba;
+
+    background: rgba(255, 255, 255, 0.025);
+}
+
+/* =========================
+   JÁ POSSUI CONTA
+========================= */
+
+.register-already {
+    margin-top: 21px;
+
+    color: #a5adb4;
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+.register-already a {
+    margin-left: 4px;
+
+    color: var(--blue);
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+.register-already a:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   MENSAGEM
+========================= */
+
+.register-message {
+    min-height: 19px;
+
+    margin-top: 10px;
+
+    color: #56b2ff;
+
+    text-align: center;
+
+    font-size: 12px;
+}
+
+.register-message.error {
+    color: #ff6b6b;
+}
+
+/* =========================
+   ACESSIBILIDADE
+========================= */
+
+.sr-only {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    padding: 0;
+    margin: -1px;
+
+    overflow: hidden;
+
+    clip: rect(0, 0, 0, 0);
+
+    white-space: nowrap;
+
+    border: 0;
+}
+
+/* =========================
+   RESPONSIVIDADE 1100px
+========================= */
+
+@media (max-width: 1100px) {
+    body.register-body {
+        padding: 24px;
+    }
+
+    .register-page {
+        min-height: calc(100vh - 48px);
+    }
+
+    .register-form-side {
+        padding: 40px 32px;
+    }
+
+    .register-visual {
+        padding-left: 35px;
+        padding-right: 35px;
+    }
+
+    .register-row {
+        gap: 14px;
+    }
+}
+
+/* =========================
+   RESPONSIVIDADE 900px
+========================= */
+
+@media (max-width: 900px) {
+    body.register-body {
+        padding: 15px;
+    }
+
+    .register-page {
+        grid-template-columns: 1fr;
+
+        min-height: auto;
+    }
+
+    .register-visual {
+        min-height: 470px;
+
+        padding: 90px 28px 55px;
+    }
+
+    .register-visual-content {
+        margin-top: 25px;
+    }
+
+    .register-back {
+        top: 28px;
+        left: 28px;
+    }
+
+    .register-form-side {
+        padding: 42px 30px 34px;
+    }
+
+    .register-progress {
+        margin-bottom: 38px;
+    }
+}
+
+/* =========================
+   RESPONSIVIDADE 560px
+========================= */
+
+@media (max-width: 560px) {
+    .register-page {
+        border-radius: 16px;
+    }
+
+    .register-visual {
+        min-height: 400px;
+    }
+
+    .register-logo {
+        width: 140px;
+
+        margin-bottom: 22px;
+    }
+
+    .register-visual h1 {
+        font-size: 40px;
+    }
+
+    .register-eyebrow {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+
+    .register-visual p {
+        font-size: 14px;
+    }
+
+    .register-form-side {
+        padding: 35px 20px 30px;
+    }
+
+    .register-row {
+        grid-template-columns: 1fr;
+
+        gap: 0;
+    }
+
+    .register-field {
+        margin-bottom: 17px;
+    }
+
+    .register-progress {
+        gap: 4px;
+    }
+
+    .register-step {
+        min-width: 64px;
+
+        font-size: 9px;
+    }
+
+    .register-step-number {
+        width: 42px;
+        height: 42px;
+
+        font-size: 17px;
+    }
+
+    .register-line {
+        width: 28px;
+    }
+
+    .register-input input,
+    .register-submit,
+    .register-google {
+        height: 56px;
+    }
+
+    .register-terms {
+        font-size: 12px;
+    }
+}
+
+/* =========================
+   PÁGINA DE POLÍTICAS
+========================= */
+
+.policy-page {
+    position: relative;
+
+    width: min(900px, 100%);
+
+    margin: auto;
+
+    padding: 90px 60px 60px;
+
+    border: 1px solid rgba(7, 149, 255, 0.5);
+    border-radius: 20px;
+
+    background: #080b0d;
+
+    box-shadow:
+        0 0 45px rgba(0, 126, 255, 0.10);
+}
+
+.policy-page .register-back {
+    top: 30px;
+    left: 30px;
+}
+
+.policy-page h1 {
+    margin-bottom: 28px;
+
+    font-family:
+        "Arial Narrow",
+        Impact,
+        sans-serif;
+
+    font-size: 46px;
+
+    text-transform: uppercase;
+}
+
+.policy-page h1,
+.policy-page h2 {
+    color: #fff;
+}
+
+.policy-page h2 {
+    margin: 28px 0 10px;
+
+    font-size: 20px;
+}
+
+.policy-page p {
+    color: #b8c0c7;
+
+    font-size: 15px;
+
+}
+
+/* Modern Cadastro Theme */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cabinet+Grotesk:wght@700;800;900&display=swap');
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #060709;
+}
+.font-brand { font-family: 'Cabinet Grotesk', 'Plus Jakarta Sans', sans-serif; }
+.glass-panel-login {
+  background: rgba(17, 19, 27, 0.7);
+  backdrop-filter: blur(16px);
+}
