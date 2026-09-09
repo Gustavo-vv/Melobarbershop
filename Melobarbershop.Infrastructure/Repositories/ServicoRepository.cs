@@ -20,6 +20,13 @@ public class ServicoRepository : IServicoRepository
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
+    public async Task<IEnumerable<Servico>> ObterPorIdsAsync(IEnumerable<int> ids)
+    {
+        return await _context.Servicos
+            .Where(s => ids.Contains(s.Id))
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Servico>> ObterTodosAsync()
     {
         return await _context.Servicos
@@ -31,6 +38,14 @@ public class ServicoRepository : IServicoRepository
     {
         return await _context.Servicos
             .Where(s => s.Ativo)
+            .OrderBy(s => s.Nome)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Servico>> ObterExibidosNoSiteAsync()
+    {
+        return await _context.Servicos
+            .Where(s => s.Ativo && s.ExibirNoSite)
             .OrderBy(s => s.Nome)
             .ToListAsync();
     }

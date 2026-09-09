@@ -14,54 +14,54 @@ public class PacoteRepository : IPacoteRepository
         _context = context;
     }
 
-    public async Task<Pacote?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Pacote?> ObterPorIdAsync(int id)
     {
         return await _context.Pacotes
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<Pacote?> ObterPorIdComItensAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Pacote?> ObterPorIdComItensAsync(int id)
     {
         return await _context.Pacotes
             .Include(p => p.Itens)
                 .ThenInclude(i => i.Servico)
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<IEnumerable<Pacote>> ObterTodosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Pacote>> ObterTodosAsync()
     {
         return await _context.Pacotes
             .Include(p => p.Itens)
                 .ThenInclude(i => i.Servico)
             .OrderBy(p => p.Nome)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Pacote>> ObterAtivosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Pacote>> ObterAtivosAsync()
     {
         return await _context.Pacotes
             .Include(p => p.Itens)
                 .ThenInclude(i => i.Servico)
             .Where(p => p.Ativo)
             .OrderBy(p => p.Nome)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task AdicionarAsync(Pacote pacote, CancellationToken cancellationToken = default)
+    public async Task AdicionarAsync(Pacote pacote)
     {
-        await _context.Pacotes.AddAsync(pacote, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.Pacotes.AddAsync(pacote);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task AtualizarAsync(Pacote pacote, CancellationToken cancellationToken = default)
+    public async Task AtualizarAsync(Pacote pacote)
     {
         _context.Pacotes.Update(pacote);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task RemoverAsync(Pacote pacote, CancellationToken cancellationToken = default)
+    public async Task RemoverAsync(Pacote pacote)
     {
         _context.Pacotes.Remove(pacote);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync();
     }
 }

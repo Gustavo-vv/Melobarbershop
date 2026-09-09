@@ -28,11 +28,11 @@ public class VendaService : IVendaService
         _mapper = mapper;
     }
 
-    public async Task<VendaDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<VendaDto?> ObterPorIdAsync(int id)
     {
         try
         {
-            var venda = await _vendaRepository.ObterPorIdCompletoAsync(id, cancellationToken);
+            var venda = await _vendaRepository.ObterPorIdCompletoAsync(id);
             return venda == null ? null : _mapper.Map<VendaDto>(venda);
         }
         catch (Exception ex)
@@ -41,11 +41,11 @@ public class VendaService : IVendaService
         }
     }
 
-    public async Task<IEnumerable<VendaDto>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<VendaDto>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim)
     {
         try
         {
-            var vendas = await _vendaRepository.ObterPorPeriodoAsync(inicio, fim, cancellationToken);
+            var vendas = await _vendaRepository.ObterPorPeriodoAsync(inicio, fim);
             return _mapper.Map<IEnumerable<VendaDto>>(vendas);
         }
         catch (Exception ex)
@@ -54,11 +54,11 @@ public class VendaService : IVendaService
         }
     }
 
-    public async Task<IEnumerable<VendaDto>> ListarPorClienteAsync(string clienteId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<VendaDto>> ListarPorClienteAsync(string clienteId)
     {
         try
         {
-            var vendas = await _vendaRepository.ObterPorClienteAsync(clienteId, cancellationToken);
+            var vendas = await _vendaRepository.ObterPorClienteAsync(clienteId);
             return _mapper.Map<IEnumerable<VendaDto>>(vendas);
         }
         catch (Exception ex)
@@ -67,7 +67,7 @@ public class VendaService : IVendaService
         }
     }
 
-    public async Task<VendaDto> IniciarVendaAsync(IniciarVendaDto dto, CancellationToken cancellationToken = default)
+    public async Task<VendaDto> IniciarVendaAsync(IniciarVendaDto dto)
     {
         try
         {
@@ -80,9 +80,9 @@ public class VendaService : IVendaService
 
             if (dto.AgendamentoId.HasValue)
             {
-                var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(dto.AgendamentoId.Value, cancellationToken);
+                var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(dto.AgendamentoId);
                 if (agendamento == null)
-                    throw new KeyNotFoundException($"Agendamento com ID {dto.AgendamentoId.Value} nao encontrado.");
+                    throw new KeyNotFoundException($"Agendamento com ID {dto.AgendamentoId} nao encontrado.");
 
                 venda.ClienteId ??= agendamento.ClienteId;
 
@@ -99,8 +99,8 @@ public class VendaService : IVendaService
             }
 
             RecalcularTotais(venda);
-            await _vendaRepository.AdicionarAsync(venda, cancellationToken);
-            return (await ObterPorIdAsync(venda.Id, cancellationToken))!;
+            await _vendaRepository.AdicionarAsync(venda);
+            return (await ObterPorIdAsync(venda.Id))!;
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
@@ -109,11 +109,11 @@ public class VendaService : IVendaService
         }
     }
 
-    public async Task<VendaDto> AdicionarItemServicoAsync(int vendaId, AdicionarItemServicoDto dto, CancellationToken cancellationToken = default)
+    public async Task<VendaDto> AdicionarItemServicoAsync(int vendaId, AdicionarItemServicoDto dto)
     {
         try
         {
-            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId, cancellationToken);
+            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId);
             if (venda == null)
                 throw new KeyNotFoundException($"Venda com ID {vendaId} nao encontrada.");
 
@@ -136,8 +136,8 @@ public class VendaService : IVendaService
             });
 
             RecalcularTotais(venda);
-            await _vendaRepository.AtualizarAsync(venda, cancellationToken);
-            return (await ObterPorIdAsync(venda.Id, cancellationToken))!;
+            await _vendaRepository.AtualizarAsync(venda);
+            return (await ObterPorIdAsync(venda.Id))!;
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }
@@ -147,18 +147,18 @@ public class VendaService : IVendaService
         }
     }
 
-    public async Task<VendaDto> AdicionarItemProdutoAsync(int vendaId, AdicionarItemProdutoDto dto, CancellationToken cancellationToken = default)
+    public async Task<VendaDto> AdicionarItemProdutoAsync(int vendaId, AdicionarItemProdutoDto dto)
     {
         if (dto.Quantidade <= 0)
             throw new ArgumentException("A quantidade deve ser maior que zero.", nameof(dto.Quantidade));
 
         try
         {
-            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId, cancellationToken);
+            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId);
             if (venda == null)
                 throw new KeyNotFoundException($"Venda com ID {vendaId} nao encontrada.");
 
-            var produto = await _produtoRepository.ObterPorIdAsync(dto.ProdutoId, cancellationToken);
+            var produto = await _produtoRepository.ObterPorIdAsync(dto.ProdutoId);
             if (produto == null)
                 throw new KeyNotFoundException($"Produto com ID {dto.ProdutoId} nao encontrado.");
 
@@ -188,8 +188,8 @@ public class VendaService : IVendaService
                 });
 
             RecalcularTotais(venda);
-            await _vendaRepository.AtualizarAsync(venda, cancellationToken);
-            return (await ObterPorIdAsync(venda.Id, cancellationToken))!;
+            await _vendaRepository.AtualizarAsync(venda);
+            return (await ObterPorIdAsync(venda.Id))!;
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }
@@ -199,11 +199,11 @@ public class VendaService : IVendaService
         }
     }
 
-    public async Task<VendaDto> RemoverItemAsync(int vendaId, int vendaItemId, CancellationToken cancellationToken = default)
+    public async Task<VendaDto> RemoverItemAsync(int vendaId, int vendaItemId)
     {
         try
         {
-            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId, cancellationToken);
+            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId);
             if (venda == null)
                 throw new KeyNotFoundException($"Venda com ID {vendaId} nao encontrada.");
 
@@ -213,8 +213,8 @@ public class VendaService : IVendaService
 
             venda.Itens.Remove(item);
             RecalcularTotais(venda);
-            await _vendaRepository.AtualizarAsync(venda, cancellationToken);
-            return (await ObterPorIdAsync(venda.Id, cancellationToken))!;
+            await _vendaRepository.AtualizarAsync(venda);
+            return (await ObterPorIdAsync(venda.Id))!;
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
@@ -223,21 +223,21 @@ public class VendaService : IVendaService
         }
     }
 
-    public async Task<VendaDto> AplicarDescontoAsync(int vendaId, decimal valorDesconto, CancellationToken cancellationToken = default)
+    public async Task<VendaDto> AplicarDescontoAsync(int vendaId, decimal valorDesconto)
     {
         if (valorDesconto < 0)
             throw new ArgumentException("O valor do desconto nao pode ser negativo.", nameof(valorDesconto));
 
         try
         {
-            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId, cancellationToken);
+            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId);
             if (venda == null)
                 throw new KeyNotFoundException($"Venda com ID {vendaId} nao encontrada.");
 
             venda.ValorDesconto = valorDesconto;
             RecalcularTotais(venda);
-            await _vendaRepository.AtualizarAsync(venda, cancellationToken);
-            return (await ObterPorIdAsync(venda.Id, cancellationToken))!;
+            await _vendaRepository.AtualizarAsync(venda);
+            return (await ObterPorIdAsync(venda.Id))!;
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
@@ -246,11 +246,11 @@ public class VendaService : IVendaService
         }
     }
 
-    public async Task<VendaDto> FinalizarVendaAsync(int vendaId, CancellationToken cancellationToken = default)
+    public async Task<VendaDto> FinalizarVendaAsync(int vendaId)
     {
         try
         {
-            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId, cancellationToken);
+            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId);
             if (venda == null)
                 throw new KeyNotFoundException($"Venda com ID {vendaId} nao encontrada.");
 
@@ -263,7 +263,7 @@ public class VendaService : IVendaService
 
             foreach (var item in venda.Itens.Where(i => i.ProdutoId.HasValue).ToList())
             {
-                var produto = await _produtoRepository.ObterPorIdAsync(item.ProdutoId!.Value, cancellationToken);
+                var produto = await _produtoRepository.ObterPorIdAsync(item.ProdutoId!.Value);
                 if (produto != null)
                 {
                     produto.EstoqueAtual -= item.Quantidade;
@@ -275,16 +275,16 @@ public class VendaService : IVendaService
                         Observacao = $"Saida por venda No {venda.Id}",
                         DataHora = DateTime.UtcNow
                     };
-                    await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacao, cancellationToken);
-                    await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+                    await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacao);
+                    await _produtoRepository.AtualizarAsync(produto);
                 }
             }
 
             if (venda.AgendamentoId.HasValue)
-                await _agendamentoRepository.AtualizarStatusAsync(venda.AgendamentoId.Value, Domain.Enums.StatusAgendamento.Concluido, cancellationToken);
+                await _agendamentoRepository.AtualizarStatusAsync(venda.AgendamentoId.Value, Domain.Enums.StatusAgendamento.Concluido);
 
-            await _vendaRepository.AtualizarAsync(venda, cancellationToken);
-            return (await ObterPorIdAsync(venda.Id, cancellationToken))!;
+            await _vendaRepository.AtualizarAsync(venda);
+            return (await ObterPorIdAsync(venda.Id))!;
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }
@@ -294,11 +294,11 @@ public class VendaService : IVendaService
         }
     }
 
-    public async Task CancelarVendaAsync(int vendaId, string motivo, CancellationToken cancellationToken = default)
+    public async Task CancelarVendaAsync(int vendaId, string motivo)
     {
         try
         {
-            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId, cancellationToken);
+            var venda = await _vendaRepository.ObterPorIdCompletoAsync(vendaId);
             if (venda == null)
                 throw new KeyNotFoundException($"Venda com ID {vendaId} nao encontrada.");
 
@@ -310,7 +310,7 @@ public class VendaService : IVendaService
 
             venda.Itens.Clear();
             RecalcularTotais(venda);
-            await _vendaRepository.AtualizarAsync(venda, cancellationToken);
+            await _vendaRepository.AtualizarAsync(venda);
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }

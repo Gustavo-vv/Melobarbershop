@@ -15,42 +15,42 @@ public class TemplateMensagemRepository : ITemplateMensagemRepository
         _context = context;
     }
 
-    public async Task<TemplateMensagem?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<TemplateMensagem?> ObterPorIdAsync(int id)
     {
         return await _context.TemplatesMensagem
-            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(t => t.Id == id);
     }
 
-    public async Task<TemplateMensagem?> ObterPorGatilhoAsync(TipoGatilhoMensagem gatilho, CancellationToken cancellationToken = default)
+    public async Task<TemplateMensagem?> ObterPorGatilhoAsync(TipoGatilhoMensagem gatilho)
     {
         return await _context.TemplatesMensagem
-            .FirstOrDefaultAsync(t => t.Gatilho == gatilho && t.Ativo, cancellationToken);
+            .FirstOrDefaultAsync(t => t.Gatilho == gatilho && t.Ativo);
     }
 
-    public async Task<IEnumerable<TemplateMensagem>> ObterTodosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<TemplateMensagem>> ObterTodosAsync()
     {
         return await _context.TemplatesMensagem
             .OrderBy(t => t.Nome)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<TemplateMensagem>> ObterAtivosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<TemplateMensagem>> ObterAtivosAsync()
     {
         return await _context.TemplatesMensagem
             .Where(t => t.Ativo)
             .OrderBy(t => t.Nome)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task AdicionarAsync(TemplateMensagem template, CancellationToken cancellationToken = default)
+    public async Task AdicionarAsync(TemplateMensagem template)
     {
-        await _context.TemplatesMensagem.AddAsync(template, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.TemplatesMensagem.AddAsync(template);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task AtualizarAsync(TemplateMensagem template, CancellationToken cancellationToken = default)
+    public async Task AtualizarAsync(TemplateMensagem template)
     {
         _context.TemplatesMensagem.Update(template);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync();
     }
 }

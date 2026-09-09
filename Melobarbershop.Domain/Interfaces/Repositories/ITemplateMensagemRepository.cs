@@ -5,10 +5,10 @@ namespace Melobarbershop.Domain.Interfaces.Repositories;
 
 public interface ITemplateMensagemRepository
 {
-    Task<TemplateMensagem?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default);
-    Task<TemplateMensagem?> ObterPorGatilhoAsync(TipoGatilhoMensagem gatilho, CancellationToken cancellationToken = default);
-    Task<IEnumerable<TemplateMensagem>> ObterTodosAsync(CancellationToken cancellationToken = default);
-    Task<IEnumerable<TemplateMensagem>> ObterAtivosAsync(CancellationToken cancellationToken = default);
-    Task AdicionarAsync(TemplateMensagem template, CancellationToken cancellationToken = default);
-    Task AtualizarAsync(TemplateMensagem template, CancellationToken cancellationToken = default);
+    Task<TemplateMensagem?> ObterPorIdAsync(int id);
+    Task<TemplateMensagem?> ObterPorGatilhoAsync(TipoGatilhoMensagem gatilho);
+    Task<IEnumerable<TemplateMensagem>> ObterTodosAsync();
+    Task<IEnumerable<TemplateMensagem>> ObterAtivosAsync();
+    Task AdicionarAsync(TemplateMensagem template);
+    Task AtualizarAsync(TemplateMensagem template);
 }

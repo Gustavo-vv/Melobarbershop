@@ -18,11 +18,11 @@ public class ProdutoService : IProdutoService
         _mapper = mapper;
     }
 
-    public async Task<ProdutoDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<ProdutoDto?> ObterPorIdAsync(int id)
     {
         try
         {
-            var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
+            var produto = await _produtoRepository.ObterPorIdAsync(id);
             return produto == null ? null : _mapper.Map<ProdutoDto>(produto);
         }
         catch (Exception ex)
@@ -31,11 +31,11 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task<ProdutoDto?> ObterPorCodigoBarrasAsync(string codigoBarras, CancellationToken cancellationToken = default)
+    public async Task<ProdutoDto?> ObterPorCodigoBarrasAsync(string codigoBarras)
     {
         try
         {
-            var produto = await _produtoRepository.ObterPorCodigoBarrasAsync(codigoBarras, cancellationToken);
+            var produto = await _produtoRepository.ObterPorCodigoBarrasAsync(codigoBarras);
             return produto == null ? null : _mapper.Map<ProdutoDto>(produto);
         }
         catch (Exception ex)
@@ -44,11 +44,11 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task<IEnumerable<ProdutoDto>> ListarAtivosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ProdutoDto>> ListarAtivosAsync()
     {
         try
         {
-            var produtos = await _produtoRepository.ObterAtivosAsync(cancellationToken);
+            var produtos = await _produtoRepository.ObterAtivosAsync();
             return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
         }
         catch (Exception ex)
@@ -57,11 +57,11 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task<IEnumerable<ProdutoDto>> ListarTodosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ProdutoDto>> ListarTodosAsync()
     {
         try
         {
-            var produtos = await _produtoRepository.ObterTodosAsync(cancellationToken);
+            var produtos = await _produtoRepository.ObterTodosAsync();
             return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
         }
         catch (Exception ex)
@@ -70,11 +70,11 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task<IEnumerable<ProdutoDto>> ListarComEstoqueAbaixoDoMinimoAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ProdutoDto>> ListarComEstoqueAbaixoDoMinimoAsync()
     {
         try
         {
-            var produtos = await _produtoRepository.ObterComEstoqueAbaixoDoMinimoAsync(cancellationToken);
+            var produtos = await _produtoRepository.ObterComEstoqueAbaixoDoMinimoAsync();
             return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
         }
         catch (Exception ex)
@@ -83,16 +83,16 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task<ProdutoDto> CriarAsync(CriarProdutoDto dto, CancellationToken cancellationToken = default)
+    public async Task<ProdutoDto> CriarAsync(CriarProdutoDto dto)
     {
         try
         {
-            var existente = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras, cancellationToken);
+            var existente = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras);
             if (existente != null)
                 throw new InvalidOperationException($"Ja existe um produto cadastrado com o codigo de barras '{dto.CodigoBarras}'.");
 
             var produto = _mapper.Map<Produto>(dto);
-            await _produtoRepository.AdicionarAsync(produto, cancellationToken);
+            await _produtoRepository.AdicionarAsync(produto);
 
             if (dto.EstoqueInicial > 0)
             {
@@ -104,7 +104,7 @@ public class ProdutoService : IProdutoService
                     Observacao = "Estoque inicial cadastrado",
                     DataHora = DateTime.UtcNow
                 };
-                await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacaoInicial, cancellationToken);
+                await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacaoInicial);
             }
 
             return _mapper.Map<ProdutoDto>(produto);
@@ -116,23 +116,23 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task<ProdutoDto> AtualizarAsync(int id, AtualizarProdutoDto dto, CancellationToken cancellationToken = default)
+    public async Task<ProdutoDto> AtualizarAsync(int id, AtualizarProdutoDto dto)
     {
         try
         {
-            var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
+            var produto = await _produtoRepository.ObterPorIdAsync(id);
             if (produto == null)
                 throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
 
             if (!string.Equals(produto.CodigoBarras, dto.CodigoBarras, StringComparison.OrdinalIgnoreCase))
             {
-                var outroComMesmoCodigo = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras, cancellationToken);
+                var outroComMesmoCodigo = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras);
                 if (outroComMesmoCodigo != null && outroComMesmoCodigo.Id != id)
                     throw new InvalidOperationException($"O codigo de barras '{dto.CodigoBarras}' ja esta em uso por outro produto.");
             }
 
             _mapper.Map(dto, produto);
-            await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+            await _produtoRepository.AtualizarAsync(produto);
             return _mapper.Map<ProdutoDto>(produto);
         }
         catch (KeyNotFoundException) { throw; }
@@ -143,14 +143,14 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task MovimentarEstoqueAsync(MovimentarEstoqueDto dto, CancellationToken cancellationToken = default)
+    public async Task MovimentarEstoqueAsync(MovimentarEstoqueDto dto)
     {
         if (dto.Quantidade <= 0)
             throw new ArgumentException("A quantidade movimentada deve ser maior que zero.", nameof(dto.Quantidade));
 
         try
         {
-            var produto = await _produtoRepository.ObterPorIdAsync(dto.ProdutoId, cancellationToken);
+            var produto = await _produtoRepository.ObterPorIdAsync(dto.ProdutoId);
             if (produto == null)
                 throw new KeyNotFoundException($"Produto com ID {dto.ProdutoId} nao encontrado.");
 
@@ -181,8 +181,8 @@ public class ProdutoService : IProdutoService
                 DataHora = DateTime.UtcNow
             };
 
-            await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacao, cancellationToken);
-            await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+            await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacao);
+            await _produtoRepository.AtualizarAsync(produto);
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }
@@ -193,11 +193,11 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task<IEnumerable<MovimentacaoEstoqueDto>> ListarMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<MovimentacaoEstoqueDto>> ListarMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null)
     {
         try
         {
-            var movimentacoes = await _produtoRepository.ObterMovimentacoesPorProdutoAsync(produtoId, inicio, fim, cancellationToken);
+            var movimentacoes = await _produtoRepository.ObterMovimentacoesPorProdutoAsync(produtoId, inicio, fim);
             return _mapper.Map<IEnumerable<MovimentacaoEstoqueDto>>(movimentacoes);
         }
         catch (Exception ex)
@@ -206,11 +206,11 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task<bool> PossuiEstoqueAsync(int produtoId, int quantidade, CancellationToken cancellationToken = default)
+    public async Task<bool> PossuiEstoqueAsync(int produtoId, int quantidade)
     {
         try
         {
-            var produto = await _produtoRepository.ObterPorIdAsync(produtoId, cancellationToken);
+            var produto = await _produtoRepository.ObterPorIdAsync(produtoId);
             if (produto == null || !produto.Ativo)
                 return false;
             return produto.EstoqueAtual >= quantidade;
@@ -221,16 +221,16 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task DesativarAsync(int id, CancellationToken cancellationToken = default)
+    public async Task DesativarAsync(int id)
     {
         try
         {
-            var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
+            var produto = await _produtoRepository.ObterPorIdAsync(id);
             if (produto == null)
                 throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
 
             produto.Ativo = false;
-            await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+            await _produtoRepository.AtualizarAsync(produto);
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
@@ -239,16 +239,16 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task AtivarAsync(int id, CancellationToken cancellationToken = default)
+    public async Task AtivarAsync(int id)
     {
         try
         {
-            var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
+            var produto = await _produtoRepository.ObterPorIdAsync(id);
             if (produto == null)
                 throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
 
             produto.Ativo = true;
-            await _produtoRepository.AtualizarAsync(produto, cancellationToken);
+            await _produtoRepository.AtualizarAsync(produto);
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
@@ -257,15 +257,15 @@ public class ProdutoService : IProdutoService
         }
     }
 
-    public async Task RemoverPermanentementeAsync(int id, CancellationToken cancellationToken = default)
+    public async Task RemoverPermanentementeAsync(int id)
     {
         try
         {
-            var produto = await _produtoRepository.ObterPorIdAsync(id, cancellationToken);
+            var produto = await _produtoRepository.ObterPorIdAsync(id);
             if (produto == null)
                 throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
 
-            await _produtoRepository.RemoverAsync(produto, cancellationToken);
+            await _produtoRepository.RemoverAsync(produto);
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)

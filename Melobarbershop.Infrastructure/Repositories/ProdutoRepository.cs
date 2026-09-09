@@ -14,60 +14,60 @@ public class ProdutoRepository : IProdutoRepository
         _context = context;
     }
 
-    public async Task<Produto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Produto?> ObterPorIdAsync(int id)
     {
         return await _context.Produtos
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<Produto?> ObterPorCodigoBarrasAsync(string codigoBarras, CancellationToken cancellationToken = default)
+    public async Task<Produto?> ObterPorCodigoBarrasAsync(string codigoBarras)
     {
         return await _context.Produtos
-            .FirstOrDefaultAsync(p => p.CodigoBarras == codigoBarras, cancellationToken);
+            .FirstOrDefaultAsync(p => p.CodigoBarras == codigoBarras);
     }
 
-    public async Task<IEnumerable<Produto>> ObterTodosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Produto>> ObterTodosAsync()
     {
         return await _context.Produtos
             .OrderBy(p => p.Nome)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Produto>> ObterAtivosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Produto>> ObterAtivosAsync()
     {
         return await _context.Produtos
             .Where(p => p.Ativo)
             .OrderBy(p => p.Nome)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Produto>> ObterComEstoqueAbaixoDoMinimoAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Produto>> ObterComEstoqueAbaixoDoMinimoAsync()
     {
         return await _context.Produtos
             .Where(p => p.Ativo && p.EstoqueAtual <= p.EstoqueMinimoAlerta)
             .OrderBy(p => p.Nome)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task AdicionarAsync(Produto produto, CancellationToken cancellationToken = default)
+    public async Task AdicionarAsync(Produto produto)
     {
-        await _context.Produtos.AddAsync(produto, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.Produtos.AddAsync(produto);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task AtualizarAsync(Produto produto, CancellationToken cancellationToken = default)
+    public async Task AtualizarAsync(Produto produto)
     {
         _context.Produtos.Update(produto);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task AdicionarMovimentacaoEstoqueAsync(MovimentacaoEstoque movimentacao, CancellationToken cancellationToken = default)
+    public async Task AdicionarMovimentacaoEstoqueAsync(MovimentacaoEstoque movimentacao)
     {
-        await _context.MovimentacoesEstoque.AddAsync(movimentacao, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.MovimentacoesEstoque.AddAsync(movimentacao);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<MovimentacaoEstoque>> ObterMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<MovimentacaoEstoque>> ObterMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null)
     {
         var query = _context.MovimentacoesEstoque
             .Include(m => m.Produto)
@@ -81,12 +81,12 @@ public class ProdutoRepository : IProdutoRepository
 
         return await query
             .OrderByDescending(m => m.DataHora)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task RemoverAsync(Produto produto, CancellationToken cancellationToken = default)
+    public async Task RemoverAsync(Produto produto)
     {
         _context.Produtos.Remove(produto);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync();
     }
 }

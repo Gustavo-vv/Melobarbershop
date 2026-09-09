@@ -19,11 +19,11 @@ public class PacoteService : IPacoteService
         _mapper = mapper;
     }
 
-    public async Task<PacoteDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<PacoteDto?> ObterPorIdAsync(int id)
     {
         try
         {
-            var pacote = await _pacoteRepo.ObterPorIdComItensAsync(id, cancellationToken);
+            var pacote = await _pacoteRepo.ObterPorIdComItensAsync(id);
             if (pacote == null) return null;
             return MapToDto(pacote);
         }
@@ -33,11 +33,11 @@ public class PacoteService : IPacoteService
         }
     }
 
-    public async Task<IEnumerable<PacoteDto>> ListarAtivosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<PacoteDto>> ListarAtivosAsync()
     {
         try
         {
-            var pacotes = await _pacoteRepo.ObterAtivosAsync(cancellationToken);
+            var pacotes = await _pacoteRepo.ObterAtivosAsync();
             return pacotes.Select(MapToDto);
         }
         catch (Exception ex)
@@ -46,11 +46,11 @@ public class PacoteService : IPacoteService
         }
     }
 
-    public async Task<IEnumerable<PacoteDto>> ListarTodosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<PacoteDto>> ListarTodosAsync()
     {
         try
         {
-            var pacotes = await _pacoteRepo.ObterTodosAsync(cancellationToken);
+            var pacotes = await _pacoteRepo.ObterTodosAsync();
             return pacotes.Select(MapToDto);
         }
         catch (Exception ex)
@@ -59,7 +59,7 @@ public class PacoteService : IPacoteService
         }
     }
 
-    public async Task<PacoteDto> CriarAsync(CriarPacoteDto dto, CancellationToken cancellationToken = default)
+    public async Task<PacoteDto> CriarAsync(CriarPacoteDto dto)
     {
         try
         {
@@ -80,9 +80,9 @@ public class PacoteService : IPacoteService
                 Itens = servicos.Select(s => new PacoteItem { ServicoId = s.Id }).ToList()
             };
 
-            await _pacoteRepo.AdicionarAsync(pacote, cancellationToken);
+            await _pacoteRepo.AdicionarAsync(pacote);
 
-            var salvo = await _pacoteRepo.ObterPorIdComItensAsync(pacote.Id, cancellationToken);
+            var salvo = await _pacoteRepo.ObterPorIdComItensAsync(pacote.Id);
             return MapToDto(salvo!);
         }
         catch (KeyNotFoundException) { throw; }
@@ -92,11 +92,11 @@ public class PacoteService : IPacoteService
         }
     }
 
-    public async Task<PacoteDto> AtualizarAsync(int id, AtualizarPacoteDto dto, CancellationToken cancellationToken = default)
+    public async Task<PacoteDto> AtualizarAsync(int id, AtualizarPacoteDto dto)
     {
         try
         {
-            var pacote = await _pacoteRepo.ObterPorIdComItensAsync(id, cancellationToken);
+            var pacote = await _pacoteRepo.ObterPorIdComItensAsync(id);
             if (pacote == null)
                 throw new KeyNotFoundException($"Pacote {id} nao encontrado.");
 
@@ -114,9 +114,9 @@ public class PacoteService : IPacoteService
             pacote.Ativo = dto.Ativo;
             pacote.Itens = servicos.Select(s => new PacoteItem { ServicoId = s.Id, PacoteId = pacote.Id }).ToList();
 
-            await _pacoteRepo.AtualizarAsync(pacote, cancellationToken);
+            await _pacoteRepo.AtualizarAsync(pacote);
 
-            var atualizado = await _pacoteRepo.ObterPorIdComItensAsync(pacote.Id, cancellationToken);
+            var atualizado = await _pacoteRepo.ObterPorIdComItensAsync(pacote.Id);
             return MapToDto(atualizado!);
         }
         catch (KeyNotFoundException) { throw; }
@@ -126,16 +126,16 @@ public class PacoteService : IPacoteService
         }
     }
 
-    public async Task DesativarAsync(int id, CancellationToken cancellationToken = default)
+    public async Task DesativarAsync(int id)
     {
         try
         {
-            var pacote = await _pacoteRepo.ObterPorIdAsync(id, cancellationToken);
+            var pacote = await _pacoteRepo.ObterPorIdAsync(id);
             if (pacote == null)
                 throw new KeyNotFoundException($"Pacote {id} nao encontrado.");
 
             pacote.Ativo = false;
-            await _pacoteRepo.AtualizarAsync(pacote, cancellationToken);
+            await _pacoteRepo.AtualizarAsync(pacote);
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
@@ -144,16 +144,16 @@ public class PacoteService : IPacoteService
         }
     }
 
-    public async Task AtivarAsync(int id, CancellationToken cancellationToken = default)
+    public async Task AtivarAsync(int id)
     {
         try
         {
-            var pacote = await _pacoteRepo.ObterPorIdAsync(id, cancellationToken);
+            var pacote = await _pacoteRepo.ObterPorIdAsync(id);
             if (pacote == null)
                 throw new KeyNotFoundException($"Pacote {id} nao encontrado.");
 
             pacote.Ativo = true;
-            await _pacoteRepo.AtualizarAsync(pacote, cancellationToken);
+            await _pacoteRepo.AtualizarAsync(pacote);
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)

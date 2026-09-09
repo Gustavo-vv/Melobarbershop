@@ -15,13 +15,13 @@ public class AgendamentoRepository : IAgendamentoRepository
         _context = context;
     }
 
-    public async Task<Agendamento?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Agendamento?> ObterPorIdAsync(int id)
     {
         return await _context.Agendamentos
-            .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<Agendamento?> ObterPorIdCompletoAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Agendamento?> ObterPorIdCompletoAsync(int id)
     {
         return await _context.Agendamentos
             .Include(a => a.Cliente)
@@ -29,10 +29,10 @@ public class AgendamentoRepository : IAgendamentoRepository
             .Include(a => a.Itens)
                 .ThenInclude(i => i.Servico)
             .Include(a => a.Avaliacao)
-            .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<IEnumerable<Agendamento>> ObterPorClienteAsync(string clienteId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Agendamento>> ObterPorClienteAsync(string clienteId)
     {
         return await _context.Agendamentos
             .Include(a => a.Barbeiro)
@@ -40,10 +40,10 @@ public class AgendamentoRepository : IAgendamentoRepository
                 .ThenInclude(i => i.Servico)
             .Where(a => a.ClienteId == clienteId)
             .OrderByDescending(a => a.DataHoraInicio)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Agendamento>> ObterPorBarbeiroEPeriodoAsync(string barbeiroId, DateTime inicio, DateTime fim, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Agendamento>> ObterPorBarbeiroEPeriodoAsync(string barbeiroId, DateTime inicio, DateTime fim)
     {
         return await _context.Agendamentos
             .Include(a => a.Cliente)
@@ -51,10 +51,10 @@ public class AgendamentoRepository : IAgendamentoRepository
                 .ThenInclude(i => i.Servico)
             .Where(a => a.BarbeiroId == barbeiroId && a.DataHoraInicio >= inicio && a.DataHoraInicio <= fim)
             .OrderBy(a => a.DataHoraInicio)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Agendamento>> ObterPorPeriodoAsync(DateTime inicio, DateTime fim, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Agendamento>> ObterPorPeriodoAsync(DateTime inicio, DateTime fim)
     {
         return await _context.Agendamentos
             .Include(a => a.Cliente)
@@ -63,10 +63,10 @@ public class AgendamentoRepository : IAgendamentoRepository
                 .ThenInclude(i => i.Servico)
             .Where(a => a.DataHoraInicio >= inicio && a.DataHoraInicio <= fim)
             .OrderBy(a => a.DataHoraInicio)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Agendamento>> ObterProximosAgendamentosAsync(DateTime aPartirDe, string? barbeiroId = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Agendamento>> ObterProximosAgendamentosAsync(DateTime aPartirDe, string? barbeiroId = null)
     {
         var query = _context.Agendamentos
             .Include(a => a.Cliente)
@@ -80,10 +80,10 @@ public class AgendamentoRepository : IAgendamentoRepository
 
         return await query
             .OrderBy(a => a.DataHoraInicio)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Agendamento>> ObterAgendamentosParaLembreteAsync(DateTime janelaInicio, DateTime janelaFim, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Agendamento>> ObterAgendamentosParaLembreteAsync(DateTime janelaInicio, DateTime janelaFim)
     {
         return await _context.Agendamentos
             .Include(a => a.Cliente)
@@ -91,10 +91,10 @@ public class AgendamentoRepository : IAgendamentoRepository
             .Include(a => a.Itens)
                 .ThenInclude(i => i.Servico)
             .Where(a => a.DataHoraInicio >= janelaInicio && a.DataHoraInicio <= janelaFim && a.Status == StatusAgendamento.Confirmado)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<bool> ExisteConflitoDeHorarioAsync(string barbeiroId, DateTime inicio, DateTime fim, int? agendamentoIdIgnorar = null, CancellationToken cancellationToken = default)
+    public async Task<bool> ExisteConflitoDeHorarioAsync(string barbeiroId, DateTime inicio, DateTime fim, int? agendamentoIdIgnorar = null)
     {
         return await _context.Agendamentos
             .AnyAsync(a => a.BarbeiroId == barbeiroId
@@ -102,29 +102,28 @@ public class AgendamentoRepository : IAgendamentoRepository
                         && a.Status != StatusAgendamento.NaoCompareceu
                         && (agendamentoIdIgnorar == null || a.Id != agendamentoIdIgnorar)
                         && a.DataHoraInicio < fim
-                        && a.DataHoraFim > inicio,
-                      cancellationToken);
+                        && a.DataHoraFim > inicio);
     }
 
-    public async Task AdicionarAsync(Agendamento agendamento, CancellationToken cancellationToken = default)
+    public async Task AdicionarAsync(Agendamento agendamento)
     {
-        await _context.Agendamentos.AddAsync(agendamento, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.Agendamentos.AddAsync(agendamento);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task AtualizarAsync(Agendamento agendamento, CancellationToken cancellationToken = default)
+    public async Task AtualizarAsync(Agendamento agendamento)
     {
         _context.Agendamentos.Update(agendamento);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task AtualizarStatusAsync(int id, StatusAgendamento status, CancellationToken cancellationToken = default)
+    public async Task AtualizarStatusAsync(int id, StatusAgendamento status)
     {
-        var agendamento = await _context.Agendamentos.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+        var agendamento = await _context.Agendamentos.FirstOrDefaultAsync(a => a.Id == id);
         if (agendamento != null)
         {
             agendamento.Status = status;
-            await _context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync();
         }
     }
 }
