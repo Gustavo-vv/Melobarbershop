@@ -17,11 +17,46 @@ public class ServicoService : IServicoService
         _mapper = mapper;
     }
 
-    public async Task<ApiResposta<ServicoDto>> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<ApiResposta<IEnumerable<ServicoDto>>> ListarAsync(bool incluirInativos = false)
     {
         try
         {
-            var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
+            var servicos = incluirInativos
+                ? await _servicoRepository.ObterTodosAsync()
+                : await _servicoRepository.ObterAtivosAsync();
+
+            var dtos = _mapper.Map<IEnumerable<ServicoDto>>(servicos);
+            return ApiResposta<IEnumerable<ServicoDto>>.Ok(dtos);
+        }
+        catch (Exception ex)
+        {
+            return ApiResposta<IEnumerable<ServicoDto>>.Falha($"Erro ao listar serviços: {ex.Message}");
+        }
+    }
+
+    public async Task<ApiResposta<IEnumerable<ServicoDto>>> ListarPorCategoriaAsync(int categoriaId, bool incluirInativos = false)
+    {
+        try
+        {
+            var servicos = await _servicoRepository.ObterPorCategoriaAsync(categoriaId);
+
+            if (!incluirInativos)
+                servicos = servicos.Where(s => s.Ativo);
+
+            var dtos = _mapper.Map<IEnumerable<ServicoDto>>(servicos);
+            return ApiResposta<IEnumerable<ServicoDto>>.Ok(dtos);
+        }
+        catch (Exception ex)
+        {
+            return ApiResposta<IEnumerable<ServicoDto>>.Falha($"Erro ao listar serviços da categoria {categoriaId}: {ex.Message}");
+        }
+    }
+
+    public async Task<ApiResposta<ServicoDto>> ObterPorIdAsync(int id)
+    {
+        try
+        {
+            var servico = await _servicoRepository.ObterPorIdAsync(id);
             if (servico == null)
                 return ApiResposta<ServicoDto>.Falha("Serviço não encontrado.");
 
@@ -30,145 +65,100 @@ public class ServicoService : IServicoService
         }
         catch (Exception ex)
         {
-            return ApiResposta<ServicoDto>.Falha($"Erro ao obter a categoria: {ex.Message}");
+            return ApiResposta<ServicoDto>.Falha($"Erro ao obter o serviço: {ex.Message}");
         }
     }
 
-    public async Task<IEnumerable<ServicoDto>> ListarAtivosAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var servicos = await _servicoRepository.ObterAtivosAsync(cancellationToken);
-            return _mapper.Map<IEnumerable<ServicoDto>>(servicos);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException("Erro ao listar servicos ativos.", ex);
-        }
-    }
-
-    public async Task<IEnumerable<ServicoDto>> ListarExibidosNoSiteAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var servicos = await _servicoRepository.ObterExibidosNoSiteAsync(cancellationToken);
-            return _mapper.Map<IEnumerable<ServicoDto>>(servicos);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException("Erro ao listar servicos exibidos no site.", ex);
-        }
-    }
-
-    public async Task<IEnumerable<ServicoDto>> ListarTodosAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var servicos = await _servicoRepository.ObterTodosAsync(cancellationToken);
-            return _mapper.Map<IEnumerable<ServicoDto>>(servicos);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException("Erro ao listar todos os servicos.", ex);
-        }
-    }
-
-    public async Task<ServicoDto> CriarAsync(CriarServicoDto dto, CancellationToken cancellationToken = default)
+    public async Task<ApiResposta<ServicoDto>> CriarAsync(CriarServicoDto dto)
     {
         try
         {
             var servico = _mapper.Map<Servico>(dto);
-            await _servicoRepository.AdicionarAsync(servico, cancellationToken);
-            return _mapper.Map<ServicoDto>(servico);
+            await _servicoRepository.AdicionarAsync(servico);
+
+            var resultado = _mapper.Map<ServicoDto>(servico);
+            return ApiResposta<ServicoDto>.Ok(resultado);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao criar servico.", ex);
+            return ApiResposta<ServicoDto>.Falha($"Erro ao criar serviço: {ex.Message}");
         }
     }
 
-    public async Task<ServicoDto> AtualizarAsync(int id, AtualizarServicoDto dto, CancellationToken cancellationToken = default)
+    public async Task<ApiResposta<ServicoDto>> AtualizarAsync(int id, AtualizarServicoDto dto)
     {
         try
         {
-            var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
+            var servico = await _servicoRepository.ObterPorIdAsync(id);
             if (servico == null)
-                throw new KeyNotFoundException($"Servico com ID {id} nao encontrado.");
+                return ApiResposta<ServicoDto>.Falha($"Serviço com ID {id} não encontrado.");
 
             _mapper.Map(dto, servico);
-            await _servicoRepository.AtualizarAsync(servico, cancellationToken);
-            return _mapper.Map<ServicoDto>(servico);
-        }
-        catch (KeyNotFoundException)
-        {
-            throw;
+            await _servicoRepository.AtualizarAsync(servico);
+
+            var resultado = _mapper.Map<ServicoDto>(servico);
+            return ApiResposta<ServicoDto>.Ok(resultado);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao atualizar servico com ID {id}.", ex);
+            return ApiResposta<ServicoDto>.Falha($"Erro ao atualizar serviço com ID {id}: {ex.Message}");
         }
     }
 
-    public async Task DesativarAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<ApiResposta<bool>> DesativarAsync(int id)
     {
         try
         {
-            var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
+            var servico = await _servicoRepository.ObterPorIdAsync(id);
             if (servico == null)
-                throw new KeyNotFoundException($"Servico com ID {id} nao encontrado.");
+                return ApiResposta<bool>.Falha($"Serviço com ID {id} não encontrado.");
 
             servico.Ativo = false;
-            await _servicoRepository.AtualizarAsync(servico, cancellationToken);
-        }
-        catch (KeyNotFoundException)
-        {
-            throw;
+            await _servicoRepository.AtualizarAsync(servico);
+
+            return ApiResposta<bool>.Ok(true);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao desativar servico com ID {id}.", ex);
+            return ApiResposta<bool>.Falha($"Erro ao desativar serviço com ID {id}: {ex.Message}");
         }
     }
 
-    public async Task AtivarAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<ApiResposta<bool>> AtivarAsync(int id)
     {
         try
         {
-            var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
+            var servico = await _servicoRepository.ObterPorIdAsync(id);
             if (servico == null)
-                throw new KeyNotFoundException($"Servico com ID {id} nao encontrado.");
+                return ApiResposta<bool>.Falha($"Serviço com ID {id} não encontrado.");
 
             servico.Ativo = true;
-            await _servicoRepository.AtualizarAsync(servico, cancellationToken);
-        }
-        catch (KeyNotFoundException)
-        {
-            throw;
+            await _servicoRepository.AtualizarAsync(servico);
+
+            return ApiResposta<bool>.Ok(true);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao ativar servico com ID {id}.", ex);
+            return ApiResposta<bool>.Falha($"Erro ao ativar serviço com ID {id}: {ex.Message}");
         }
     }
 
-    public async Task RemoverPermanentementeAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<ApiResposta<bool>> RemoverPermanentementeAsync(int id)
     {
         try
         {
-            var servico = await _servicoRepository.ObterPorIdAsync(id, cancellationToken);
+            var servico = await _servicoRepository.ObterPorIdAsync(id);
             if (servico == null)
-                throw new KeyNotFoundException($"Servico com ID {id} nao encontrado.");
+                return ApiResposta<bool>.Falha($"Serviço com ID {id} não encontrado.");
 
-            await _servicoRepository.RemoverAsync(servico, cancellationToken);
-        }
-        catch (KeyNotFoundException)
-        {
-            throw;
+            await _servicoRepository.RemoverAsync(servico);
+
+            return ApiResposta<bool>.Ok(true);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException(
-                "Nao e possivel remover este servico permanentemente pois ele possui agendamentos, pacotes ou vendas vinculados. Recomenda-se desativa-lo em vez de excluir permanentemente.", ex);
+            return ApiResposta<bool>.Falha(
+                "Não é possível remover este serviço permanentemente pois ele possui agendamentos, pacotes ou vendas vinculados. Recomenda-se desativá-lo em vez de excluir permanentemente.");
         }
     }
 }

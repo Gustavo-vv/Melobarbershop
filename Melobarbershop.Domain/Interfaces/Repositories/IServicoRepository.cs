@@ -9,6 +9,7 @@ public interface IServicoRepository
     Task<IEnumerable<Servico>> ObterTodosAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Servico>> ObterAtivosAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Servico>> ObterExibidosNoSiteAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<Servico>> ObterPorCategoriaAsync(int categoriaId, bool incluirInativos = false, CancellationToken cancellationToken = default);
     Task AdicionarAsync(Servico servico, CancellationToken cancellationToken = default);
     Task AtualizarAsync(Servico servico, CancellationToken cancellationToken = default);
     Task RemoverAsync(Servico servico, CancellationToken cancellationToken = default);
