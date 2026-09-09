@@ -80,7 +80,7 @@ public class VendaService : IVendaService
 
             if (dto.AgendamentoId.HasValue)
             {
-                var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(dto.AgendamentoId);
+                var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(dto.AgendamentoId.Value);
                 if (agendamento == null)
                     throw new KeyNotFoundException($"Agendamento com ID {dto.AgendamentoId} nao encontrado.");
 
