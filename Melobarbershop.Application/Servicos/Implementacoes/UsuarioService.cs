@@ -23,11 +23,11 @@ public class UsuarioService : IUsuarioService
         _mapper = mapper;
     }
 
-    public async Task<UsuarioDto?> ObterPorIdAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<UsuarioDto?> ObterPorIdAsync(string id)
     {
         try
         {
-            var usuario = await _usuarioRepo.ObterPorIdAsync(id, cancellationToken);
+            var usuario = await _usuarioRepo.ObterPorIdAsync(id);
             if (usuario == null) return null;
             var dto = _mapper.Map<UsuarioDto>(usuario);
             dto.Roles = (await _userManager.GetRolesAsync(usuario)).ToList();
@@ -39,11 +39,11 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task<UsuarioDto?> ObterPorTelefoneAsync(string telefone, CancellationToken cancellationToken = default)
+    public async Task<UsuarioDto?> ObterPorTelefoneAsync(string telefone)
     {
         try
         {
-            var usuario = await _usuarioRepo.ObterPorTelefoneAsync(telefone, cancellationToken);
+            var usuario = await _usuarioRepo.ObterPorTelefoneAsync(telefone);
             if (usuario == null) return null;
             var dto = _mapper.Map<UsuarioDto>(usuario);
             dto.Roles = (await _userManager.GetRolesAsync(usuario)).ToList();
@@ -55,11 +55,11 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task<UsuarioDto?> ObterPorEmailAsync(string email, CancellationToken cancellationToken = default)
+    public async Task<UsuarioDto?> ObterPorEmailAsync(string email)
     {
         try
         {
-            var usuario = await _usuarioRepo.ObterPorEmailAsync(email, cancellationToken);
+            var usuario = await _usuarioRepo.ObterPorEmailAsync(email);
             if (usuario == null) return null;
             var dto = _mapper.Map<UsuarioDto>(usuario);
             dto.Roles = (await _userManager.GetRolesAsync(usuario)).ToList();
@@ -71,13 +71,13 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task<IEnumerable<UsuarioDto>> ListarPorRoleAsync(string roleName, bool apenasAtivos = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UsuarioDto>> ListarPorRoleAsync(string roleName, bool apenasAtivos = true)
     {
         try
         {
             IEnumerable<ApplicationUser> usuarios = apenasAtivos
-                ? await _usuarioRepo.ObterAtivosPorRoleAsync(roleName, cancellationToken)
-                : await _usuarioRepo.ObterPorRoleAsync(roleName, cancellationToken);
+                ? await _usuarioRepo.ObterAtivosPorRoleAsync(roleName)
+                : await _usuarioRepo.ObterPorRoleAsync(roleName);
 
             var dtos = new List<UsuarioDto>();
             foreach (var u in usuarios)
@@ -94,7 +94,7 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task<UsuarioDto> CriarAsync(CriarUsuarioDto dto, CancellationToken cancellationToken = default)
+    public async Task<UsuarioDto> CriarAsync(CriarUsuarioDto dto)
     {
         try
         {
@@ -136,11 +136,11 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task<UsuarioDto> AtualizarAsync(string id, AtualizarUsuarioDto dto, CancellationToken cancellationToken = default)
+    public async Task<UsuarioDto> AtualizarAsync(string id, AtualizarUsuarioDto dto)
     {
         try
         {
-            var usuario = await _usuarioRepo.ObterPorIdAsync(id, cancellationToken);
+            var usuario = await _usuarioRepo.ObterPorIdAsync(id);
             if (usuario == null)
                 throw new KeyNotFoundException($"Usuario '{id}' nao encontrado.");
 
@@ -155,7 +155,7 @@ public class UsuarioService : IUsuarioService
             usuario.PercentualComissao = dto.PercentualComissao;
             usuario.Ativo = dto.Ativo;
 
-            await _usuarioRepo.AtualizarAsync(usuario, cancellationToken);
+            await _usuarioRepo.AtualizarAsync(usuario);
 
             var resultDto = _mapper.Map<UsuarioDto>(usuario);
             resultDto.Roles = (await _userManager.GetRolesAsync(usuario)).ToList();
@@ -169,16 +169,16 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task DesativarAsync(string id, CancellationToken cancellationToken = default)
+    public async Task DesativarAsync(string id)
     {
         try
         {
-            var usuario = await _usuarioRepo.ObterPorIdAsync(id, cancellationToken);
+            var usuario = await _usuarioRepo.ObterPorIdAsync(id);
             if (usuario == null)
                 throw new KeyNotFoundException($"Usuario '{id}' nao encontrado.");
 
             usuario.Ativo = false;
-            await _usuarioRepo.AtualizarAsync(usuario, cancellationToken);
+            await _usuarioRepo.AtualizarAsync(usuario);
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
@@ -187,16 +187,16 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task AtivarAsync(string id, CancellationToken cancellationToken = default)
+    public async Task AtivarAsync(string id)
     {
         try
         {
-            var usuario = await _usuarioRepo.ObterPorIdAsync(id, cancellationToken);
+            var usuario = await _usuarioRepo.ObterPorIdAsync(id);
             if (usuario == null)
                 throw new KeyNotFoundException($"Usuario '{id}' nao encontrado.");
 
             usuario.Ativo = true;
-            await _usuarioRepo.AtualizarAsync(usuario, cancellationToken);
+            await _usuarioRepo.AtualizarAsync(usuario);
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
@@ -205,11 +205,11 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task<BloqueioAgendaDto> AdicionarBloqueioAgendaAsync(CriarBloqueioAgendaDto dto, CancellationToken cancellationToken = default)
+    public async Task<BloqueioAgendaDto> AdicionarBloqueioAgendaAsync(CriarBloqueioAgendaDto dto)
     {
         try
         {
-            var barbeiro = await _usuarioRepo.ObterPorIdAsync(dto.BarbeiroId, cancellationToken);
+            var barbeiro = await _usuarioRepo.ObterPorIdAsync(dto.BarbeiroId);
             if (barbeiro == null)
                 throw new KeyNotFoundException($"Barbeiro '{dto.BarbeiroId}' nao encontrado.");
 
@@ -221,7 +221,7 @@ public class UsuarioService : IUsuarioService
                 Motivo = dto.Motivo
             };
 
-            await _usuarioRepo.AdicionarBloqueioAsync(bloqueio, cancellationToken);
+            await _usuarioRepo.AdicionarBloqueioAsync(bloqueio);
 
             return new BloqueioAgendaDto
             {
@@ -240,15 +240,15 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task RemoverBloqueioAgendaAsync(int bloqueioId, CancellationToken cancellationToken = default)
+    public async Task RemoverBloqueioAgendaAsync(int bloqueioId)
     {
         try
         {
-            var bloqueio = await _usuarioRepo.ObterBloqueioPorIdAsync(bloqueioId, cancellationToken);
+            var bloqueio = await _usuarioRepo.ObterBloqueioPorIdAsync(bloqueioId);
             if (bloqueio == null)
                 throw new KeyNotFoundException($"Bloqueio '{bloqueioId}' nao encontrado.");
 
-            await _usuarioRepo.RemoverBloqueioAsync(bloqueio, cancellationToken);
+            await _usuarioRepo.RemoverBloqueioAsync(bloqueio);
         }
         catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
@@ -257,15 +257,15 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task<IEnumerable<BloqueioAgendaDto>> ListarBloqueiosBarbeiroAsync(string barbeiroId, DateTime inicio, DateTime fim, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<BloqueioAgendaDto>> ListarBloqueiosBarbeiroAsync(string barbeiroId, DateTime inicio, DateTime fim)
     {
         try
         {
-            var barbeiro = await _usuarioRepo.ObterPorIdAsync(barbeiroId, cancellationToken);
+            var barbeiro = await _usuarioRepo.ObterPorIdAsync(barbeiroId);
             if (barbeiro == null)
                 throw new KeyNotFoundException($"Barbeiro '{barbeiroId}' nao encontrado.");
 
-            var bloqueios = await _usuarioRepo.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicio, fim, cancellationToken);
+            var bloqueios = await _usuarioRepo.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicio, fim);
             return bloqueios.Select(b => new BloqueioAgendaDto
             {
                 Id = b.Id,
@@ -283,15 +283,15 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public async Task<bool> VerificarDisponibilidadeBarbeiroAsync(string barbeiroId, DateTime inicio, DateTime fim, CancellationToken cancellationToken = default)
+    public async Task<bool> VerificarDisponibilidadeBarbeiroAsync(string barbeiroId, DateTime inicio, DateTime fim)
     {
         try
         {
-            var barbeiro = await _usuarioRepo.ObterPorIdAsync(barbeiroId, cancellationToken);
+            var barbeiro = await _usuarioRepo.ObterPorIdAsync(barbeiroId);
             if (barbeiro == null)
                 throw new KeyNotFoundException($"Barbeiro '{barbeiroId}' nao encontrado.");
 
-            var temBloqueio = await _usuarioRepo.ExisteBloqueioNoPeriodoAsync(barbeiroId, inicio, fim, cancellationToken);
+            var temBloqueio = await _usuarioRepo.ExisteBloqueioNoPeriodoAsync(barbeiroId, inicio, fim);
             return !temBloqueio;
         }
         catch (KeyNotFoundException) { throw; }

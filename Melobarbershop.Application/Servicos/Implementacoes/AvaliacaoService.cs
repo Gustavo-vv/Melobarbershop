@@ -21,11 +21,11 @@ public class AvaliacaoService : IAvaliacaoService
         _usuarioRepo = usuarioRepo;
     }
 
-    public async Task<AvaliacaoDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<AvaliacaoDto?> ObterPorIdAsync(int id)
     {
         try
         {
-            var av = await _avaliacaoRepo.ObterPorIdAsync(id, cancellationToken);
+            var av = await _avaliacaoRepo.ObterPorIdAsync(id);
             return av == null ? null : MapToDto(av);
         }
         catch (Exception ex)
@@ -34,11 +34,11 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
-    public async Task<AvaliacaoDto?> ObterPorAgendamentoAsync(int agendamentoId, CancellationToken cancellationToken = default)
+    public async Task<AvaliacaoDto?> ObterPorAgendamentoAsync(int agendamentoId)
     {
         try
         {
-            var av = await _avaliacaoRepo.ObterPorAgendamentoIdAsync(agendamentoId, cancellationToken);
+            var av = await _avaliacaoRepo.ObterPorAgendamentoIdAsync(agendamentoId);
             return av == null ? null : MapToDto(av);
         }
         catch (Exception ex)
@@ -47,11 +47,11 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
-    public async Task<IEnumerable<AvaliacaoDto>> ListarPorBarbeiroAsync(string barbeiroId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<AvaliacaoDto>> ListarPorBarbeiroAsync(string barbeiroId)
     {
         try
         {
-            var avaliacoes = await _avaliacaoRepo.ObterPorBarbeiroAsync(barbeiroId, cancellationToken);
+            var avaliacoes = await _avaliacaoRepo.ObterPorBarbeiroAsync(barbeiroId);
             return avaliacoes.Select(MapToDto);
         }
         catch (Exception ex)
@@ -60,11 +60,11 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
-    public async Task<IEnumerable<AvaliacaoDto>> ListarPorClienteAsync(string clienteId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<AvaliacaoDto>> ListarPorClienteAsync(string clienteId)
     {
         try
         {
-            var avaliacoes = await _avaliacaoRepo.ObterPorClienteAsync(clienteId, cancellationToken);
+            var avaliacoes = await _avaliacaoRepo.ObterPorClienteAsync(clienteId);
             return avaliacoes.Select(MapToDto);
         }
         catch (Exception ex)
@@ -73,16 +73,16 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
-    public async Task<ResumoAvaliacoesDto> ObterResumoAvaliacoesBarbeiroAsync(string barbeiroId, CancellationToken cancellationToken = default)
+    public async Task<ResumoAvaliacoesDto> ObterResumoAvaliacoesBarbeiroAsync(string barbeiroId)
     {
         try
         {
-            var barbeiro = await _usuarioRepo.ObterPorIdAsync(barbeiroId, cancellationToken);
+            var barbeiro = await _usuarioRepo.ObterPorIdAsync(barbeiroId);
             if (barbeiro == null)
                 throw new KeyNotFoundException($"Barbeiro '{barbeiroId}' nao encontrado.");
 
-            var media = await _avaliacaoRepo.CalcularMediaAvaliacoesBarbeiroAsync(barbeiroId, cancellationToken);
-            var avaliacoes = await _avaliacaoRepo.ObterPorBarbeiroAsync(barbeiroId, cancellationToken);
+            var media = await _avaliacaoRepo.CalcularMediaAvaliacoesBarbeiroAsync(barbeiroId);
+            var avaliacoes = await _avaliacaoRepo.ObterPorBarbeiroAsync(barbeiroId);
 
             return new ResumoAvaliacoesDto
             {
@@ -99,18 +99,18 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
-    public async Task<AvaliacaoDto> RegistrarAvaliacaoAsync(CriarAvaliacaoDto dto, CancellationToken cancellationToken = default)
+    public async Task<AvaliacaoDto> RegistrarAvaliacaoAsync(CriarAvaliacaoDto dto)
     {
         try
         {
             if (dto.NotaEstrelas < 1 || dto.NotaEstrelas > 5)
                 throw new InvalidOperationException("A nota deve ser entre 1 e 5 estrelas.");
 
-            var agendamento = await _agendamentoRepo.ObterPorIdAsync(dto.AgendamentoId, cancellationToken);
+            var agendamento = await _agendamentoRepo.ObterPorIdAsync(dto.AgendamentoId);
             if (agendamento == null)
                 throw new KeyNotFoundException($"Agendamento {dto.AgendamentoId} nao encontrado.");
 
-            if (await _avaliacaoRepo.ExisteAvaliacaoParaAgendamentoAsync(dto.AgendamentoId, cancellationToken))
+            if (await _avaliacaoRepo.ExisteAvaliacaoParaAgendamentoAsync(dto.AgendamentoId))
                 throw new InvalidOperationException("Ja existe uma avaliacao para este agendamento.");
 
             var avaliacao = new Avaliacao
@@ -123,11 +123,11 @@ public class AvaliacaoService : IAvaliacaoService
                 DataCriacao = DateTime.UtcNow
             };
 
-            await _avaliacaoRepo.AdicionarAsync(avaliacao, cancellationToken);
+            await _avaliacaoRepo.AdicionarAsync(avaliacao);
 
-            var salva = await _avaliacaoRepo.ObterPorIdAsync(avaliacao.Id, cancellationToken);
-            var cliente = await _usuarioRepo.ObterPorIdAsync(avaliacao.ClienteId, cancellationToken);
-            var barbeiro = await _usuarioRepo.ObterPorIdAsync(avaliacao.BarbeiroId, cancellationToken);
+            var salva = await _avaliacaoRepo.ObterPorIdAsync(avaliacao.Id);
+            var cliente = await _usuarioRepo.ObterPorIdAsync(avaliacao.ClienteId);
+            var barbeiro = await _usuarioRepo.ObterPorIdAsync(avaliacao.BarbeiroId);
 
             return new AvaliacaoDto
             {

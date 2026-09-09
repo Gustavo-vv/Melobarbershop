@@ -14,57 +14,57 @@ public class ServicoRepository : IServicoRepository
         _context = context;
     }
 
-    public async Task<Servico?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Servico?> ObterPorIdAsync(int id)
     {
         return await _context.Servicos
-            .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(s => s.Id == id);
     }
 
-    public async Task<IEnumerable<Servico>> ObterPorIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Servico>> ObterPorIdsAsync(IEnumerable<int> ids)
     {
         return await _context.Servicos
             .Where(s => ids.Contains(s.Id))
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Servico>> ObterTodosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Servico>> ObterTodosAsync()
     {
         return await _context.Servicos
             .OrderBy(s => s.Nome)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Servico>> ObterAtivosAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Servico>> ObterAtivosAsync()
     {
         return await _context.Servicos
             .Where(s => s.Ativo)
             .OrderBy(s => s.Nome)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Servico>> ObterExibidosNoSiteAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Servico>> ObterExibidosNoSiteAsync()
     {
         return await _context.Servicos
             .Where(s => s.Ativo && s.ExibirNoSite)
             .OrderBy(s => s.Nome)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task AdicionarAsync(Servico servico, CancellationToken cancellationToken = default)
+    public async Task AdicionarAsync(Servico servico)
     {
-        await _context.Servicos.AddAsync(servico, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.Servicos.AddAsync(servico);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task AtualizarAsync(Servico servico, CancellationToken cancellationToken = default)
+    public async Task AtualizarAsync(Servico servico)
     {
         _context.Servicos.Update(servico);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task RemoverAsync(Servico servico, CancellationToken cancellationToken = default)
+    public async Task RemoverAsync(Servico servico)
     {
         _context.Servicos.Remove(servico);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync();
     }
 }

@@ -14,39 +14,39 @@ public class NotificacaoLogRepository : INotificacaoLogRepository
         _context = context;
     }
 
-    public async Task<NotificacaoLog?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<NotificacaoLog?> ObterPorIdAsync(int id)
     {
         return await _context.NotificacoesLog
-            .FirstOrDefaultAsync(n => n.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(n => n.Id == id);
     }
 
-    public async Task<IEnumerable<NotificacaoLog>> ObterPorClienteAsync(string clienteId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<NotificacaoLog>> ObterPorClienteAsync(string clienteId)
     {
         return await _context.NotificacoesLog
             .Where(n => n.ClienteId == clienteId)
             .OrderByDescending(n => n.DataEnvio)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<NotificacaoLog>> ObterPorPeriodoAsync(DateTime inicio, DateTime fim, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<NotificacaoLog>> ObterPorPeriodoAsync(DateTime inicio, DateTime fim)
     {
         return await _context.NotificacoesLog
             .Where(n => n.DataEnvio >= inicio && n.DataEnvio <= fim)
             .OrderByDescending(n => n.DataEnvio)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<NotificacaoLog>> ObterFalhasPorPeriodoAsync(DateTime inicio, DateTime fim, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<NotificacaoLog>> ObterFalhasPorPeriodoAsync(DateTime inicio, DateTime fim)
     {
         return await _context.NotificacoesLog
             .Where(n => !n.Sucesso && n.DataEnvio >= inicio && n.DataEnvio <= fim)
             .OrderByDescending(n => n.DataEnvio)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task RegistrarAsync(NotificacaoLog log, CancellationToken cancellationToken = default)
+    public async Task RegistrarAsync(NotificacaoLog log)
     {
-        await _context.NotificacoesLog.AddAsync(log, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.NotificacoesLog.AddAsync(log);
+        await _context.SaveChangesAsync();
     }
 }

@@ -26,11 +26,11 @@ public class AgendamentoService : IAgendamentoService
         _mapper = mapper;
     }
 
-    public async Task<AgendamentoDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<AgendamentoDto?> ObterPorIdAsync(int id)
     {
         try
         {
-            var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(id, cancellationToken);
+            var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(id);
             return agendamento == null ? null : _mapper.Map<AgendamentoDto>(agendamento);
         }
         catch (Exception ex)
@@ -39,16 +39,16 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    public async Task<IEnumerable<AgendamentoDto>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim, string? barbeiroId = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<AgendamentoDto>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim, string? barbeiroId = null)
     {
         try
         {
             IEnumerable<Agendamento> agendamentos;
 
             if (!string.IsNullOrWhiteSpace(barbeiroId))
-                agendamentos = await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicio, fim, cancellationToken);
+                agendamentos = await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicio, fim);
             else
-                agendamentos = await _agendamentoRepository.ObterPorPeriodoAsync(inicio, fim, cancellationToken);
+                agendamentos = await _agendamentoRepository.ObterPorPeriodoAsync(inicio, fim);
 
             return _mapper.Map<IEnumerable<AgendamentoDto>>(agendamentos);
         }
@@ -58,11 +58,11 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    public async Task<IEnumerable<AgendamentoDto>> ListarPorClienteAsync(string clienteId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<AgendamentoDto>> ListarPorClienteAsync(string clienteId)
     {
         try
         {
-            var agendamentos = await _agendamentoRepository.ObterPorClienteAsync(clienteId, cancellationToken);
+            var agendamentos = await _agendamentoRepository.ObterPorClienteAsync(clienteId);
             return _mapper.Map<IEnumerable<AgendamentoDto>>(agendamentos);
         }
         catch (Exception ex)
@@ -71,11 +71,11 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    public async Task ConfirmarAsync(int agendamentoId, CancellationToken cancellationToken = default)
+    public async Task ConfirmarAsync(int agendamentoId)
     {
         try
         {
-            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.Confirmado, cancellationToken);
+            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.Confirmado);
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }
@@ -85,11 +85,11 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    public async Task IniciarAtendimentoAsync(int agendamentoId, CancellationToken cancellationToken = default)
+    public async Task IniciarAtendimentoAsync(int agendamentoId)
     {
         try
         {
-            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.EmAtendimento, cancellationToken);
+            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.EmAtendimento);
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }
@@ -99,11 +99,11 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    public async Task ConcluirAsync(int agendamentoId, CancellationToken cancellationToken = default)
+    public async Task ConcluirAsync(int agendamentoId)
     {
         try
         {
-            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.Concluido, cancellationToken);
+            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.Concluido);
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }
@@ -113,11 +113,11 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    public async Task RegistrarNaoComparecimentoAsync(int agendamentoId, CancellationToken cancellationToken = default)
+    public async Task RegistrarNaoComparecimentoAsync(int agendamentoId)
     {
         try
         {
-            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.NaoCompareceu, cancellationToken);
+            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.NaoCompareceu);
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }
@@ -127,11 +127,11 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    public async Task CancelarAsync(int agendamentoId, string? motivo = null, CancellationToken cancellationToken = default)
+    public async Task CancelarAsync(int agendamentoId, string? motivo = null)
     {
         try
         {
-            var agendamento = await _agendamentoRepository.ObterPorIdAsync(agendamentoId, cancellationToken);
+            var agendamento = await _agendamentoRepository.ObterPorIdAsync(agendamentoId);
             if (agendamento == null)
                 throw new KeyNotFoundException($"Agendamento com ID {agendamentoId} nao encontrado.");
 
@@ -150,7 +150,7 @@ public class AgendamentoService : IAgendamentoService
                     : $"{agendamento.Observacoes} | Cancelado: {motivo}";
             }
 
-            await _agendamentoRepository.AtualizarAsync(agendamento, cancellationToken);
+            await _agendamentoRepository.AtualizarAsync(agendamento);
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }
@@ -160,7 +160,7 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    public async Task<AgendamentoDto> CriarAsync(CriarAgendamentoDto dto, CancellationToken cancellationToken = default)
+    public async Task<AgendamentoDto> CriarAsync(CriarAgendamentoDto dto)
     {
         try
         {
@@ -170,19 +170,19 @@ public class AgendamentoService : IAgendamentoService
             if (dto.DataHoraInicio < DateTime.UtcNow.AddMinutes(-5))
                 throw new ArgumentException("A data e hora do agendamento nao pode ser no passado.", nameof(dto.DataHoraInicio));
 
-            var cliente = await _usuarioRepository.ObterPorIdAsync(dto.ClienteId, cancellationToken);
+            var cliente = await _usuarioRepository.ObterPorIdAsync(dto.ClienteId);
             if (cliente == null)
                 throw new KeyNotFoundException($"Cliente com ID '{dto.ClienteId}' nao encontrado.");
             if (!cliente.Ativo)
                 throw new InvalidOperationException("O cliente informado esta desativado no sistema.");
 
-            var barbeiro = await _usuarioRepository.ObterPorIdAsync(dto.BarbeiroId, cancellationToken);
+            var barbeiro = await _usuarioRepository.ObterPorIdAsync(dto.BarbeiroId);
             if (barbeiro == null)
                 throw new KeyNotFoundException($"Barbeiro com ID '{dto.BarbeiroId}' nao encontrado.");
             if (!barbeiro.Ativo)
                 throw new InvalidOperationException("O barbeiro informado esta desativado no sistema.");
 
-            var servicos = (await _servicoRepository.ObterPorIdsAsync(dto.ServicoIds, cancellationToken))
+            var servicos = (await _servicoRepository.ObterPorIdsAsync(dto.ServicoIds))
                 .Where(s => s.Ativo)
                 .ToList();
 
@@ -192,11 +192,11 @@ public class AgendamentoService : IAgendamentoService
             var duracaoTotalMinutos = servicos.Sum(s => s.DuracaoMinutos);
             var dataHoraFim = dto.DataHoraInicio.AddMinutes(duracaoTotalMinutos);
 
-            var possuiBloqueio = await _usuarioRepository.ExisteBloqueioNoPeriodoAsync(dto.BarbeiroId, dto.DataHoraInicio, dataHoraFim, cancellationToken);
+            var possuiBloqueio = await _usuarioRepository.ExisteBloqueioNoPeriodoAsync(dto.BarbeiroId, dto.DataHoraInicio, dataHoraFim);
             if (possuiBloqueio)
                 throw new InvalidOperationException("O barbeiro selecionado possui um bloqueio de agenda no horario solicitado.");
 
-            var possuiConflito = await _agendamentoRepository.ExisteConflitoDeHorarioAsync(dto.BarbeiroId, dto.DataHoraInicio, dataHoraFim, null, cancellationToken);
+            var possuiConflito = await _agendamentoRepository.ExisteConflitoDeHorarioAsync(dto.BarbeiroId, dto.DataHoraInicio, dataHoraFim, null);
             if (possuiConflito)
                 throw new InvalidOperationException("Ja existe outro agendamento para este barbeiro no horario solicitado.");
 
@@ -217,8 +217,8 @@ public class AgendamentoService : IAgendamentoService
                 }).ToList()
             };
 
-            await _agendamentoRepository.AdicionarAsync(agendamento, cancellationToken);
-            return (await ObterPorIdAsync(agendamento.Id, cancellationToken))!;
+            await _agendamentoRepository.AdicionarAsync(agendamento);
+            return (await ObterPorIdAsync(agendamento.Id))!;
         }
         catch (KeyNotFoundException) { throw; }
         catch (ArgumentException) { throw; }
@@ -229,11 +229,11 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    public async Task<AgendamentoDto> ReagendarAsync(int agendamentoId, ReagendarAgendamentoDto dto, CancellationToken cancellationToken = default)
+    public async Task<AgendamentoDto> ReagendarAsync(int agendamentoId, ReagendarAgendamentoDto dto)
     {
         try
         {
-            var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(agendamentoId, cancellationToken);
+            var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(agendamentoId);
             if (agendamento == null)
                 throw new KeyNotFoundException($"Agendamento com ID {agendamentoId} nao encontrado.");
 
@@ -245,7 +245,7 @@ public class AgendamentoService : IAgendamentoService
 
             var barbeiroId = !string.IsNullOrWhiteSpace(dto.NovoBarbeiroId) ? dto.NovoBarbeiroId : agendamento.BarbeiroId;
 
-            var barbeiro = await _usuarioRepository.ObterPorIdAsync(barbeiroId, cancellationToken);
+            var barbeiro = await _usuarioRepository.ObterPorIdAsync(barbeiroId);
             if (barbeiro == null)
                 throw new KeyNotFoundException($"Barbeiro com ID '{barbeiroId}' nao encontrado.");
             if (!barbeiro.Ativo)
@@ -254,11 +254,11 @@ public class AgendamentoService : IAgendamentoService
             var duracaoOriginal = agendamento.DataHoraFim - agendamento.DataHoraInicio;
             var novoDataHoraFim = dto.NovoDataHoraInicio.Add(duracaoOriginal);
 
-            var possuiBloqueio = await _usuarioRepository.ExisteBloqueioNoPeriodoAsync(barbeiroId, dto.NovoDataHoraInicio, novoDataHoraFim, cancellationToken);
+            var possuiBloqueio = await _usuarioRepository.ExisteBloqueioNoPeriodoAsync(barbeiroId, dto.NovoDataHoraInicio, novoDataHoraFim);
             if (possuiBloqueio)
                 throw new InvalidOperationException("O barbeiro possui um bloqueio de agenda no novo horario selecionado.");
 
-            var possuiConflito = await _agendamentoRepository.ExisteConflitoDeHorarioAsync(barbeiroId, dto.NovoDataHoraInicio, novoDataHoraFim, agendamento.Id, cancellationToken);
+            var possuiConflito = await _agendamentoRepository.ExisteConflitoDeHorarioAsync(barbeiroId, dto.NovoDataHoraInicio, novoDataHoraFim, agendamento.Id);
             if (possuiConflito)
                 throw new InvalidOperationException("Ja existe outro agendamento para este barbeiro no novo horario selecionado.");
 
@@ -267,8 +267,8 @@ public class AgendamentoService : IAgendamentoService
             agendamento.DataHoraFim = novoDataHoraFim;
             agendamento.Status = StatusAgendamento.Pendente;
 
-            await _agendamentoRepository.AtualizarAsync(agendamento, cancellationToken);
-            return (await ObterPorIdAsync(agendamento.Id, cancellationToken))!;
+            await _agendamentoRepository.AtualizarAsync(agendamento);
+            return (await ObterPorIdAsync(agendamento.Id))!;
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }
@@ -279,18 +279,18 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    public async Task<IEnumerable<DateTime>> ListarHorariosDisponiveisAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<DateTime>> ListarHorariosDisponiveisAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds)
     {
         try
         {
             if (data.Date < DateTime.UtcNow.Date)
                 return Enumerable.Empty<DateTime>();
 
-            var barbeiro = await _usuarioRepository.ObterPorIdAsync(barbeiroId, cancellationToken);
+            var barbeiro = await _usuarioRepository.ObterPorIdAsync(barbeiroId);
             if (barbeiro == null)
                 throw new KeyNotFoundException($"Barbeiro com ID '{barbeiroId}' nao encontrado.");
 
-            var servicos = (await _servicoRepository.ObterPorIdsAsync(servicoIds, cancellationToken))
+            var servicos = (await _servicoRepository.ObterPorIdsAsync(servicoIds))
                 .Where(s => s.Ativo)
                 .ToList();
 
@@ -301,11 +301,11 @@ public class AgendamentoService : IAgendamentoService
             var inicioDia = data.Date;
             var fimDia = data.Date.AddDays(1);
 
-            var agendamentosExistentes = (await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicioDia, fimDia, cancellationToken))
+            var agendamentosExistentes = (await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicioDia, fimDia))
                 .Where(a => a.Status != StatusAgendamento.Cancelado && a.Status != StatusAgendamento.NaoCompareceu)
                 .ToList();
 
-            var bloqueios = (await _usuarioRepository.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicioDia, fimDia, cancellationToken))
+            var bloqueios = (await _usuarioRepository.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicioDia, fimDia))
                 .ToList();
 
             var horariosDisponiveis = new List<DateTime>();
@@ -333,11 +333,11 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
-    private async Task ValidarEAtualizarStatusAsync(int agendamentoId, StatusAgendamento novoStatus, CancellationToken cancellationToken)
+    private async Task ValidarEAtualizarStatusAsync(int agendamentoId, StatusAgendamento novoStatus)
     {
         try
         {
-            var agendamento = await _agendamentoRepository.ObterPorIdAsync(agendamentoId, cancellationToken);
+            var agendamento = await _agendamentoRepository.ObterPorIdAsync(agendamentoId);
             if (agendamento == null)
                 throw new KeyNotFoundException($"Agendamento com ID {agendamentoId} nao encontrado.");
 
@@ -347,7 +347,7 @@ public class AgendamentoService : IAgendamentoService
             if (agendamento.Status == StatusAgendamento.Concluido)
                 throw new InvalidOperationException("Nao e possivel alterar o status de um agendamento ja concluido.");
 
-            await _agendamentoRepository.AtualizarStatusAsync(agendamentoId, novoStatus, cancellationToken);
+            await _agendamentoRepository.AtualizarStatusAsync(agendamentoId, novoStatus);
         }
         catch (KeyNotFoundException) { throw; }
         catch (InvalidOperationException) { throw; }

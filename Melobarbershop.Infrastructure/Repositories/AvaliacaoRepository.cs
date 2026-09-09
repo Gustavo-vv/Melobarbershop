@@ -14,44 +14,44 @@ public class AvaliacaoRepository : IAvaliacaoRepository
         _context = context;
     }
 
-    public async Task<Avaliacao?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Avaliacao?> ObterPorIdAsync(int id)
     {
         return await _context.Avaliacoes
-            .FirstOrDefaultAsync(av => av.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(av => av.Id == id);
     }
 
-    public async Task<Avaliacao?> ObterPorAgendamentoIdAsync(int agendamentoId, CancellationToken cancellationToken = default)
+    public async Task<Avaliacao?> ObterPorAgendamentoIdAsync(int agendamentoId)
     {
         return await _context.Avaliacoes
             .Include(av => av.Cliente)
             .Include(av => av.Barbeiro)
-            .FirstOrDefaultAsync(av => av.AgendamentoId == agendamentoId, cancellationToken);
+            .FirstOrDefaultAsync(av => av.AgendamentoId == agendamentoId);
     }
 
-    public async Task<IEnumerable<Avaliacao>> ObterPorBarbeiroAsync(string barbeiroId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Avaliacao>> ObterPorBarbeiroAsync(string barbeiroId)
     {
         return await _context.Avaliacoes
             .Include(av => av.Cliente)
             .Where(av => av.BarbeiroId == barbeiroId)
             .OrderByDescending(av => av.DataCriacao)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Avaliacao>> ObterPorClienteAsync(string clienteId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Avaliacao>> ObterPorClienteAsync(string clienteId)
     {
         return await _context.Avaliacoes
             .Include(av => av.Barbeiro)
             .Where(av => av.ClienteId == clienteId)
             .OrderByDescending(av => av.DataCriacao)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 
-    public async Task<double> CalcularMediaAvaliacoesBarbeiroAsync(string barbeiroId, CancellationToken cancellationToken = default)
+    public async Task<double> CalcularMediaAvaliacoesBarbeiroAsync(string barbeiroId)
     {
         var avaliacoes = await _context.Avaliacoes
             .Where(av => av.BarbeiroId == barbeiroId)
             .Select(av => av.NotaEstrelas)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
 
         if (!avaliacoes.Any())
             return 0.0;
@@ -59,15 +59,15 @@ public class AvaliacaoRepository : IAvaliacaoRepository
         return avaliacoes.Average();
     }
 
-    public async Task<bool> ExisteAvaliacaoParaAgendamentoAsync(int agendamentoId, CancellationToken cancellationToken = default)
+    public async Task<bool> ExisteAvaliacaoParaAgendamentoAsync(int agendamentoId)
     {
         return await _context.Avaliacoes
-            .AnyAsync(av => av.AgendamentoId == agendamentoId, cancellationToken);
+            .AnyAsync(av => av.AgendamentoId == agendamentoId);
     }
 
-    public async Task AdicionarAsync(Avaliacao avaliacao, CancellationToken cancellationToken = default)
+    public async Task AdicionarAsync(Avaliacao avaliacao)
     {
-        await _context.Avaliacoes.AddAsync(avaliacao, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.Avaliacoes.AddAsync(avaliacao);
+        await _context.SaveChangesAsync();
     }
 }
