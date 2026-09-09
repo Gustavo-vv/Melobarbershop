@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cabinet+Grotesk:wght@700;800;900&display=swap');
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  user-select: none;
+  background-color: #060709;
+}
+
+.font-brand {
+  font-family: 'Cabinet Grotesk', 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Custom Scrollbar for Desktop feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0d0f15;
+}
+::-webkit-scrollbar-thumb {
+  background: #232736;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+}
+
+/* Neon Gradients & Glows matching the web reference */
+.glow-blue {
+  box-shadow: 0 0 25px -5px rgba(0, 168, 255, 0.35);
+}
+.glow-red {
+  box-shadow: 0 0 25px -5px rgba(255, 0, 85, 0.35);
+}
+.gradient-border-barber {
+  border: 1.5px solid transparent;
+  background: linear-gradient(#11131a, #11131a) padding-box,
+              linear-gradient(135deg, #ff0055 0%, #8b5cf6 50%, #00a8ff 100%) border-box;
+}
+.gradient-border-subtle {
+  border: 1px solid transparent;
+  background: linear-gradient(#131620, #131620) padding-box,
+              linear-gradient(135deg, rgba(255, 0, 85, 0.4) 0%, rgba(0, 168, 255, 0.4) 100%) border-box;
+}
+.glass-panel {
+  background: rgba(17, 19, 27, 0.85);
+  backdrop-filter: blur(12px);
+}
+
+/* Windows window drag simulation */
+.window-drag-region {
+  -webkit-app-region: drag;
+}
+.window-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Pulse animation */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite ease-in-out;
+}
