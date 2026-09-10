@@ -221,15 +221,3 @@
     letter-spacing: 2px;
     margin-bottom: 8px;
 }
-
-/* Modern Login Theme */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cabinet+Grotesk:wght@700;800;900&display=swap');
-body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #060709;
-}
-.font-brand { font-family: 'Cabinet Grotesk', 'Plus Jakarta Sans', sans-serif; }
-.glass-panel-login {
-  background: rgba(17, 19, 27, 0.7);
-  backdrop-filter: blur(16px);
-}

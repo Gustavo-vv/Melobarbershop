@@ -2,74 +2,158 @@
     Layout = null;
 }
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastro - Melo Barber Shop</title>
-  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
-  <link rel="stylesheet" href="~/css/cadastro.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Crie sua conta na Melo Barber Shop e facilite seus próximos agendamentos.">
+    <title>Criar Conta | Melo Barber Shop</title>
+    <link rel="stylesheet" href="~/css/cadastro.css" asp-append-version="true">
 </head>
-<body class="min-h-screen w-full bg-[#08090d] text-slate-100 flex items-center justify-center p-4 relative overflow-hidden py-10">
-  
-  <!-- Background Glow Effects -->
-  <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-  <div class="absolute bottom-1/4 left-1/4 w-96 h-96 bg-emerald-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+<body class="register-body">
+    <main class="register-page">
+        <section class="register-visual" aria-label="Melo Barber Shop">
+            <a href="/Auth/Login" class="register-back" aria-label="Voltar para o login">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                <span>Voltar para o login</span>
+            </a>
 
-  <!-- Register Container -->
-  <div class="w-full max-w-md z-10">
-    <div class="glass-panel-login border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-      
-      <!-- Top Accent Line -->
-      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-sky-500 to-purple-500"></div>
+            <div class="register-visual-content">
+                <a href="/" aria-label="Voltar para a página inicial">
+                    <img src="~/img/logo.png" alt="Melo Barber Shop" class="register-logo" width="150" height="175">
+                </a>
+                <span class="register-eyebrow">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3l15 15M3 6l15 15M8 8l8 8M16 8l-8 8"/></svg>
+                    Faça parte da família
+                </span>
+                <h1>Crie sua <span>conta</span></h1>
+                <div class="register-accent"></div>
+                <p>Preencha os dados abaixo para criar sua conta e agendar seus próximos cortes com praticidade.</p>
+            </div>
+        </section>
 
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <h1 class="text-2xl font-black text-white font-brand tracking-wider">CRIAR CONTA</h1>
-        <p class="text-sm text-slate-400 mt-1">Junte-se à Melo Barber Shop</p>
-      </div>
+        <section class="register-form-side" aria-labelledby="register-title">
+            <div class="register-progress" aria-label="Etapa 1 de 3">
+                <div class="register-step active">
+                    <div class="register-step-number">1</div>
+                    <span>DADOS</span>
+                </div>
+                <div class="register-line active"></div>
+                <div class="register-step">
+                    <div class="register-step-number">2</div>
+                    <span>CONFIRMAÇÃO</span>
+                </div>
+                <div class="register-line"></div>
+                <div class="register-step">
+                    <div class="register-step-number">3</div>
+                    <span>CONCLUÍDO</span>
+                </div>
+            </div>
 
-      <!-- Form -->
-      <form action="/Auth/Cadastro" method="POST" class="space-y-4">
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Nome Completo</label>
-          <input type="text" name="nome" required placeholder="Seu nome" 
-                 class="w-full px-4 py-2.5 rounded-xl bg-[#0b0d14] border border-slate-800 text-sm text-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all outline-none">
-        </div>
+            <form id="registerForm" action="/Auth/Cadastro" method="POST" novalidate>
+                <h2 id="register-title" class="sr-only">Criar sua conta</h2>
 
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">E-mail</label>
-          <input type="email" name="email" required placeholder="seu@email.com" 
-                 class="w-full px-4 py-2.5 rounded-xl bg-[#0b0d14] border border-slate-800 text-sm text-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all outline-none">
-        </div>
-        
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Senha</label>
-          <input type="password" name="password" required placeholder="Crie uma senha forte" 
-                 class="w-full px-4 py-2.5 rounded-xl bg-[#0b0d14] border border-slate-800 text-sm text-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all outline-none">
-        </div>
+                <div class="register-row">
+                    <div class="register-field">
+                        <label for="nome">Nome completo</label>
+                        <div class="register-input">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>
+                            <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Digite seu nome completo" required>
+                        </div>
+                    </div>
+                    <div class="register-field">
+                        <label for="email">E-mail</label>
+                        <div class="register-input">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM3 7l9 7 9-7"/></svg>
+                            <input type="email" id="email" name="email" autocomplete="email" placeholder="Digite seu e-mail" required>
+                        </div>
+                    </div>
+                </div>
 
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Confirmar Senha</label>
-          <input type="password" name="confirmPassword" required placeholder="Repita a senha" 
-                 class="w-full px-4 py-2.5 rounded-xl bg-[#0b0d14] border border-slate-800 text-sm text-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all outline-none">
-        </div>
+                <div class="register-row">
+                    <div class="register-field">
+                        <label for="telefone">Telefone</label>
+                        <div class="register-input">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.5l3 1.5-1.8 3.5a16 16 0 0 0 7.8 7.8l3.5-1.8 1.5 3a2 2 0 0 1-2.2 2.9A18 18 0 0 1 3.6 5.7 2 2 0 0 1 6.5 3.5z"/></svg>
+                            <input type="tel" id="telefone" name="telefone" autocomplete="tel" inputmode="tel" placeholder="(11) 99999-9999">
+                        </div>
+                    </div>
+                    <div class="register-field">
+                        <label for="nascimento">Data de nascimento</label>
+                        <div class="register-input">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+                            <input type="date" id="nascimento" name="nascimento" autocomplete="bday">
+                        </div>
+                    </div>
+                </div>
 
-        <button type="submit" class="w-full mt-2 py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-sm flex items-center justify-center shadow-lg shadow-sky-500/25 active:scale-[0.98] transition-all">
-          CADASTRAR E ENTRAR
-        </button>
-      </form>
+                <div class="register-field">
+                    <label for="senha">Senha</label>
+                    <div class="register-input">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                        <input type="password" id="senha" name="password" autocomplete="new-password" placeholder="Crie uma senha" minlength="8" required>
+                        <button type="button" class="register-eye" data-target="senha" aria-label="Mostrar senha">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
 
-      <!-- Footer Links -->
-      <div class="mt-8 text-center border-t border-slate-800/80 pt-6">
-        <p class="text-xs text-slate-400">
-          Já possui conta? 
-          <a href="/Auth/Login" class="text-sky-400 font-bold hover:text-sky-300 transition-colors ml-1">Fazer Login</a>
-        </p>
-      </div>
+                <div class="register-field">
+                    <label for="confirmarSenha">Confirmar senha</label>
+                    <div class="register-input">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                        <input type="password" id="confirmarSenha" name="confirmarSenha" autocomplete="new-password" placeholder="Confirme sua senha" minlength="8" required>
+                        <button type="button" class="register-eye" data-target="confirmarSenha" aria-label="Mostrar confirmação de senha">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
 
-    </div>
-  </div>
+                <label class="register-terms">
+                    <input type="checkbox" id="termos" name="termos" required>
+                    <span>Eu aceito os <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a></span>
+                </label>
 
+                <button type="submit" class="register-submit">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M16 11h6"/></svg>
+                    Criar conta
+                </button>
+
+                <p class="register-already">Já tem uma conta? <a href="/Auth/Login">Fazer login</a></p>
+                <div class="register-message" id="message" aria-live="polite"></div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        document.querySelectorAll('.register-eye').forEach(button => {
+            button.addEventListener('click', () => {
+                const input = document.getElementById(button.dataset.target);
+                const visible = input.type === 'text';
+                input.type = visible ? 'password' : 'text';
+                button.setAttribute('aria-label', visible ? 'Mostrar senha' : 'Ocultar senha');
+            });
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', event => {
+            const form = event.currentTarget;
+            const message = document.getElementById('message');
+            const senha = document.getElementById('senha').value;
+            const confirmar = document.getElementById('confirmarSenha').value;
+
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                form.reportValidity();
+                return;
+            }
+
+            if (senha !== confirmar) {
+                event.preventDefault();
+                message.textContent = 'As senhas não são iguais.';
+                message.className = 'register-message error';
+                return;
+            }
+        });
+    </script>
 </body>
 </html>
