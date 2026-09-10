@@ -48,5 +48,37 @@ namespace Melobarbershop.API.Controllers
             if (!response.Sucesso) return BadRequest(response);
             return StatusCode(201, response);
         }
+
+        [HttpPut("id")]
+        public async Task<IActionResult> Atualizar(int id, [FromBody] AtualizarServicoDto dto)
+        {
+            var response = await _servicoService.AtualizarAsync(id, dto);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpDelete("{id}/desativar")]
+        public async Task<IActionResult> Desativar(int id)
+        {
+            var response = await _servicoService.DesativarAsync(id);
+            if (!response.Sucesso) return NotFound(response);
+            return Ok(response);
+        }
+
+        [HttpPut("{id}/reativar")]
+        public async Task<IActionResult> Reativar(int id)
+        {
+            var response = await _servicoService.AtivarAsync(id);
+            if (!response.Sucesso) return NotFound(response);
+            return Ok(response);
+        }
+
+        [HttpDelete("{id}/permanente")]
+        public async Task<IActionResult> ExcluirPermanente(int id)
+        {
+            var response = await _servicoService.RemoverPermanentementeAsync(id);
+            if (!response.Sucesso) return NotFound(response);
+            return Ok(response);
+        }
     }
 }
