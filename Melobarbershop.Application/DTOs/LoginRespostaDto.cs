@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SenacFlix.Application.DTOs
+namespace Melobarbershop.Application.DTOs
 {
     public class LoginRespostaDto
     {

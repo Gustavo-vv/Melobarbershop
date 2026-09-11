@@ -39,7 +39,6 @@ public class CriarUsuarioDto
     public DateTime? DataNascimento { get; set; }
     public string? PreferenciasNotas { get; set; }
     public string? FotoUrl { get; set; }
-    public decimal? PercentualComissao { get; set; }
 }
 
 public class LoginDto

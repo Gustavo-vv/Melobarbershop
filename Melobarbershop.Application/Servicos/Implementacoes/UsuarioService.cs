@@ -113,7 +113,6 @@ public class UsuarioService : IUsuarioService
                 DataNascimento = dto.DataNascimento,
                 PreferenciasNotas = dto.PreferenciasNotas,
                 FotoUrl = dto.FotoUrl,
-                PercentualComissao = dto.PercentualComissao,
                 DataCadastro = DateTime.UtcNow,
                 Ativo = true
             };

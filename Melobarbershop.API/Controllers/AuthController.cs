@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using SenacFlix.Application.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -16,11 +15,13 @@ namespace Melobarbershop.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
             _configuration = configuration;
         }
 
@@ -71,11 +72,15 @@ namespace Melobarbershop.API.Controllers
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null || !user.Ativo)
-                return Unauthorized(ApiResposta<LoginRespostaDto>.Falha("Usuario invalido ou inativo"));
+                return Unauthorized(ApiResposta<LoginRespostaDto>.Falha("Email ou senha inválidos"));
 
-            var passwordIsValid = await _userManager.CheckPasswordAsync(user, dto.Senha);
-            if (!passwordIsValid)
-                return Unauthorized(ApiResposta<LoginRespostaDto>.Falha("Senha Incorreta"));
+            var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Senha, lockoutOnFailure: true);
+
+            if (result.IsLockedOut)
+                return Unauthorized(ApiResposta<LoginRespostaDto>.Falha("Conta bloqueada por temporariamente por excesso de tentativas. Tente novamente mais tarde."));
+            
+            if (!result.Succeeded)
+                return Unauthorized(ApiResposta<LoginRespostaDto>.Falha("Email ou senha inválidos"));
 
             var roles = await _userManager.GetRolesAsync(user);
 
