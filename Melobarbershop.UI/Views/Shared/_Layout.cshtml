@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
@@ -38,9 +38,32 @@
                 Agendar
                 <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
             </a>
-            <a href="/Auth/Login" class="login-icon" aria-label="Entrar">
-                <img src="~/img/icons/user.png" alt="" class="">
-            </a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="user-logged-box">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a href="/Dashboard" class="user-name-badge" title="Acessar Dashboard">
+                            <img src="~/img/icons/user.png" alt="">
+                            <span>@(User.Identity.Name ?? "Admin") (Painel)</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="user-name-badge" title="Usuário autenticado">
+                            <img src="~/img/icons/user.png" alt="">
+                            <span>@(User.Identity.Name ?? "Minha Conta")</span>
+                        </span>
+                    }
+                    <a href="/Auth/Logout" class="user-logout-btn" title="Sair da conta">Sair</a>
+                </div>
+            }
+            else
+            {
+                <a href="/Auth/Login" class="login-icon" aria-label="Entrar">
+                    <img src="~/img/icons/user.png" alt="" class="">
+                </a>
+            }
         </div>
     </header>
 
@@ -62,8 +85,19 @@
                     <li><a href="/#servicos">ServiÃ§os</a></li>
                     <li><a href="/#galeria">Galeria</a></li>
                     <li><a href="/#contato">Contato</a></li>
-                    <li><a href="/Auth/Login">Entrar</a></li>
-                    <li><a href="/Auth/Cadastro">Criar conta</a></li>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li><a href="/Dashboard">Painel Admin</a></li>
+                        }
+                        <li><a href="/Auth/Logout">Sair (@User.Identity.Name)</a></li>
+                    }
+                    else
+                    {
+                        <li><a href="/Auth/Login">Entrar</a></li>
+                        <li><a href="/Auth/Cadastro">Criar conta</a></li>
+                    }
                 </ul>
             </div>
             <div>

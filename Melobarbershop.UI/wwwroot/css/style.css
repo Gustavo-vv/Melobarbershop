@@ -238,6 +238,60 @@ img {
     filter: invert(43%) sepia(98%) saturate(2607%) hue-rotate(195deg) brightness(101%) contrast(104%);
 }
 
+.user-logged-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 10px;
+}
+
+.user-name-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(22, 140, 255, 0.12);
+    border: 1px solid rgba(22, 140, 255, 0.35);
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.user-name-badge:hover {
+    background: rgba(22, 140, 255, 0.22);
+    border-color: var(--blue);
+}
+
+.user-name-badge img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+}
+
+.user-logout-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #a8b2bc;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.user-logout-btn:hover {
+    background: rgba(255, 71, 87, 0.15);
+    border-color: rgba(255, 71, 87, 0.5);
+    color: #ff4757;
+}
+
 /* =========================
    HERO
 ========================= */

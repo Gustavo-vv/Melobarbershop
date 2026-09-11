@@ -209,7 +209,18 @@
     margin-top: -8px;
     text-align: center;
     color: #35a1ff;
-    font-size: 12px;
+    font-size: 13px;
+    transition: color 0.2s ease;
+}
+
+.auth-message.error {
+    color: #ff5252;
+    font-weight: 600;
+}
+
+.auth-message.success {
+    color: #2ed573;
+    font-weight: 600;
 }
 
 .auth-brand {
