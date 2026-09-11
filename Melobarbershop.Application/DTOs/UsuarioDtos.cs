@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Melobarbershop.Application.DTOs;
 
 public class UsuarioDto
@@ -17,11 +19,23 @@ public class UsuarioDto
 
 public class CriarUsuarioDto
 {
+    [Required(ErrorMessage = "O Nome Completo e obrigatorio.")]
     public string Nome { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "O E-mail e obrigatorio.")]
+    [EmailAddress(ErrorMessage = "E-mail em formato invalido.")]
     public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "A Senha e obrigatoria.")]
+    [MinLength(6, ErrorMessage = "A senha deve ter no minimo 6 caracteres.")]
     public string Senha { get; set; } = string.Empty;
-    public string? TelefoneWhatsApp { get; set; }
-    public string Role { get; set; } = "Cliente"; // "Cliente", "Barbeiro", "Admin"
+
+    [Required(ErrorMessage = "A confirmacao de senha e obrigatoria.")]
+    [Compare("Senha", ErrorMessage = "As senhas nao coincidem.")]
+    public string ConfirmarSenha { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "O Telefone é obrigatorio.")]
+    public string TelefoneWhatsApp { get; set; } = string.Empty;
     public DateTime? DataNascimento { get; set; }
     public string? PreferenciasNotas { get; set; }
     public string? FotoUrl { get; set; }

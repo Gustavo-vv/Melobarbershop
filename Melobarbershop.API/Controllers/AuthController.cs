@@ -1,4 +1,5 @@
-﻿using Melobarbershop.Domain.Entidades;
+﻿using Melobarbershop.Application.DTOs;
+using Melobarbershop.Domain.Entidades;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -36,9 +37,32 @@ namespace Melobarbershop.API.Controllers
         }
 
         [HttpPost("registrar")]
-        public async Task<IActionResult> Registrar([FromBody] RegistrarUsuarioDto)
+        public async Task<IActionResult> Registrar([FromBody] CriarUsuarioDto dto)
         {
+            var userExists = await _userManager.FindByEmailAsync(dto.Email);
+            if (userExists != null) return BadRequest(ApiResposta<object>.Falha("Já existe um usuário com este email! "));
 
+            var user = new ApplicationUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                Nome = dto.Nome,
+                PhoneNumber = dto.TelefoneWhatsApp,
+                DataNascimento = dto.DataNascimento,
+                Ativo = true,
+                DataCadastro = DateTime.Now
+            };
+
+            var result = await _userManager.CreateAsync(user, dto.Senha);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description).ToList();
+                return BadRequest(ApiResposta<object>.FalhaValidacao(errors, "Erro ao criar Usuário"));
+            }
+
+            await _userManager.AddToRoleAsync(user, "Cliente");
+            return StatusCode(201, ApiResposta<object>.Ok(null!, "Usuário registrado com sucesso!"));
         }
     }
 }

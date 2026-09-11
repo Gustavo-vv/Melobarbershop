@@ -122,11 +122,11 @@ public class UsuarioService : IUsuarioService
             if (!result.Succeeded)
                 throw new InvalidOperationException($"Erro ao criar usuario: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-            var roleValida = dto.Role is "Cliente" or "Barbeiro" or "Admin" ? dto.Role : "Cliente";
-            await _userManager.AddToRoleAsync(usuario, roleValida);
+            const string roleCliente = "Cliente"; // sempre Cliente, endpoint de registro é público
+            await _userManager.AddToRoleAsync(usuario, roleCliente);
 
             var resultDto = _mapper.Map<UsuarioDto>(usuario);
-            resultDto.Roles = [roleValida];
+            resultDto.Roles = [roleCliente];
             return resultDto;
         }
         catch (InvalidOperationException) { throw; }

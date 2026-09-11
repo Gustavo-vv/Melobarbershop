@@ -5,9 +5,10 @@ namespace Melobarbershop.Domain.Entidades;
 public class ApplicationUser : IdentityUser
 {
     public string Nome { get; set; } = string.Empty;
+    public string? TelefoneWhatsApp { get; set; }
     public DateTime? DataNascimento { get; set; }
-    public string? PreferenciasNotas { get; set; } // Preferências do cliente ou notas
-    public string? FotoUrl { get; set; }           // Foto de perfil do barbeiro/cliente
+    public string? PreferenciasNotas { get; set; }   // Preferências do cliente ou notas
+    public string? FotoUrl { get; set; }             // Foto de perfil do barbeiro/cliente
     public decimal? PercentualComissao { get; set; } // Percentual de comissao para barbeiros
     public DateTime DataCadastro { get; set; } = DateTime.UtcNow;
     public bool Ativo { get; set; } = true;
