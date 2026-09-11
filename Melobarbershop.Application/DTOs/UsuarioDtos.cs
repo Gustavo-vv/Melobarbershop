@@ -42,6 +42,15 @@ public class CriarUsuarioDto
     public decimal? PercentualComissao { get; set; }
 }
 
+public class LoginDto
+{
+    [Required(ErrorMessage = "O Email é obrigatório!")]
+    public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "A Senha é obrigatória!")]
+    public string Senha { get; set; } = string.Empty;
+}
+
 public class AtualizarUsuarioDto
 {
     public string Nome { get; set; } = string.Empty;
