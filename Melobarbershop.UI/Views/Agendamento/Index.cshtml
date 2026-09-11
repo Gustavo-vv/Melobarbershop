@@ -1,0 +1,115 @@
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Agendamento online - Melo Barber Shop">
+  <title>Agendamento | Melo Barber Shop</title>
+  <link rel="icon" type="image/png" href="~/img/logo.png">
+  <link rel="stylesheet" href="~/css/agendamento.css" asp-append-version="true" />
+</head>
+<body>
+  <main class="booking-page">
+    <div class="topbar">
+      <button class="back-btn" type="button" aria-label="Voltar" onclick="history.back()">
+        <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="topbar-actions">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Mudar tema">
+          <span class="theme-icon">☾</span>
+          <span id="themeText">Tema preto</span>
+        </button>
+        <button class="close-btn" type="button" aria-label="Fechar" onclick="location.href='/'">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="booking-layout">
+      <section class="schedule-panel" aria-label="Escolha do dia e horário">
+        <div class="brand-row">
+          <div class="brand-copy">
+            <img class="brand-logo" src="~/img/logo.png" alt="Melo Barber Shop">
+            <div>
+              <div class="eyebrow">Agendamento online</div>
+              <h1>Escolha seu <span>horário</span></h1>
+            </div>
+          </div>
+        </div>
+
+        <div class="month-toolbar">
+          <div class="month-label" id="monthLabel">Setembro 2026</div>
+          <div class="month-controls">
+            <button class="month-btn" id="prevMonth" type="button" aria-label="Mês anterior">‹</button>
+            <div class="month-picker">
+              <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+              <span id="monthPickerLabel">Setembro 2026</span>
+            </div>
+            <button class="month-btn" id="nextMonth" type="button" aria-label="Próximo mês">›</button>
+          </div>
+        </div>
+
+        <div class="notice" id="notice">
+          <strong>Precisa de mais datas?</strong>
+          Expanda para a visualização do mês completo.
+          <button class="notice-close" id="noticeClose" type="button" aria-label="Fechar aviso">×</button>
+        </div>
+
+        <div class="days-wrap" id="daysWrap"></div>
+
+        <div class="times">
+          <div class="available-times-title">Horários disponíveis</div>
+          <div class="time-list" id="timeList"></div>
+        </div>
+      </section>
+
+      <aside class="order-card" aria-label="Resumo do pedido">
+        <h2>Seu pedido</h2>
+        <div class="service-box">
+          <div class="service-main">
+            <div>
+              <div class="service-name" id="serviceName">Corte</div>
+              <div class="service-duration" id="serviceDuration">30 min</div>
+            </div>
+            <div class="service-price" id="servicePrice">R$ 40,00</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="team-title">Equipe disponível</div>
+          <div class="team-list">
+            <button class="barber selected" data-barber="Guilherme" type="button">
+              <span class="avatar">G</span>
+              <span class="barber-name">Guilherme <span class="preference-dot"></span></span>
+              <span class="rating">★ 5,0</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="order-actions">
+          <button class="add-service" type="button" onclick="location.href='/Servicos'">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Adicionar outro serviço
+          </button>
+
+          <div class="total-row">
+            <span>Total</span>
+            <span id="totalPrice">R$ 40,00</span>
+          </div>
+
+          <button class="continue-btn" id="continueBtn" type="button">Continuar</button>
+        </div>
+
+        <p style="color:#7e8a97;font-size:11px;margin-top:12px;text-align:center">
+          <span id="selectedDayLabel">11 de setembro</span> • <span id="barberSummary">Guilherme</span>
+        </p>
+      </aside>
+    </div>
+  </main>
+
+  <script src="~/js/agendamento.js" asp-append-version="true"></script>
+</body>
+</html>
