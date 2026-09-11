@@ -1,5 +1,9 @@
+@model IEnumerable<Melobarbershop.Application.DTOs.ServicoDto>
 @{
     Layout = null;
+    var servicosLista = Model?.ToList() ?? new List<Melobarbershop.Application.DTOs.ServicoDto>();
+    var populares = servicosLista.Take(4).ToList();
+    var outros = servicosLista.Skip(4).ToList();
 }
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="dark">
@@ -48,33 +52,69 @@
           </div>
         </div>
 
-        <div class="group">
-          <div class="group-title">Serviços populares</div>
-          <button class="service-row" type="button" data-service-id="corte" data-service-name="Corte" data-service-duration="30" data-service-price="40">
-            <span class="service-main"><strong>Corte</strong><small>30 min</small></span>
-            <span class="service-side"><strong>R$ 40,00</strong><span class="select-btn">Selecionar</span></span>
-          </button>
-          <button class="service-row" type="button" data-service-id="corte-barba" data-service-name="Corte & Barba" data-service-duration="40" data-service-price="60">
-            <span class="service-main"><strong>Corte &amp; Barba</strong><small>40 min</small></span>
-            <span class="service-side"><strong>R$ 60,00</strong><span class="select-btn">Selecionar</span></span>
-          </button>
-          <button class="service-row" type="button" data-service-id="barba" data-service-name="Barba" data-service-duration="30" data-service-price="30">
-            <span class="service-main"><strong>Barba</strong><small>30 min</small></span>
-            <span class="service-side"><strong>R$ 30,00</strong><span class="select-btn">Selecionar</span></span>
-          </button>
-        </div>
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage as string))
+        {
+          <div class="service-feedback error">
+            <p>@ViewBag.ErrorMessage</p>
+            <button type="button" onclick="location.reload()">Tentar novamente</button>
+          </div>
+        }
+        else if (!servicosLista.Any())
+        {
+          <div class="service-feedback">
+            <p>Nenhum serviço disponível no momento.</p>
+          </div>
+        }
+        else
+        {
+          @if (populares.Any())
+          {
+            <div class="group">
+              <div class="group-title">Serviços populares</div>
+              @foreach (var servico in populares)
+              {
+                <button class="service-row" type="button"
+                        data-service-id="@servico.Id"
+                        data-service-name="@servico.Nome"
+                        data-service-duration="@servico.DuracaoMinutos"
+                        data-service-price="@servico.Preco.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)">
+                  <span class="service-main">
+                    <strong>@servico.Nome</strong>
+                    <small>@servico.DuracaoMinutos min</small>
+                  </span>
+                  <span class="service-side">
+                    <strong>@servico.Preco.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                    <span class="select-btn">Selecionar</span>
+                  </span>
+                </button>
+              }
+            </div>
+          }
 
-        <div class="group">
-          <div class="group-title">Outros serviços</div>
-          <button class="service-row" type="button" data-service-id="lavagem" data-service-name="Lavagem" data-service-duration="20" data-service-price="20">
-            <span class="service-main"><strong>Lavagem</strong><small>20 min</small></span>
-            <span class="service-side"><strong>R$ 20,00</strong><span class="select-btn">Selecionar</span></span>
-          </button>
-          <button class="service-row" type="button" data-service-id="sobrancelha" data-service-name="Sobrancelha" data-service-duration="15" data-service-price="15">
-            <span class="service-main"><strong>Sobrancelha</strong><small>15 min</small></span>
-            <span class="service-side"><strong>R$ 15,00</strong><span class="select-btn">Selecionar</span></span>
-          </button>
-        </div>
+          @if (outros.Any())
+          {
+            <div class="group">
+              <div class="group-title">Outros serviços</div>
+              @foreach (var servico in outros)
+              {
+                <button class="service-row" type="button"
+                        data-service-id="@servico.Id"
+                        data-service-name="@servico.Nome"
+                        data-service-duration="@servico.DuracaoMinutos"
+                        data-service-price="@servico.Preco.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)">
+                  <span class="service-main">
+                    <strong>@servico.Nome</strong>
+                    <small>@servico.DuracaoMinutos min</small>
+                  </span>
+                  <span class="service-side">
+                    <strong>@servico.Preco.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</strong>
+                    <span class="select-btn">Selecionar</span>
+                  </span>
+                </button>
+              }
+            </div>
+          }
+        }
       </section>
 
       <p class="note">
