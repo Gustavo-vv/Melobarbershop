@@ -135,23 +135,88 @@
             });
         });
 
-        document.getElementById('registerForm').addEventListener('submit', event => {
+        document.getElementById('registerForm').addEventListener('submit', async event => {
+            event.preventDefault();
             const form = event.currentTarget;
             const message = document.getElementById('message');
-            const senha = document.getElementById('senha').value;
-            const confirmar = document.getElementById('confirmarSenha').value;
+            const submitBtn = form.querySelector('.register-submit');
 
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                form.reportValidity();
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
+            const nascimento = document.getElementById('nascimento').value;
+            const senha = document.getElementById('senha').value;
+            const confirmarSenha = document.getElementById('confirmarSenha').value;
+            const termos = document.getElementById('termos').checked;
+
+            if (!nome || !email || !telefone || !senha || !confirmarSenha) {
+                message.textContent = 'Por favor, preencha todos os campos obrigatórios.';
+                message.className = 'register-message error';
                 return;
             }
 
-            if (senha !== confirmar) {
-                event.preventDefault();
-                message.textContent = 'As senhas não são iguais.';
+            if (!termos) {
+                message.textContent = 'Você deve aceitar os termos de uso para prosseguir.';
                 message.className = 'register-message error';
                 return;
+            }
+
+            if (senha.length < 6) {
+                message.textContent = 'A senha deve ter no mínimo 6 caracteres.';
+                message.className = 'register-message error';
+                return;
+            }
+
+            if (senha !== confirmarSenha) {
+                message.textContent = 'As senhas não conferem.';
+                message.className = 'register-message error';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Criando conta...';
+            message.textContent = '';
+            message.className = 'register-message';
+
+            try {
+                const payload = {
+                    nome: nome,
+                    email: email,
+                    telefoneWhatsApp: telefone,
+                    senha: senha,
+                    confirmarSenha: confirmarSenha,
+                    dataNascimento: nascimento ? new Date(nascimento).toISOString() : null
+                };
+
+                const response = await fetch('/Auth/Cadastro', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json().catch(() => null);
+
+                if (response.ok && data && data.sucesso) {
+                    message.textContent = data.mensagem || 'Cadastro realizado com sucesso! Redirecionando para o login...';
+                    message.className = 'register-message success';
+                    setTimeout(() => {
+                        window.location.href = '/Auth/Login';
+                    }, 1500);
+                } else {
+                    const erro = (data && data.mensagem) ? data.mensagem : 'Erro ao cadastrar usuário. Verifique seus dados.';
+                    message.textContent = erro;
+                    message.className = 'register-message error';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Criar conta';
+                }
+            } catch (err) {
+                message.textContent = 'Falha ao conectar com o servidor. Verifique sua conexão.';
+                message.className = 'register-message error';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Criar conta';
             }
         });
     </script>

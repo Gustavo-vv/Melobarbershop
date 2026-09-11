@@ -167,10 +167,59 @@ namespace Melobarbershop.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Cadastro(string nome, string email, string password)
+        public async Task<IActionResult> Cadastro([FromBody] CriarUsuarioDto dto)
         {
-            // Lógica de registro a ser implementada futuramente
-            return RedirectToAction("Login");
+            if (dto == null)
+                return BadRequest(new { sucesso = false, mensagem = "Dados inválidos. Por favor, preencha todos os campos." });
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("ApiClient");
+                var jsonContent = new StringContent(
+                    JsonSerializer.Serialize(dto),
+                    Encoding.UTF8,
+                    "application/json");
+
+                var response = await client.PostAsync("/api/Auth/registrar", jsonContent);
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var apiResult = JsonSerializer.Deserialize<ApiResposta<object>>(responseBody, jsonOptions);
+
+                if (response.IsSuccessStatusCode && apiResult?.Sucesso == true)
+                {
+                    return StatusCode(201, new
+                    {
+                        sucesso = true,
+                        mensagem = apiResult.Mensagem ?? "Conta criada com sucesso! Faça o login para continuar."
+                    });
+                }
+
+                // Trata erros de validação (lista de erros) ou mensagem única
+                var mensagem = apiResult?.Mensagem ?? "Erro ao criar conta. Tente novamente.";
+                if (apiResult?.Erros != null && apiResult.Erros.Count > 0)
+                    mensagem = string.Join(" ", apiResult.Erros);
+
+                return StatusCode((int)response.StatusCode, new { sucesso = false, mensagem });
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Erro de conexão com a API de registro.");
+                return StatusCode(503, new
+                {
+                    sucesso = false,
+                    mensagem = "Não foi possível conectar ao servidor. Verifique se a API está online."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro inesperado durante o cadastro.");
+                return StatusCode(500, new
+                {
+                    sucesso = false,
+                    mensagem = "Ocorreu um erro interno ao processar o cadastro."
+                });
+            }
         }
     }
 }
