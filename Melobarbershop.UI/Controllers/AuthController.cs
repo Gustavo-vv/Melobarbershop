@@ -106,13 +106,12 @@ namespace Melobarbershop.UI.Controllers
                     authProperties);
 
                 // Regra de Redirecionamento por Role/Claim:
-                // SE Role = "Admin": /Dashboard (mapeado para Admin/Index)
+                // SE Role = "Admin": /Admin
                 // SE Role = "Cliente": /Home/Index
-                // Fallback: /Home/Index
                 string redirectUrl = "/Home/Index";
                 if (loginData.Perfis != null && loginData.Perfis.Contains("Admin", StringComparer.OrdinalIgnoreCase))
                 {
-                    redirectUrl = "/Dashboard";
+                    redirectUrl = "/Admin";
                 }
 
                 return Ok(new
