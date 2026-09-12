@@ -140,44 +140,80 @@ document.addEventListener('keydown', event => {
 const year = document.querySelector('.copy p');
 if (year) year.innerHTML = `&copy; ${new Date().getFullYear()} Melo Barber Shop. Todos os direitos reservados.`;
 
-// Vídeo da seção "Experiência Melo".
+// Vídeo da seção "Experiência Melo" — autoplay ao entrar na viewport + pausa ao clicar.
 const videoMelo = document.getElementById("videoMelo");
 const playVideo = document.getElementById("playVideo");
+const playIcon = document.getElementById("playIcon");
 
 if (videoMelo && playVideo) {
-    const updatePlayButton = () => {
-        const isPlaying = !videoMelo.paused && !videoMelo.ended;
+    const PLAY_ICON = "/img/icons/play.svg";
+    const PAUSE_ICON = "/img/icons/pause.svg";
 
-        playVideo.style.opacity = isPlaying ? "0" : "1";
-        playVideo.style.pointerEvents = isPlaying ? "none" : "auto";
-        playVideo.setAttribute(
-            "aria-label",
-            isPlaying ? "Pausar vídeo" : "Reproduzir vídeo"
-        );
-
-        const icon = playVideo.querySelector("img");
-
-        if (icon) {
-            icon.src = isPlaying
-                ? "./img/icons/pause.svg"
-                : "./img/icons/play.svg";
-            icon.alt = isPlaying ? "Pausar vídeo" : "Reproduzir vídeo";
+    // Atualiza ícone e aria-label conforme estado do vídeo
+    const syncBtn = () => {
+        const playing = !videoMelo.paused && !videoMelo.ended;
+        playVideo.setAttribute("aria-label", playing ? "Pausar vídeo" : "Reproduzir vídeo");
+        if (playIcon) {
+            playIcon.src = playing ? PAUSE_ICON : PLAY_ICON;
+            playIcon.alt = playing ? "Pausar" : "Reproduzir";
         }
+        // Botão some quando tocando, aparece ao pausar
+        playVideo.style.opacity = playing ? "0" : "1";
+        playVideo.style.pointerEvents = playing ? "none" : "auto";
     };
 
+    // Autoplay quando o vídeo entrar 40% na tela; pausa ao sair
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    videoMelo.play().catch(() => {});
+                } else {
+                    videoMelo.pause();
+                }
+                syncBtn();
+            });
+        },
+        { threshold: 0.4 }
+    );
+    observer.observe(videoMelo);
+
+    // Clicar no botão pausa ou retoma
     playVideo.addEventListener("click", () => {
         if (videoMelo.paused) {
             videoMelo.play().catch(() => {});
         } else {
             videoMelo.pause();
         }
-
-        updatePlayButton();
+        syncBtn();
     });
 
-    videoMelo.addEventListener("play", updatePlayButton);
-    videoMelo.addEventListener("pause", updatePlayButton);
-    videoMelo.addEventListener("ended", updatePlayButton);
+    // Clicar direto no vídeo também pausa/retoma
+    videoMelo.addEventListener("click", () => {
+        if (videoMelo.paused) {
+            videoMelo.play().catch(() => {});
+        } else {
+            videoMelo.pause();
+        }
+        syncBtn();
+    });
 
-    updatePlayButton();
+    // Mostra o botão de play quando o mouse passa sobre a área do vídeo (parado)
+    videoMelo.parentElement.addEventListener("mouseenter", () => {
+        playVideo.style.opacity = "1";
+        playVideo.style.pointerEvents = "auto";
+    });
+    videoMelo.parentElement.addEventListener("mouseleave", () => {
+        if (!videoMelo.paused) {
+            playVideo.style.opacity = "0";
+            playVideo.style.pointerEvents = "none";
+        }
+    });
+
+    videoMelo.addEventListener("play",  syncBtn);
+    videoMelo.addEventListener("pause", syncBtn);
+    videoMelo.addEventListener("ended", syncBtn);
+
+    syncBtn();
 }
+

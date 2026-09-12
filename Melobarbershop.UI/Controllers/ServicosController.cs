@@ -61,6 +61,44 @@ namespace Melobarbershop.UI.Controllers
 
             return View(servicos);
         }
+
+        /// <summary>
+        /// Retorna os serviços ativos como JSON para consumo client-side (ex: Agendamento).
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> Dados()
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient("ApiClient");
+                var response = await client.GetAsync("/api/Servicos/todos");
+
+                if (!response.IsSuccessStatusCode)
+                    return Json(new { sucesso = false, dados = Array.Empty<object>() });
+
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var apiResult = JsonSerializer.Deserialize<ApiResposta<List<ServicoDto>>>(responseBody, jsonOptions);
+
+                var servicos = apiResult?.Dados?
+                    .Where(s => s.Ativo && s.ExibirNoSite)
+                    .Select(s => new {
+                        id = s.Id,
+                        nome = s.Nome,
+                        descricao = s.Descricao,
+                        preco = s.Preco,
+                        duracaoMinutos = s.DuracaoMinutos
+                    })
+                    .ToList() ?? new List<object>() as dynamic;
+
+                return Json(new { sucesso = true, dados = servicos });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao retornar serviços como JSON.");
+                return Json(new { sucesso = false, dados = Array.Empty<object>() });
+            }
+        }
     }
 }
 

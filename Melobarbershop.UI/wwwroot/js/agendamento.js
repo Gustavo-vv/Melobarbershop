@@ -1,18 +1,15 @@
 const bookingParams = new URLSearchParams(window.location.search);
-const selectedServiceFromUrl = {
-  id: bookingParams.get('serviceId'),
-  name: bookingParams.get('serviceName'),
-  durationMinutes: Number(bookingParams.get('duration')) || 45,
-  price: Number(bookingParams.get('price')) || 0
-};
+const urlServiceId   = bookingParams.get('serviceId');
+const urlServiceName = bookingParams.get('serviceName');
 
-const services = {
-  corte: { id:'corte', name:'Corte', durationMinutes:45, price:40 }
-};
+// Serviço em uso (começa com fallback; atualizado ao carregar da API)
 const stateService = {
-  selected: selectedServiceFromUrl.id
-    ? selectedServiceFromUrl
-    : services.corte
+  selected: {
+    id: urlServiceId || null,
+    name: urlServiceName || 'Corte',
+    durationMinutes: Number(bookingParams.get('duration')) || 45,
+    price: Number(bookingParams.get('price')) || 0
+  }
 };
 
 function renderServiceSummary() {
@@ -24,9 +21,53 @@ function renderServiceSummary() {
 
   if (name) name.textContent = service.name;
   if (duration) duration.textContent = `${service.durationMinutes} min`;
-  if (price) price.textContent = service.price.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-  if (total) total.textContent = service.price.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+  if (price) price.textContent = Number(service.price).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+  if (total) total.textContent = Number(service.price).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 }
+
+// Busca os serviços reais da API e substitui o serviço selecionado pelo correto
+async function carregarServicoDaApi() {
+  try {
+    const res = await fetch('/Servicos/Dados');
+    if (!res.ok) return;
+    const json = await res.json();
+    if (!json.sucesso || !json.dados || json.dados.length === 0) return;
+
+    const servicos = json.dados;
+    let encontrado = null;
+
+    // Prioridade: match por ID numérico
+    if (urlServiceId) {
+      encontrado = servicos.find(s => String(s.id) === String(urlServiceId));
+    }
+
+    // Fallback: match por nome (case insensitive, ignora acentos)
+    if (!encontrado && urlServiceName) {
+      const normalize = str => str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+      const nome = normalize(urlServiceName);
+      encontrado = servicos.find(s => normalize(s.nome) === nome)
+                || servicos.find(s => normalize(s.nome).includes(nome) || nome.includes(normalize(s.nome)));
+    }
+
+    if (encontrado) {
+      stateService.selected = {
+        id: encontrado.id,
+        name: encontrado.nome,
+        durationMinutes: encontrado.duracaoMinutos,
+        price: encontrado.preco
+      };
+      renderServiceSummary();
+    }
+  } catch (e) {
+    // Silencioso: mantém o fallback da URL
+  }
+}
+
+// Renderiza com fallback da URL imediatamente, depois atualiza com dados reais
+renderServiceSummary();
+carregarServicoDaApi();
+
+
 
 const themeToggle = document.querySelector('#themeToggle');
 const themeText = document.querySelector('#themeText');
