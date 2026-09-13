@@ -37,6 +37,7 @@ namespace Melobarbershop.UI.Controllers
                     {
                         var servicosVisiveis = apiResult.Dados
                             .Where(s => s.Ativo && s.ExibirNoSite)
+                            .Take(5) // Mantém a Home com uma quantidade fixa de cards em destaque, igual era antes da integração com a API
                             .Select((s, index) => MapearParaViewModel(s, index == 0))
                             .ToList();
 
