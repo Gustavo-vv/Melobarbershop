@@ -24,11 +24,12 @@ public static class InfrastructureServiceExtensions
         // 2. ASP.NET Core Identity com suporte a Roles
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         {
+            // Exigir número, letra minúscula, letra maiúscula e caracter especial
             options.Password.RequireDigit = true;
             options.Password.RequireLowercase = true;
-            options.Password.RequireUppercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequiredLength = 6;
+            options.Password.RequireUppercase = true; // alterado para exigir maiúscula
+            options.Password.RequireNonAlphanumeric = true; // alterar para exigir caracter especial
+            options.Password.RequiredLength = 8; // comprimento mínimo mais seguro
             options.User.RequireUniqueEmail = true;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             options.Lockout.MaxFailedAccessAttempts = 5;
