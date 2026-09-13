@@ -1,5 +1,8 @@
 namespace Melobarbershop.Domain.Enums;
 
+/// <summary>
+/// Representa os possíveis status de um agendamento.
+/// </summary>
 public enum StatusAgendamento
 {
     Pendente = 1,

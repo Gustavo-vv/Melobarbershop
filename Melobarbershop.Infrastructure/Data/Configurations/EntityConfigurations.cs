@@ -1,3 +1,6 @@
+// Arquivo: Melobarbershop.Infrastructure/Data/Configurations/EntityConfigurations.cs
+// Namespace: Melobarbershop.Infrastructure.Data.Configurations
+// Resumo: Contém configurações de mapeamento EF Core para entidades do domínio (Fluent API).
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Melobarbershop.Domain.Entidades;

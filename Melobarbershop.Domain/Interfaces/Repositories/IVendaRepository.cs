@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Interfaces/Repositories/IVendaRepository.cs
+// Namespace: Melobarbershop.Domain.Interfaces.Repositories
+// Conteúdo: interface IVendaRepository
+// Resumo: Contrato de repositório para operações sobre Vendas, itens e pagamentos.
 using Melobarbershop.Domain.Entidades;
 
 namespace Melobarbershop.Domain.Interfaces.Repositories;

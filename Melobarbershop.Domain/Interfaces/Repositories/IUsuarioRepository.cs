@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Interfaces/Repositories/IUsuarioRepository.cs
+// Namespace: Melobarbershop.Domain.Interfaces.Repositories
+// Conteúdo: interface IUsuarioRepository
+// Resumo: Contrato de repositório para operações relacionadas a ApplicationUser (usuários do sistema).
 using Melobarbershop.Domain.Entidades;
 
 namespace Melobarbershop.Domain.Interfaces.Repositories;

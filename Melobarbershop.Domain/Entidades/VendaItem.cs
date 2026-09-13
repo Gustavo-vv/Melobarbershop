@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Entidades/VendaItem.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class VendaItem
+// Resumo: Item que faz parte de uma Venda, pode referenciar serviço ou produto e quantidades.
 namespace Melobarbershop.Domain.Entidades;
 
 public class VendaItem

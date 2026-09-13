@@ -1,4 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+// Arquivo: Melobarbershop.Infrastructure/Repositories/PacoteRepository.cs
+// Namespace: Melobarbershop.Infrastructure.Repositories
+// Conteúdo: class PacoteRepository : IPacoteRepository
+// Resumo: Implementação do repositório para Pacote e PacoteItem.
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Interfaces.Repositories;
 using Melobarbershop.Infrastructure.Data;

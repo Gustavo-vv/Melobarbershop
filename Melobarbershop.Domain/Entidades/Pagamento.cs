@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Entidades/Pagamento.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class Pagamento
+// Resumo: Representa um pagamento realizado para uma venda, com forma e valor.
 using Melobarbershop.Domain.Enums;
 
 namespace Melobarbershop.Domain.Entidades;

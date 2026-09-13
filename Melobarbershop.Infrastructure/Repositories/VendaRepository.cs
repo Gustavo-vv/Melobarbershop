@@ -1,4 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+// Arquivo: Melobarbershop.Infrastructure/Repositories/VendaRepository.cs
+// Namespace: Melobarbershop.Infrastructure.Repositories
+// Conteúdo: class VendaRepository : IVendaRepository
+// Resumo: Implementação do repositório para Vendas, incluindo operações de criação e consulta de itens/pagamentos.
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Interfaces.Repositories;
 using Melobarbershop.Infrastructure.Data;

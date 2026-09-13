@@ -1,5 +1,8 @@
 namespace Melobarbershop.Domain.Enums;
 
+/// <summary>
+/// Enumeração que representa os tipos de movimentação de estoque.
+/// </summary>
 public enum TipoMovimentacaoEstoque
 {
     Entrada = 1,

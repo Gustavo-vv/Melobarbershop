@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Infrastructure/Repositories/UsuarioRepository.cs
+// Namespace: Melobarbershop.Infrastructure.Repositories
+// Conteúdo: class UsuarioRepository : IUsuarioRepository
+// Resumo: Implementação do repositório para usuários (consultas por perfil, atualização de dados).
 using Microsoft.EntityFrameworkCore;
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Interfaces.Repositories;

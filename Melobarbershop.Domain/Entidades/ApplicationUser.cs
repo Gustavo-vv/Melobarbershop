@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Entidades/ApplicationUser.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class ApplicationUser : IdentityUser
+// Resumo: Extensão do IdentityUser com campos específicos do domínio (nome, telefone, foto, etc.).
 using Microsoft.AspNetCore.Identity;
 
 namespace Melobarbershop.Domain.Entidades;

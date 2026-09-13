@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Melobarbershop.Application.DTOs;
+using Melobarbershop.UI.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Melobarbershop.UI.Controllers
@@ -17,7 +18,7 @@ namespace Melobarbershop.UI.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var servicos = new List<ServicoDto>();
+            var viewModel = new ListaServicosViewModel();
 
             try
             {
@@ -32,34 +33,52 @@ namespace Melobarbershop.UI.Controllers
 
                     if (apiResult != null && apiResult.Sucesso && apiResult.Dados != null)
                     {
-                        // Exibir serviços ativos e que estão habilitados para exibição no site
-                        servicos = apiResult.Dados
+                        // Exibir serviços ativos e que estão habilitados para exibição no site,
+                        // já convertidos de ServicoDto (Application) para ServicoViewModel (UI)
+                        var servicosVisiveis = apiResult.Dados
                             .Where(s => s.Ativo && s.ExibirNoSite)
+                            .Select(MapearParaViewModel)
                             .ToList();
+
+                        viewModel.Populares = servicosVisiveis.Take(4).ToList();
+                        viewModel.Outros = servicosVisiveis.Skip(4).ToList();
                     }
                     else
                     {
-                        ViewBag.ErrorMessage = apiResult?.Mensagem ?? "Não foi possível carregar os serviços.";
+                        viewModel.MensagemErro = apiResult?.Mensagem ?? "Não foi possível carregar os serviços.";
                     }
                 }
                 else
                 {
                     _logger.LogWarning("Falha ao consultar serviços na API. Status: {StatusCode}", response.StatusCode);
-                    ViewBag.ErrorMessage = "O serviço está temporariamente indisponível. Tente novamente mais tarde.";
+                    viewModel.MensagemErro = "O serviço está temporariamente indisponível. Tente novamente mais tarde.";
                 }
             }
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "Erro de conexão ao acessar GET /api/Servicos/todos.");
-                ViewBag.ErrorMessage = "Não foi possível conectar ao servidor de serviços. Verifique a conexão.";
+                viewModel.MensagemErro = "Não foi possível conectar ao servidor de serviços. Verifique a conexão.";
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro inesperado ao carregar serviços.");
-                ViewBag.ErrorMessage = "Ocorreu um erro ao carregar os serviços disponíveis.";
+                viewModel.MensagemErro = "Ocorreu um erro ao carregar os serviços disponíveis.";
             }
 
-            return View(servicos);
+            return View(viewModel);
+        }
+
+        // Converte o DTO recebido da API para o ViewModel usado pela camada de apresentação (UI)
+        private static ServicoViewModel MapearParaViewModel(ServicoDto dto)
+        {
+            return new ServicoViewModel
+            {
+                Id = dto.Id,
+                Nome = dto.Nome,
+                Descricao = dto.Descricao,
+                DuracaoMinutos = dto.DuracaoMinutos,
+                Preco = dto.Preco
+            };
         }
 
         /// <summary>

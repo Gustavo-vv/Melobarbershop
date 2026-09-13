@@ -1,3 +1,4 @@
+// Resumo: Implementação do repositório de Agendamento, responsável pelas operações de acesso a dados de agendamentos.
 using Microsoft.EntityFrameworkCore;
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Enums;

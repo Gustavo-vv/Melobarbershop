@@ -1,5 +1,8 @@
 namespace Melobarbershop.Domain.Enums;
 
+/// <summary>
+/// Indica a origem de um agendamento.
+/// </summary>
 public enum OrigemAgendamento
 {
     Site = 1,

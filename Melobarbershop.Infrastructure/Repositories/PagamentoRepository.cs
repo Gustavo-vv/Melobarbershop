@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Infrastructure/Repositories/PagamentoRepository.cs
+// Namespace: Melobarbershop.Infrastructure.Repositories
+// Conteúdo: class PagamentoRepository : IPagamentoRepository
+// Resumo: Implementação do repositório para operações relacionadas a Pagamento.
 using Microsoft.EntityFrameworkCore;
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Enums;

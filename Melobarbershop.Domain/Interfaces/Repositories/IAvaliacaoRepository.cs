@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Interfaces/Repositories/IAvaliacaoRepository.cs
+// Namespace: Melobarbershop.Domain.Interfaces.Repositories
+// Conteúdo: interface IAvaliacaoRepository
+// Resumo: Contrato de repositório para operações relacionadas a Avaliacao.
 using Melobarbershop.Domain.Entidades;
 
 namespace Melobarbershop.Domain.Interfaces.Repositories;

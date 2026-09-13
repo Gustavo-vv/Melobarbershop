@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Entidades/MovimentacaoEstoque.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class MovimentacaoEstoque
+// Resumo: Representa uma movimentação de estoque (entrada/saída) de um produto.
 using Melobarbershop.Domain.Enums;
 
 namespace Melobarbershop.Domain.Entidades;

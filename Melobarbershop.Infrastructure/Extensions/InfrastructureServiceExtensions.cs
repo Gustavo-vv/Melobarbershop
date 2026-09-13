@@ -15,6 +15,11 @@ public static class InfrastructureServiceExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // Arquivo: Melobarbershop.Infrastructure/Extensions/InfrastructureServiceExtensions.cs
+        // Namespace: Melobarbershop.Infrastructure.Extensions
+        // Conteúdo: static class InfrastructureServiceExtensions
+        // Resumo: Extensões para configurar serviços de infraestrutura (DbContext, Identity, repositórios).
+
         // 1. DbContext
         services.AddDbContext<BarbeariaDbContext>(options =>
             options.UseSqlServer(

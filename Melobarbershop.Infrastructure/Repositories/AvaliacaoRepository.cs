@@ -1,4 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+// Arquivo: Melobarbershop.Infrastructure/Repositories/AvaliacaoRepository.cs
+// Namespace: Melobarbershop.Infrastructure.Repositories
+// Conteúdo: class AvaliacaoRepository : IAvaliacaoRepository
+// Resumo: Implementação do repositório para Avaliacao, encapsulando operações de persistência.
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Interfaces.Repositories;
 using Melobarbershop.Infrastructure.Data;

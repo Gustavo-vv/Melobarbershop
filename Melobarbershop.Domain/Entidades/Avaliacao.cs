@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Entidades/Avaliacao.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class Avaliacao
+// Resumo: Representa a avaliação (nota e comentário) associada a um agendamento.
 namespace Melobarbershop.Domain.Entidades;
 
 public class Avaliacao

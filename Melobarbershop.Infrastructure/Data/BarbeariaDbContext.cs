@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Infrastructure/Data/BarbeariaDbContext.cs
+// Namespace: Melobarbershop.Infrastructure.Data
+// Conteúdo: class BarbeariaDbContext : IdentityDbContext<ApplicationUser>
+// Resumo: DbContext do EF Core que representa o banco de dados da barbearia, com DbSets e configurações.
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Melobarbershop.Domain.Entidades;

@@ -1,4 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+// Arquivo: Melobarbershop.Infrastructure/Repositories/NotificacaoLogRepository.cs
+// Namespace: Melobarbershop.Infrastructure.Repositories
+// Conteúdo: class NotificacaoLogRepository : INotificacaoLogRepository
+// Resumo: Implementação do repositório para logs de notificações, grava e consulta envios.
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Interfaces.Repositories;
 using Melobarbershop.Infrastructure.Data;

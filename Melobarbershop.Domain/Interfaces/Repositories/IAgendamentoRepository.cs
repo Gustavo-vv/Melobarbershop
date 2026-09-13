@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Interfaces/Repositories/IAgendamentoRepository.cs
+// Namespace: Melobarbershop.Domain.Interfaces.Repositories
+// Conteúdo: interface IAgendamentoRepository
+// Resumo: Contrato de repositório para operações CRUD e consultas específicas sobre Agendamento.
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Enums;
 

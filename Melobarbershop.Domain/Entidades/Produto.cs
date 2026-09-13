@@ -1,4 +1,8 @@
-﻿namespace Melobarbershop.Domain.Entidades
+﻿// Arquivo: Melobarbershop.Domain/Entidades/Produto.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class Produto
+// Resumo: Representa um produto físico vendido na barbearia (estoque, preços, código).
+namespace Melobarbershop.Domain.Entidades
 {
     public class Produto
     {

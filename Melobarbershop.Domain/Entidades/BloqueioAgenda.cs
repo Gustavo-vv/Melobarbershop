@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Entidades/BloqueioAgenda.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class BloqueioAgenda
+// Resumo: Representa um bloqueio de agenda para um barbeiro (período indisponível).
 namespace Melobarbershop.Domain.Entidades;
 
 public class BloqueioAgenda

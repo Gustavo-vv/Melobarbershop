@@ -1,4 +1,8 @@
-﻿namespace Melobarbershop.Domain.Entidades;
+﻿// Arquivo: Melobarbershop.Domain/Entidades/Servico.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class Servico
+// Resumo: Representa um serviço oferecido (nome, preço, duração e visibilidade no site).
+namespace Melobarbershop.Domain.Entidades;
 public class Servico
 {
    

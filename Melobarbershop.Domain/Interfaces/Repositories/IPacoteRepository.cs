@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Interfaces/Repositories/IPacoteRepository.cs
+// Namespace: Melobarbershop.Domain.Interfaces.Repositories
+// Conteúdo: interface IPacoteRepository
+// Resumo: Contrato de repositório para operações com Pacote e seus itens.
 namespace Melobarbershop.Domain.Interfaces.Repositories;
 
 using Melobarbershop.Domain.Entidades;

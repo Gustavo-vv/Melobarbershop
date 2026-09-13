@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Interfaces/Repositories/IPagamentoRepository.cs
+// Namespace: Melobarbershop.Domain.Interfaces.Repositories
+// Conteúdo: interface IPagamentoRepository
+// Resumo: Contrato de repositório para operações de pagamento associadas a Vendas.
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Enums;
 

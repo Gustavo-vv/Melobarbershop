@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Infrastructure/Repositories/TemplateMensagemRepository.cs
+// Namespace: Melobarbershop.Infrastructure.Repositories
+// Conteúdo: class TemplateMensagemRepository : ITemplateMensagemRepository
+// Resumo: Implementação do repositório para gerenciar templates de mensagem usados nas notificações.
 using Microsoft.EntityFrameworkCore;
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Enums;

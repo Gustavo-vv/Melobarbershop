@@ -10,6 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+// Resumo:
+// Popula dados de exemplo da barbearia (serviços, produtos, pacotes, usuários,
+// agendamentos, vendas e demais entidades) para ambiente de desenvolvimento.
 namespace Melobarbershop.Infrastructure.Data
 {
     public static class SeedDadosBarbearia

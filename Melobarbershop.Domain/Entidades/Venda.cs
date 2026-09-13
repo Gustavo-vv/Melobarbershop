@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Entidades/Venda.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class Venda
+// Resumo: Representa uma venda de produtos/serviços, com itens e pagamentos associados.
 namespace Melobarbershop.Domain.Entidades;
 
 public class Venda

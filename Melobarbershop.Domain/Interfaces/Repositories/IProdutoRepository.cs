@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Interfaces/Repositories/IProdutoRepository.cs
+// Namespace: Melobarbershop.Domain.Interfaces.Repositories
+// Conteúdo: interface IProdutoRepository
+// Resumo: Contrato de repositório para operações CRUD e consultas sobre produtos e estoque.
 namespace Melobarbershop.Domain.Interfaces.Repositories;
 
 using Melobarbershop.Domain.Entidades;

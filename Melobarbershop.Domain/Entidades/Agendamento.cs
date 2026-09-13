@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Entidades/Agendamento.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class Agendamento
+// Resumo: Entidade de domínio que representa um agendamento realizado na barbearia.
 using Melobarbershop.Domain.Enums;
 
 namespace Melobarbershop.Domain.Entidades;

@@ -1,4 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+// Arquivo: Melobarbershop.Infrastructure/Repositories/ServicoRepository.cs
+// Namespace: Melobarbershop.Infrastructure.Repositories
+// Conteúdo: class ServicoRepository : IServicoRepository
+// Resumo: Implementação do repositório para Serviços (CRUD e disponibilidade).
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Interfaces.Repositories;
 using Melobarbershop.Infrastructure.Data;

@@ -1,4 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+// Arquivo: Melobarbershop.Infrastructure/Repositories/ProdutoRepository.cs
+// Namespace: Melobarbershop.Infrastructure.Repositories
+// Conteúdo: class ProdutoRepository : IProdutoRepository
+// Resumo: Implementação do repositório para Produtos e controle de estoque.
 using Melobarbershop.Domain.Entidades;
 using Melobarbershop.Domain.Interfaces.Repositories;
 using Melobarbershop.Infrastructure.Data;

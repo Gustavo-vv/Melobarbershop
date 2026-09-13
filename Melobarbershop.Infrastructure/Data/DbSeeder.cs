@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Infrastructure/Data/DbSeeder.cs
+// Namespace: Melobarbershop.Infrastructure.Data
+// Conteúdo: static class DbSeeder
+// Resumo: Responsável por criar dados iniciais essenciais, como roles e usuário administrador.
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

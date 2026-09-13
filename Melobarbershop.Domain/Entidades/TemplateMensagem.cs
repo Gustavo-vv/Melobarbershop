@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Entidades/TemplateMensagem.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class TemplateMensagem
+// Resumo: Template de mensagem usado para notificações automáticas (gatilhos e conteúdo).
 using Melobarbershop.Domain.Enums;
 
 namespace Melobarbershop.Domain.Entidades;

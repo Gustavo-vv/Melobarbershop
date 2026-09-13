@@ -1,4 +1,8 @@
-﻿namespace Melobarbershop.Domain.Entidades
+﻿// Arquivo: Melobarbershop.Domain/Entidades/AgendamentoItem.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class AgendamentoItem
+// Resumo: Item que compõe um Agendamento, referenciando serviços e preços cobrados.
+namespace Melobarbershop.Domain.Entidades
 {
     public class AgendamentoItem
     {

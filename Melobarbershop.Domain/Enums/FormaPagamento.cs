@@ -1,5 +1,8 @@
 namespace Melobarbershop.Domain.Enums;
 
+/// <summary>
+/// Enumeração que define as formas de pagamento suportadas.
+/// </summary>
 public enum FormaPagamento
 {
     Dinheiro = 1,

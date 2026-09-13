@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Entidades/NotificacaoLog.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class NotificacaoLog
+// Resumo: Registro de tentativas de envio de notificações (mensagens) aos clientes.
 namespace Melobarbershop.Domain.Entidades;
 
 public class NotificacaoLog

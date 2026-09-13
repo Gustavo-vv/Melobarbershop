@@ -1,4 +1,8 @@
-﻿namespace Melobarbershop.Domain.Entidades
+﻿// Arquivo: Melobarbershop.Domain/Entidades/Pacote.cs
+// Namespace: Melobarbershop.Domain.Entidades
+// Conteúdo: class Pacote
+// Resumo: Representa um pacote/combo de serviços vendidos como um único produto.
+namespace Melobarbershop.Domain.Entidades
 {
     public class Pacote
     {

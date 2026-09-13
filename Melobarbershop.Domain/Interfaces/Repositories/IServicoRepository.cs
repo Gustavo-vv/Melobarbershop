@@ -1,4 +1,8 @@
-﻿namespace Melobarbershop.Domain.Interfaces.Repositories;
+﻿// Arquivo: Melobarbershop.Domain/Interfaces/Repositories/IServicoRepository.cs
+// Namespace: Melobarbershop.Domain.Interfaces.Repositories
+// Conteúdo: interface IServicoRepository
+// Resumo: Contrato de repositório para operações sobre Serviços (listar, obter, atualizar disponibilidade).
+namespace Melobarbershop.Domain.Interfaces.Repositories;
 
 using Melobarbershop.Domain.Entidades;
 

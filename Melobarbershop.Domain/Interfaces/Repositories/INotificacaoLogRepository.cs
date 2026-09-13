@@ -1,3 +1,7 @@
+// Arquivo: Melobarbershop.Domain/Interfaces/Repositories/INotificacaoLogRepository.cs
+// Namespace: Melobarbershop.Domain.Interfaces.Repositories
+// Conteúdo: interface INotificacaoLogRepository
+// Resumo: Contrato de repositório para persistência e consulta de logs de notificações.
 using Melobarbershop.Domain.Entidades;
 
 namespace Melobarbershop.Domain.Interfaces.Repositories;
