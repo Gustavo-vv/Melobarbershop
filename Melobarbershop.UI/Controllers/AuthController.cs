@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using Melobarbershop.Application.DTOs;
+using Melobarbershop.UI.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,8 @@ namespace Melobarbershop.UI.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            return View();
+            var viewModel = new LoginViewModel();
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -162,7 +164,8 @@ namespace Melobarbershop.UI.Controllers
         [HttpGet]
         public IActionResult Cadastro()
         {
-            return View();
+            var viewModel = new CadastroViewModel();
+            return View(viewModel);
         }
 
         [HttpPost]

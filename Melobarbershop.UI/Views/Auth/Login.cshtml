@@ -1,3 +1,4 @@
+@model Melobarbershop.UI.ViewModels.LoginViewModel
 @{
     Layout = null;
 }
@@ -25,7 +26,7 @@
             <form class="auth-form" id="loginForm" action="/Auth/Login" method="POST">
                 <div class="input-group">
                     <label for="email">E-mail</label>
-                    <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+                    <input type="email" id="email" name="email" value="@Model.Email" placeholder="seu@email.com" required>
                 </div>
 
                 <div class="input-group">
@@ -42,7 +43,7 @@
                 </div>
 
                 <button type="submit" class="btn-auth">Entrar</button>
-                <div class="auth-message" id="authMessage" aria-live="polite"></div>
+                <div class="auth-message @(!string.IsNullOrEmpty(Model.MensagemErro) ? "error" : !string.IsNullOrEmpty(Model.MensagemSucesso) ? "success" : "")" id="authMessage" aria-live="polite">@(!string.IsNullOrEmpty(Model.MensagemErro) ? Model.MensagemErro : Model.MensagemSucesso)</div>
             </form>
 
             <div class="auth-footer">

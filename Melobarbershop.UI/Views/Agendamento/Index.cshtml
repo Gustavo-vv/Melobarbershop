@@ -1,5 +1,13 @@
+@model Melobarbershop.UI.ViewModels.AgendamentoViewModel
 @{
     Layout = null;
+    var servico = Model.ServicoSelecionado;
+    var servicoNome = servico?.Nome ?? "Corte";
+    var servicoDuracao = servico != null ? $"{servico.DuracaoMinutos} min" : "45 min";
+    var servicoPrecoFormatado = servico?.PrecoFormatado ?? "R$ 40,00";
+    var servicoPrecoInvariante = servico?.PrecoInvariante ?? "40.00";
+    var servicoDuracaoMin = servico?.DuracaoMinutos ?? 45;
+    var servicoId = servico?.Id.ToString() ?? "";
 }
 <!doctype html>
 <html lang="pt-BR">
@@ -40,6 +48,13 @@
           </div>
         </div>
 
+        @if (!string.IsNullOrEmpty(Model.MensagemErro))
+        {
+          <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;">
+            <p>@Model.MensagemErro</p>
+          </div>
+        }
+
         <div class="month-toolbar">
           <div class="month-label" id="monthLabel">Setembro 2026</div>
           <div class="month-controls">
@@ -71,21 +86,29 @@
         <div class="service-box">
           <div class="service-main">
             <div>
-              <div class="service-name" id="serviceName">Corte</div>
-              <div class="service-duration" id="serviceDuration">30 min</div>
+              <div class="service-name" id="serviceName"
+                   data-service-id="@servicoId"
+                   data-service-duration="@servicoDuracaoMin"
+                   data-service-price="@servicoPrecoInvariante">@servicoNome</div>
+              <div class="service-duration" id="serviceDuration">@servicoDuracao</div>
             </div>
-            <div class="service-price" id="servicePrice">R$ 40,00</div>
+            <div class="service-price" id="servicePrice">@servicoPrecoFormatado</div>
           </div>
 
           <div class="divider"></div>
 
           <div class="team-title">Equipe disponível</div>
           <div class="team-list">
-            <button class="barber selected" data-barber="Guilherme" type="button">
-              <span class="avatar">G</span>
-              <span class="barber-name">Guilherme <span class="preference-dot"></span></span>
-              <span class="rating">★ 5,0</span>
-            </button>
+            @for (int i = 0; i < Model.BarbeirosDisponiveis.Count; i++)
+            {
+              var b = Model.BarbeirosDisponiveis[i];
+              var isSelected = i == 0 ? "selected" : "";
+              <button class="barber @isSelected" data-barber="@b.Nome" data-barber-id="@b.Id" type="button">
+                <span class="avatar">@b.Inicial</span>
+                <span class="barber-name">@b.Nome <span class="preference-dot"></span></span>
+                <span class="rating">★ 5,0</span>
+              </button>
+            }
           </div>
         </div>
 
@@ -97,14 +120,14 @@
 
           <div class="total-row">
             <span>Total</span>
-            <span id="totalPrice">R$ 40,00</span>
+            <span id="totalPrice">@servicoPrecoFormatado</span>
           </div>
 
           <button class="continue-btn" id="continueBtn" type="button">Continuar</button>
         </div>
 
         <p style="color:#7e8a97;font-size:11px;margin-top:12px;text-align:center">
-          <span id="selectedDayLabel">11 de setembro</span> • <span id="barberSummary">Guilherme</span>
+          <span id="selectedDayLabel">11 de setembro</span> • <span id="barberSummary">@(Model.BarbeirosDisponiveis.FirstOrDefault()?.Nome ?? "Guilherme")</span>
         </p>
       </aside>
     </div>

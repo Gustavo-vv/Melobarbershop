@@ -1,3 +1,4 @@
+@model Melobarbershop.UI.ViewModels.AdminViewModel
 @{
     Layout = null;
 }
@@ -266,6 +267,17 @@
         <!-- ================================================================= -->
         <div id="tab-dashboard" class="tab-content space-y-6">
           
+          @if (!string.IsNullOrEmpty(Model.MensagemErro))
+          {
+            <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>@Model.MensagemErro</span>
+              </div>
+              <button type="button" onclick="location.reload()" class="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500/30 rounded text-rose-300 font-semibold transition-colors">Tentar novamente</button>
+            </div>
+          }
+
           <!-- TOP STAT CARDS (Reflects Web Brand: 10h-21h, 20+ Clientes, 2024) -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             
@@ -279,7 +291,7 @@
                 </div>
               </div>
               <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-white font-brand">R$ 2.450,00</span>
+                <span class="text-2xl font-black text-white font-brand">@Model.FaturamentoHojeFormatado</span>
                 <span class="text-xs font-semibold text-emerald-400 flex items-center">+18% vs ontem</span>
               </div>
               <p class="text-[11px] text-slate-500 mt-2">Ticket médio: <strong class="text-slate-300 font-semibold">R$ 68,00</strong> / cliente</p>
@@ -295,7 +307,7 @@
                 </div>
               </div>
               <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-white font-brand">28 Clientes</span>
+                <span class="text-2xl font-black text-white font-brand">@Model.AtendimentosHoje Clientes</span>
                 <span class="text-xs font-semibold text-sky-400">Meta: 20+</span>
               </div>
               <p class="text-[11px] text-slate-500 mt-2">19 finalizados • <strong class="text-amber-400">4 na cadeira</strong> • 5 na fila</p>
@@ -312,7 +324,7 @@
               </div>
               <div class="flex items-baseline gap-2">
                 <span class="text-2xl font-black text-white font-brand">72%</span>
-                <span class="text-xs font-semibold text-rose-400">20 agendamentos</span>
+                <span class="text-xs font-semibold text-rose-400">@Model.AgendamentosWeb agendamentos</span>
               </div>
               <p class="text-[11px] text-slate-500 mt-2">Landing Page convertendo <strong class="text-emerald-400">+34%</strong> nesta semana</p>
             </div>
@@ -327,7 +339,7 @@
                 </div>
               </div>
               <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-white font-brand">91.4%</span>
+                <span class="text-2xl font-black text-white font-brand">@Model.TaxaOcupacao%</span>
                 <span class="text-xs font-semibold text-purple-400">Horário Nobre</span>
               </div>
               <p class="text-[11px] text-slate-500 mt-2">Horário de Pico: <strong class="text-slate-300">17h00 às 20h30</strong></p>
@@ -531,76 +543,30 @@
               <!-- List of Upcoming Web Appointments -->
               <div class="p-3 rounded-xl bg-[#11141d] border border-slate-800/80 space-y-2.5 max-h-[380px] overflow-y-auto">
                 
-                <!-- Web Appointment Item 1 -->
-                <div class="p-2.5 rounded-lg bg-[#0d0f17] border border-slate-800 hover:border-sky-500/40 transition-all flex items-start justify-between">
-                  <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs font-bold text-white">Renan Costa</span>
-                      <span class="text-[9px] font-bold bg-sky-500/20 text-sky-300 px-1.5 py-0.2 rounded border border-sky-500/30">SITE</span>
+                @foreach (var ag in Model.AgendamentosFila)
+                {
+                  <div class="p-2.5 rounded-lg bg-[#0d0f17] border border-slate-800 hover:border-sky-500/40 transition-all flex items-start justify-between">
+                    <div class="space-y-1">
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-white">@ag.ClienteNome</span>
+                        <span class="text-[9px] font-bold bg-sky-500/20 text-sky-300 px-1.5 py-0.2 rounded border border-sky-500/30">@ag.Origem.ToUpper()</span>
+                      </div>
+                      <p class="text-[11px] text-slate-400">@ag.ServicoNome • @ag.BarbeiroNome</p>
+                      @if (!string.IsNullOrEmpty(ag.Telefone))
+                      {
+                        <div class="flex items-center gap-2 text-[10px] text-slate-500 font-mono">
+                          <span>📞 @ag.Telefone</span>
+                        </div>
+                      }
                     </div>
-                    <p class="text-[11px] text-slate-400">Corte Americano • Diego Navalha</p>
-                    <div class="flex items-center gap-2 text-[10px] text-slate-500 font-mono">
-                      <span>📞 (11) 98765-4321</span>
-                    </div>
-                  </div>
-                  <div class="text-right space-y-1">
-                    <span class="text-xs font-bold text-emerald-400 font-mono">20:15</span>
-                    <button onclick="showToast('Confirmando chegada de Renan Costa')" class="block text-[10px] px-2 py-0.5 rounded bg-sky-600 hover:bg-sky-500 text-white font-medium">
-                      Check-in
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Web Appointment Item 2 -->
-                <div class="p-2.5 rounded-lg bg-[#0d0f17] border border-slate-800 hover:border-sky-500/40 transition-all flex items-start justify-between">
-                  <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs font-bold text-white">Lucas Vasconcelos</span>
-                      <span class="text-[9px] font-bold bg-sky-500/20 text-sky-300 px-1.5 py-0.2 rounded border border-sky-500/30">SITE</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400">Corte + Barba + Sobrancelha • Melo</p>
-                    <div class="flex items-center gap-2 text-[10px] text-slate-500 font-mono">
-                      <span>📞 (11) 97112-9988</span>
+                    <div class="text-right space-y-1">
+                      <span class="text-xs font-bold text-emerald-400 font-mono">@ag.Horario</span>
+                      <button onclick="showToast('Confirmando chegada de @ag.ClienteNome')" class="block text-[10px] px-2 py-0.5 rounded bg-sky-600 hover:bg-sky-500 text-white font-medium">
+                        Check-in
+                      </button>
                     </div>
                   </div>
-                  <div class="text-right space-y-1">
-                    <span class="text-xs font-bold text-slate-300 font-mono">20:30</span>
-                    <span class="text-[9px] text-amber-400 block">Confirmado</span>
-                  </div>
-                </div>
-
-                <!-- Web Appointment Item 3 -->
-                <div class="p-2.5 rounded-lg bg-[#0d0f17] border border-slate-800 hover:border-sky-500/40 transition-all flex items-start justify-between">
-                  <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs font-bold text-white">Rafael Mendes</span>
-                      <span class="text-[9px] font-bold bg-sky-500/20 text-sky-300 px-1.5 py-0.2 rounded border border-sky-500/30">SITE</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400">Degradê na Navalha • Lucas Fade</p>
-                    <div class="flex items-center gap-2 text-[10px] text-slate-500 font-mono">
-                      <span>📞 (11) 96554-1122</span>
-                    </div>
-                  </div>
-                  <div class="text-right space-y-1">
-                    <span class="text-xs font-bold text-slate-300 font-mono">20:45</span>
-                    <span class="text-[9px] text-slate-400 block">Aguardando</span>
-                  </div>
-                </div>
-
-                <!-- Web Appointment Item 4 -->
-                <div class="p-2.5 rounded-lg bg-[#0d0f17] border border-slate-800 hover:border-sky-500/40 transition-all flex items-start justify-between">
-                  <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs font-bold text-white">Vitor Hugo</span>
-                      <span class="text-[9px] font-bold bg-purple-500/20 text-purple-300 px-1.5 py-0.2 rounded border border-purple-500/30">BALCÃO</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400">Pézinho & Barboterapia • Diego</p>
-                  </div>
-                  <div class="text-right space-y-1">
-                    <span class="text-xs font-bold text-slate-300 font-mono">20:50</span>
-                    <span class="text-[9px] text-slate-400 block">Encaixe</span>
-                  </div>
-                </div>
+                }
 
               </div>
 
@@ -1091,83 +1057,20 @@
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             
-            <!-- Service 1 -->
-            <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Corte Degradê / Fade</span>
-                <span class="text-sm font-black text-sky-400 font-mono">R$ 45,00</span>
+            @foreach (var s in Model.Servicos)
+            {
+              <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-white">@s.Nome</span>
+                  <span class="text-sm font-black text-sky-400 font-mono">@s.PrecoFormatado</span>
+                </div>
+                <p class="text-[11px] text-slate-400">@(string.IsNullOrWhiteSpace(s.Descricao) ? "Serviço profissional de alta qualidade Melo Barber." : s.Descricao)</p>
+                <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800 text-slate-400">
+                  <span>Duração: @s.DuracaoMinutos min</span>
+                  <span class="@(s.Ativo ? "text-emerald-400 font-bold" : "text-rose-400 font-bold")">@(s.Ativo ? "Ativo no Site" : "Inativo")</span>
+                </div>
               </div>
-              <p class="text-[11px] text-slate-400">Tesoura e máquina com transição perfeita e acabamento a navalha.</p>
-              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800 text-slate-400">
-                <span>Duração: 40 min</span>
-                <span class="text-emerald-400 font-bold">Ativo no Site</span>
-              </div>
-            </div>
-
-            <!-- Service 2 -->
-            <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Barba Terapia & Alinhamento</span>
-                <span class="text-sm font-black text-rose-400 font-mono">R$ 35,00</span>
-              </div>
-              <p class="text-[11px] text-slate-400">Toalha quente, óleos essenciais, massagem facial e navalha afiada.</p>
-              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800 text-slate-400">
-                <span>Duração: 30 min</span>
-                <span class="text-emerald-400 font-bold">Ativo no Site</span>
-              </div>
-            </div>
-
-            <!-- Service 3 -->
-            <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Combo VIP (Cabelo + Barba)</span>
-                <span class="text-sm font-black text-purple-400 font-mono">R$ 75,00</span>
-              </div>
-              <p class="text-[11px] text-slate-400">Experiência completa com bebida de cortesia e finalização premium.</p>
-              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800 text-slate-400">
-                <span>Duração: 1h15 min</span>
-                <span class="text-emerald-400 font-bold">Mais Vendido</span>
-              </div>
-            </div>
-
-            <!-- Service 4 -->
-            <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Pigmentação / Platinado</span>
-                <span class="text-sm font-black text-amber-400 font-mono">R$ 90,00</span>
-              </div>
-              <p class="text-[11px] text-slate-400">Realce e uniformização do corte com produtos de alta fixação.</p>
-              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800 text-slate-400">
-                <span>Duração: 1h30 min</span>
-                <span class="text-emerald-400 font-bold">Ativo no Site</span>
-              </div>
-            </div>
-
-            <!-- Service 5 -->
-            <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Tranças Nagô & Estilos</span>
-                <span class="text-sm font-black text-teal-400 font-mono">R$ 110,00</span>
-              </div>
-              <p class="text-[11px] text-slate-400">Alinhamento afro e desenhos personalizados em tranças.</p>
-              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800 text-slate-400">
-                <span>Duração: 1h45 min</span>
-                <span class="text-emerald-400 font-bold">Ativo no Site</span>
-              </div>
-            </div>
-
-            <!-- Service 6 -->
-            <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Sobrancelha na Navalha</span>
-                <span class="text-sm font-black text-slate-200 font-mono">R$ 15,00</span>
-              </div>
-              <p class="text-[11px] text-slate-400">Alinhamento e limpeza rápida para valorizar o olhar.</p>
-              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800 text-slate-400">
-                <span>Duração: 15 min</span>
-                <span class="text-emerald-400 font-bold">Ativo no Site</span>
-              </div>
-            </div>
+            }
 
           </div>
 
@@ -1180,77 +1083,25 @@
           
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             
-            <!-- Barber 1 -->
-            <div class="p-5 rounded-xl bg-[#11141e] border border-sky-500/40 space-y-4">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl bg-sky-500/20 border border-sky-400 flex items-center justify-center font-black text-sky-400 font-brand text-base">
-                  M
+            @foreach (var b in Model.Barbeiros)
+            {
+              <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800 hover:border-sky-500/40 transition-all space-y-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-sky-500/20 border border-sky-400 flex items-center justify-center font-black text-sky-400 font-brand text-base">
+                    @b.Inicial
+                  </div>
+                  <div class="overflow-hidden">
+                    <h3 class="text-sm font-bold text-white font-brand truncate">@b.Nome</h3>
+                    <span class="text-[11px] text-sky-400">@(b.Roles.FirstOrDefault() ?? "Barbeiro")</span>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="text-sm font-bold text-white font-brand">Melo Master</h3>
-                  <span class="text-[11px] text-sky-400">Dono / Cadeira 01</span>
-                </div>
-              </div>
-              <div class="space-y-1 text-xs border-t border-slate-800 pt-3">
-                <div class="flex justify-between text-slate-400"><span>Cortes Hoje:</span> <strong class="text-white">9 atendimentos</strong></div>
-                <div class="flex justify-between text-slate-400"><span>Total Bruto:</span> <strong class="text-emerald-400 font-mono">R$ 720,00</strong></div>
-                <div class="flex justify-between text-slate-400"><span>Avaliação Web:</span> <strong class="text-amber-400">⭐ 5.0 (184)</strong></div>
-              </div>
-            </div>
-
-            <!-- Barber 2 -->
-            <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800 space-y-4">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400 flex items-center justify-center font-black text-purple-400 font-brand text-base">
-                  L
-                </div>
-                <div>
-                  <h3 class="text-sm font-bold text-white font-brand">Lucas Fade</h3>
-                  <span class="text-[11px] text-purple-400">Barbeiro / Cadeira 02</span>
+                <div class="space-y-1 text-xs border-t border-slate-800 pt-3">
+                  <div class="flex justify-between text-slate-400"><span>Status:</span> <strong class="@(b.Ativo ? "text-emerald-400" : "text-rose-400")">@(b.Ativo ? "Ativo" : "Inativo")</strong></div>
+                  <div class="flex justify-between text-slate-400"><span>Email:</span> <span class="text-slate-300 truncate max-w-[120px]" title="@b.Email">@b.Email</span></div>
+                  <div class="flex justify-between text-slate-400"><span>Avaliação Web:</span> <strong class="text-amber-400">⭐ 5.0</strong></div>
                 </div>
               </div>
-              <div class="space-y-1 text-xs border-t border-slate-800 pt-3">
-                <div class="flex justify-between text-slate-400"><span>Cortes Hoje:</span> <strong class="text-white">8 atendimentos</strong></div>
-                <div class="flex justify-between text-slate-400"><span>Comissão 50%:</span> <strong class="text-emerald-400 font-mono">R$ 240,00</strong></div>
-                <div class="flex justify-between text-slate-400"><span>Avaliação Web:</span> <strong class="text-amber-400">⭐ 4.9 (92)</strong></div>
-              </div>
-            </div>
-
-            <!-- Barber 3 -->
-            <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800 space-y-4">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl bg-rose-500/20 border border-rose-400 flex items-center justify-center font-black text-rose-400 font-brand text-base">
-                  D
-                </div>
-                <div>
-                  <h3 class="text-sm font-bold text-white font-brand">Diego Navalha</h3>
-                  <span class="text-[11px] text-rose-400">Barbeiro / Cadeira 03</span>
-                </div>
-              </div>
-              <div class="space-y-1 text-xs border-t border-slate-800 pt-3">
-                <div class="flex justify-between text-slate-400"><span>Cortes Hoje:</span> <strong class="text-white">7 atendimentos</strong></div>
-                <div class="flex justify-between text-slate-400"><span>Comissão 50%:</span> <strong class="text-emerald-400 font-mono">R$ 245,00</strong></div>
-                <div class="flex justify-between text-slate-400"><span>Avaliação Web:</span> <strong class="text-amber-400">⭐ 4.9 (78)</strong></div>
-              </div>
-            </div>
-
-            <!-- Barber 4 -->
-            <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800 space-y-4">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400 flex items-center justify-center font-black text-amber-400 font-brand text-base">
-                  A
-                </div>
-                <div>
-                  <h3 class="text-sm font-bold text-white font-brand">André Tranças</h3>
-                  <span class="text-[11px] text-amber-400">Especialista / Cadeira 04</span>
-                </div>
-              </div>
-              <div class="space-y-1 text-xs border-t border-slate-800 pt-3">
-                <div class="flex justify-between text-slate-400"><span>Cortes Hoje:</span> <strong class="text-white">5 atendimentos</strong></div>
-                <div class="flex justify-between text-slate-400"><span>Comissão 50%:</span> <strong class="text-emerald-400 font-mono">R$ 275,00</strong></div>
-                <div class="flex justify-between text-slate-400"><span>Avaliação Web:</span> <strong class="text-amber-400">⭐ 5.0 (64)</strong></div>
-              </div>
-            </div>
+            }
 
           </div>
 

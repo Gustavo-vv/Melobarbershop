@@ -1,3 +1,4 @@
+@model Melobarbershop.UI.ViewModels.HomeViewModel
 @{
     ViewData["Title"] = "Home";
 }
@@ -47,7 +48,7 @@
    <div class="destaques-item">
     <img src="~/img/icons/relogio.svg" alt="" class="icon-svg">
     <h6>
-     10h às 21h
+     @Model.HorarioFuncionamento
     </h6>
     <p>
      horário de atendimento
@@ -56,7 +57,7 @@
    <div class="destaques-item">
     <img src="~/img/icons/user.png" alt="" class="destaque-icon">
     <h6>
-     20+
+     @Model.ClientesPorDia
     </h6>
     <p>
      clientes por dia
@@ -65,7 +66,7 @@
    <div class="destaques-item">
     <img src="~/img/icons/calendario.svg" alt="" class="icon-svg">
     <h6>
-     2024
+     @Model.AnoFundacao
     </h6>
     <p>
      ano de fundação
@@ -215,99 +216,34 @@
    </p>
   </div>
   <div class="service-grid" id="precos">
-   <article class="service-card featured">
-    <div class="service-icon">
-     <img src="~/img/icons/tesoura.svg" alt="" class="icon-svg">
-    </div>
-    <span class="service-tag">
-     Mais procurado
-    </span>
-    <h3>
-     Corte Masculino Tradicional
-    </h3>
-    <p>
-     Corte de cabelo clássico feito com tesoura e máquina.
-    </p>
-    <strong>
-     R$ 45,00
-    </strong>
-    <a href="/Agendamento?serviceName=Corte+Masculino+Tradicional">
-     Agendar serviço
-     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
-    </a>
-   </article>
-   <article class="service-card">
-    <div class="service-icon">
-     <img src="~/img/icons/Bigode.svg" alt="" class="icon-svg">
-    </div>
-    <h3>
-     Barba Completa
-    </h3>
-    <p>
-     Aparo, desenho e finalização da barba com toalha quente.
-    </p>
-    <strong>
-     R$ 40,00
-    </strong>
-    <a href="/Agendamento?serviceName=Barba+Completa">
-     Agendar serviço
-     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
-    </a>
-   </article>
-   <article class="service-card">
-    <div class="service-icon">
-     <img src="~/img/icons/corte_barba.svg" alt="Corte e barba" class="icon-svg">
-    </div>
-    <h3>
-     Combo Corte + Barba
-    </h3>
-    <p>
-     Corte de cabelo à escolha combinado com barba completa.
-    </p>
-    <strong>
-     R$ 75,00
-    </strong>
-    <a href="/Agendamento?serviceName=Combo+Corte+%2B+Barba">
-     Agendar serviço
-     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
-    </a>
-   </article>
-   <article class="service-card">
-    <div class="service-icon">
-     <img src="~/img/icons/sobrancelha.svg" alt="" class="icon-svg">
-    </div>
-    <h3>
-     Sobrancelha na Navalha
-    </h3>
-    <p>
-     Design de sobrancelha masculina feito na navalha.
-    </p>
-    <strong>
-     R$ 20,00
-    </strong>
-    <a href="/Agendamento?serviceName=Sobrancelha+na+Navalha">
-    Agendar serviço
-     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
-    </a>
-   </article>
-   <article class="service-card">
-    <div class="service-icon">
-     <img src="~/img/icons/star.svg" alt="" class="icon-svg">
-    </div>
-    <h3>
-     Corte Navalhado
-    </h3>
-    <p>
-     Acabamento 100% na navalha para um contorno preciso.
-    </p>
-    <strong>
-     R$ 60,00
-    </strong>
-    <a href="/Agendamento?serviceName=Corte+Navalhado">
-    Agendar serviço
-     <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
-    </a>
-   </article>
+   @foreach (var servico in Model.Servicos)
+   {
+    <article class="service-card @(servico.Destaque ? "featured" : "")">
+     <div class="service-icon">
+      <img src="~/img/icons/@servico.IconeSvg" alt="@servico.Nome" class="icon-svg">
+     </div>
+     @if (servico.Destaque)
+     {
+      <span class="service-tag">
+       Mais procurado
+      </span>
+     }
+     <h3>
+      @servico.Nome
+     </h3>
+     <p>
+      @(string.IsNullOrWhiteSpace(servico.Descricao) ? "Cuidado especializado com profissionais da Melo Barber Shop." : servico.Descricao)
+     </p>
+     <strong>
+      @servico.PrecoFormatado
+     </strong>
+     <a href="@servico.UrlAgendamento">
+      Agendar serviço
+      <img src="~/img/icons/arrow-right.svg" alt="" class="icon-svg">
+     </a>
+    </article>
+   }
+
    <article class="service-card">
     <div class="service-icon">
      <img src="~/img/icons/mensagem.svg" alt="" class="icon-svg">

@@ -2,13 +2,20 @@ const bookingParams = new URLSearchParams(window.location.search);
 const urlServiceId   = bookingParams.get('serviceId');
 const urlServiceName = bookingParams.get('serviceName');
 
-// Serviço em uso (começa com fallback; atualizado ao carregar da API)
+// Lê os dados do serviço renderizado inicialmente pelo servidor (ViewModel)
+const serverServiceNameEl = document.querySelector('#serviceName');
+const initialServiceId = serverServiceNameEl?.dataset.serviceId || urlServiceId || null;
+const initialServiceName = serverServiceNameEl?.textContent?.trim() || urlServiceName || 'Corte';
+const initialDuration = Number(serverServiceNameEl?.dataset.serviceDuration) || Number(bookingParams.get('duration')) || 45;
+const initialPrice = Number(serverServiceNameEl?.dataset.servicePrice) || Number(bookingParams.get('price')) || 40;
+
+// Serviço em uso (inicializado com dados do servidor via ViewModel / URL)
 const stateService = {
   selected: {
-    id: urlServiceId || null,
-    name: urlServiceName || 'Corte',
-    durationMinutes: Number(bookingParams.get('duration')) || 45,
-    price: Number(bookingParams.get('price')) || 0
+    id: initialServiceId,
+    name: initialServiceName,
+    durationMinutes: initialDuration,
+    price: initialPrice
   }
 };
 
