@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="Melobarbershop.API/Melobarbershop.API.csproj" Id="12b5b7e9-46cb-4dbb-9e15-7bae693fd18b" />
   <Project Path="Melobarbershop.Application/Melobarbershop.Application.csproj" />
+  <Project Path="Melobarbershop.Desktop/Melobarbershop.Desktop.csproj" Id="7c8d5b0a-3329-46d0-b379-9052eeeb3078" />
   <Project Path="Melobarbershop.Domain/Melobarbershop.Domain.csproj" />
   <Project Path="Melobarbershop.Infrastructure/Melobarbershop.Infrastructure.csproj" />
   <Project Path="Melobarbershop.UI/Melobarbershop.UI.csproj" />
