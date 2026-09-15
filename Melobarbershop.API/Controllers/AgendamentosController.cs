@@ -1,4 +1,4 @@
-﻿using Melobarbershop.Application.DTOs;
+using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +43,14 @@ namespace Melobarbershop.API.Controllers
         public async Task<IActionResult> ListarHorariosDisponiveis([FromQuery] string barbeiroId, [FromQuery] DateTime data, [FromQuery] IEnumerable<int> servicoIds)
         {
             var response = await _agendamentoService.ListarHorariosDisponiveisAsync(barbeiroId, data, servicoIds);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpGet("horarios-do-dia")]
+        public async Task<IActionResult> ListarHorariosDoDia([FromQuery] string barbeiroId, [FromQuery] DateTime data, [FromQuery] IEnumerable<int> servicoIds)
+        {
+            var response = await _agendamentoService.ListarTodosHorariosDoDiaAsync(barbeiroId, data, servicoIds);
             if (!response.Sucesso) return BadRequest(response);
             return Ok(response);
         }

@@ -9,6 +9,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private Label lblLogo;
         private Label lblLogoSub;
         private Button btnMenuDashboard;
+        private Button btnMenuAgendamentos;
         private Button btnMenuServicos;
         private Button btnMenuUsuarios;
         private Button btnMenuSair;
@@ -35,6 +36,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             lblLogo = new Label();
             lblLogoSub = new Label();
             btnMenuDashboard = new Button();
+            btnMenuAgendamentos = new Button();
             btnMenuServicos = new Button();
             btnMenuUsuarios = new Button();
             btnMenuSair = new Button();
@@ -57,6 +59,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             panelSidebar.Controls.Add(lblLogo);
             panelSidebar.Controls.Add(lblLogoSub);
             panelSidebar.Controls.Add(btnMenuDashboard);
+            panelSidebar.Controls.Add(btnMenuAgendamentos);
             panelSidebar.Controls.Add(btnMenuServicos);
             panelSidebar.Controls.Add(btnMenuUsuarios);
             panelSidebar.Controls.Add(btnMenuSair);
@@ -83,14 +86,20 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             btnMenuDashboard.Text = "📊  Dashboard";
             btnMenuDashboard.Click += btnMenuDashboard_Click;
 
+            // btnMenuAgendamentos
+            btnMenuAgendamentos.Location = new Point(0, 165);
+            btnMenuAgendamentos.Size = new Size(240, 50);
+            btnMenuAgendamentos.Text = "📅  Agendamentos";
+            btnMenuAgendamentos.Click += btnMenuAgendamentos_Click;
+
             // btnMenuServicos
-            btnMenuServicos.Location = new Point(0, 165);
+            btnMenuServicos.Location = new Point(0, 220);
             btnMenuServicos.Size = new Size(240, 50);
             btnMenuServicos.Text = "💈  Serviços";
             btnMenuServicos.Click += btnMenuServicos_Click;
 
             // btnMenuUsuarios
-            btnMenuUsuarios.Location = new Point(0, 220);
+            btnMenuUsuarios.Location = new Point(0, 275);
             btnMenuUsuarios.Size = new Size(240, 50);
             btnMenuUsuarios.Text = "👥  Usuários & Barbeiros";
             btnMenuUsuarios.Click += btnMenuUsuarios_Click;

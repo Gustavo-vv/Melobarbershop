@@ -6,6 +6,7 @@ public interface IAgendamentoService
     Task<ApiResposta<IEnumerable<AgendamentoDto>>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim, string? barbeiroId = null);
     Task<ApiResposta<IEnumerable<AgendamentoDto>>> ListarPorClienteAsync(string clienteId);
     Task<ApiResposta<IEnumerable<DateTime>>> ListarHorariosDisponiveisAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds);
+    Task<ApiResposta<IEnumerable<HorarioSlotDto>>> ListarTodosHorariosDoDiaAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds);
     Task<ApiResposta<AgendamentoDto>> CriarAsync(CriarAgendamentoDto dto);
     Task<ApiResposta<AgendamentoDto>> ConfirmarAsync(int agendamentoId);
     Task<ApiResposta<AgendamentoDto>> IniciarAtendimentoAsync(int agendamentoId);

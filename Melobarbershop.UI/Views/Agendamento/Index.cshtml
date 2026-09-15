@@ -84,7 +84,14 @@
             {
               @foreach (var horario in Model.HorariosDisponiveis)
               {
-                <button class="time-btn" data-time="@horario" type="button">@horario</button>
+                var classeExtra = horario.Disponivel ? "" : "unavailable";
+                <button class="time-btn @classeExtra"
+                        data-time="@horario.Label"
+                        data-value="@horario.Valor"
+                        type="button"
+                        @(horario.Disponivel ? "" : "disabled")>
+                  @horario.Label
+                </button>
               }
             }
             else
@@ -137,7 +144,10 @@
             <span id="totalPrice">@servicoPrecoFormatado</span>
           </div>
 
-          <button class="continue-btn" id="continueBtn" type="button">Continuar</button>
+          <button class="continue-btn" id="continueBtn" type="button"
+                  data-logado="@(Model.UsuarioLogado ? "true" : "false")">
+            @(Model.UsuarioLogado ? "Continuar" : "Fazer login para continuar")
+          </button>
         </div>
 
         <p style="color:#7e8a97;font-size:11px;margin-top:12px;text-align:center">

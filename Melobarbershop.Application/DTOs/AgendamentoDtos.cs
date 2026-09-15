@@ -46,3 +46,9 @@ public class ReagendarAgendamentoDto
     public DateTime NovoDataHoraInicio { get; set; }
     public string? NovoBarbeiroId { get; set; }
 }
+
+public class HorarioSlotDto
+{
+    public DateTime Horario { get; set; }
+    public bool Disponivel { get; set; }
+}

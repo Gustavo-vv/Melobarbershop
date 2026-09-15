@@ -2,6 +2,7 @@ using Melobarbershop.Desktop.Configuration;
 using Melobarbershop.Desktop.Services;
 using Melobarbershop.Desktop.Theme;
 using Melobarbershop.Desktop.Forms.Login;
+using Melobarbershop.Desktop.Forms.Agendamentos;
 using Melobarbershop.Desktop.Forms.Servicos;
 using Melobarbershop.Desktop.Forms.Usuarios;
 
@@ -10,6 +11,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
     public partial class FormMain : Form
     {
         private UcDashboard? _ucDashboard;
+        private UcAgendamentos? _ucAgendamentos;
         private UcServicos? _ucServicos;
         private UcUsuarios? _ucUsuarios;
 
@@ -42,6 +44,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             lblLogoSub.ForeColor = TemaMelobarbershop.TextMuted;
 
             EstilizarBotaoMenu(btnMenuDashboard);
+            EstilizarBotaoMenu(btnMenuAgendamentos);
             EstilizarBotaoMenu(btnMenuServicos);
             EstilizarBotaoMenu(btnMenuUsuarios);
             EstilizarBotaoMenu(btnMenuSair);
@@ -72,7 +75,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
 
         private void DestacarBotaoAtivo(Button btnAtivo)
         {
-            var botoes = new[] { btnMenuDashboard, btnMenuServicos, btnMenuUsuarios };
+            var botoes = new[] { btnMenuDashboard, btnMenuAgendamentos, btnMenuServicos, btnMenuUsuarios };
             foreach (var b in botoes)
             {
                 if (b == btnAtivo)
@@ -91,10 +94,12 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private void InicializarTelas()
         {
             _ucDashboard = new UcDashboard { Dock = DockStyle.Fill };
+            _ucAgendamentos = new UcAgendamentos { Dock = DockStyle.Fill };
             _ucServicos = new UcServicos { Dock = DockStyle.Fill };
             _ucUsuarios = new UcUsuarios { Dock = DockStyle.Fill };
 
             panelConteudo.Controls.Add(_ucDashboard);
+            panelConteudo.Controls.Add(_ucAgendamentos);
             panelConteudo.Controls.Add(_ucServicos);
             panelConteudo.Controls.Add(_ucUsuarios);
 
@@ -104,6 +109,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private async void ExibirTela(UserControl tela, Button btnMenu)
         {
             if (_ucDashboard != null) _ucDashboard.Visible = false;
+            if (_ucAgendamentos != null) _ucAgendamentos.Visible = false;
             if (_ucServicos != null) _ucServicos.Visible = false;
             if (_ucUsuarios != null) _ucUsuarios.Visible = false;
 
@@ -114,6 +120,10 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             if (tela == _ucDashboard)
             {
                 await _ucDashboard.CarregarDadosAsync();
+            }
+            else if (tela == _ucAgendamentos)
+            {
+                await _ucAgendamentos.CarregarAgendamentosAsync();
             }
             else if (tela == _ucServicos)
             {
@@ -156,6 +166,11 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private void btnMenuDashboard_Click(object sender, EventArgs e)
         {
             if (_ucDashboard != null) ExibirTela(_ucDashboard, btnMenuDashboard);
+        }
+
+        private void btnMenuAgendamentos_Click(object sender, EventArgs e)
+        {
+            if (_ucAgendamentos != null) ExibirTela(_ucAgendamentos, btnMenuAgendamentos);
         }
 
         private void btnMenuServicos_Click(object sender, EventArgs e)

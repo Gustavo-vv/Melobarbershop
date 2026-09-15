@@ -1,5 +1,10 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 using Melobarbershop.Application.DTOs;
+using Melobarbershop.Domain.Enums;
 using Melobarbershop.UI.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +25,7 @@ namespace Melobarbershop.UI.Controllers
         public async Task<IActionResult> Index([FromQuery] string? serviceId, [FromQuery] string? serviceName)
         {
             var viewModel = new AgendamentoViewModel();
+            viewModel.UsuarioLogado = User.Identity?.IsAuthenticated == true;
             var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
             try
@@ -134,12 +140,10 @@ namespace Melobarbershop.UI.Controllers
         }
 
         /// <summary>
-        /// Retorna os horários disponíveis (formato "HH:mm") para um barbeiro/dia/serviço(s),
+        /// Retorna os horários disponíveis para um barbeiro/dia/serviço(s),
         /// consumido via AJAX pela tela de Agendamento quando o cliente troca o dia ou o barbeiro.
-        /// Espelha a regra de negócio de GET /api/Agendamentos/horarios-disponiveis, que já
-        /// desconsidera horários com conflito de agenda (ExisteConflitoDeHorarioAsync) ou bloqueio.
+        /// Retorna objetos { label, valor } com o DateTime exato calculado pela API.
         /// </summary>
-        /// <param name="servicoIds">IDs dos serviços selecionados, separados por vírgula (ex: "1,3").</param>
         [HttpGet]
         public async Task<IActionResult> HorariosDisponiveis(
             [FromQuery] string barbeiroId,
@@ -147,7 +151,7 @@ namespace Melobarbershop.UI.Controllers
             [FromQuery] string? servicoIds)
         {
             if (string.IsNullOrWhiteSpace(barbeiroId))
-                return Json(new { sucesso = false, mensagem = "Barbeiro não informado.", dados = Array.Empty<string>() });
+                return Json(new { sucesso = false, mensagem = "Barbeiro não informado.", dados = Array.Empty<object>() });
 
             var ids = (servicoIds ?? string.Empty)
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -165,15 +169,131 @@ namespace Melobarbershop.UI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao buscar horários disponíveis para o barbeiro {BarbeiroId} em {Data}.", barbeiroId, data);
-                return Json(new { sucesso = false, mensagem = "Não foi possível carregar os horários disponíveis.", dados = Array.Empty<string>() });
+                return Json(new { sucesso = false, mensagem = "Não foi possível carregar os horários disponíveis.", dados = Array.Empty<object>() });
             }
         }
 
         /// <summary>
-        /// Chama GET /api/Agendamentos/horarios-disponiveis e converte o resultado
-        /// (lista de DateTime em UTC) para strings "HH:mm" prontas para exibição.
+        /// Cria o agendamento no banco via POST /api/Agendamentos.
+        /// O ClienteId é extraído com segurança da claim 'jwt_token' do usuário autenticado.
         /// </summary>
-        private async Task<List<string>> ObterHorariosDisponiveisAsync(
+        [HttpPost]
+        public async Task<IActionResult> Criar([FromBody] CriarAgendamentoRequisicao requisicao)
+        {
+            if (User.Identity?.IsAuthenticated != true)
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, new
+                {
+                    sucesso = false,
+                    mensagem = "Você precisa estar autenticado para realizar um agendamento."
+                });
+            }
+
+            if (requisicao == null || string.IsNullOrWhiteSpace(requisicao.BarbeiroId) || requisicao.DataHoraInicio == default)
+            {
+                return BadRequest(new { sucesso = false, mensagem = "Dados incompletos para criação do agendamento." });
+            }
+
+            if (requisicao.ServicoIds == null || !requisicao.ServicoIds.Any())
+            {
+                return BadRequest(new { sucesso = false, mensagem = "Selecione pelo menos um serviço." });
+            }
+
+            // Extrai a claim jwt_token
+            var jwtToken = User.FindFirst("jwt_token")?.Value;
+            if (string.IsNullOrWhiteSpace(jwtToken))
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, new
+                {
+                    sucesso = false,
+                    mensagem = "Sessão inválida. Por favor, faça login novamente."
+                });
+            }
+
+            string? clienteId = null;
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadJwtToken(jwtToken);
+                clienteId = token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier || c.Type == "nameid" || c.Type == "sub")?.Value;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Falha ao decodificar token JWT para extrair ClienteId.");
+            }
+
+            if (string.IsNullOrWhiteSpace(clienteId))
+            {
+                return StatusCode(StatusCodes.Status401Unauthorized, new
+                {
+                    sucesso = false,
+                    mensagem = "Não foi possível identificar o cliente autenticado."
+                });
+            }
+
+            var dto = new CriarAgendamentoDto
+            {
+                ClienteId = clienteId,
+                BarbeiroId = requisicao.BarbeiroId,
+                DataHoraInicio = requisicao.DataHoraInicio,
+                ServicoIds = requisicao.ServicoIds.ToList(),
+                Origem = OrigemAgendamento.Site,
+                Observacoes = requisicao.Observacoes
+            };
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("ApiClient");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+
+                var jsonContent = new StringContent(
+                    JsonSerializer.Serialize(dto),
+                    Encoding.UTF8,
+                    "application/json");
+
+                var response = await client.PostAsync("/api/Agendamentos", jsonContent);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var apiResult = JsonSerializer.Deserialize<ApiResposta<AgendamentoDto>>(responseBody, jsonOptions);
+
+                if (!response.IsSuccessStatusCode || apiResult == null || !apiResult.Sucesso)
+                {
+                    var msg = apiResult?.Mensagem ?? "Não foi possível criar o agendamento.";
+                    return StatusCode((int)response.StatusCode, new { sucesso = false, mensagem = msg });
+                }
+
+                return Ok(new
+                {
+                    sucesso = true,
+                    mensagem = "Agendamento realizado com sucesso!",
+                    dados = apiResult.Dados
+                });
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Erro de conexão ao criar agendamento na API.");
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, new
+                {
+                    sucesso = false,
+                    mensagem = "Não foi possível conectar ao servidor. Tente novamente mais tarde."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro inesperado ao criar agendamento.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    sucesso = false,
+                    mensagem = "Ocorreu um erro interno ao processar seu agendamento."
+                });
+            }
+        }
+
+        /// <summary>
+        /// Chama GET /api/Agendamentos/horarios-do-dia e converte o resultado
+        /// para objetos HorarioDisponivelViewModel (Label "HH:mm", Valor ISO exato e Disponivel).
+        /// </summary>
+        private async Task<List<HorarioDisponivelViewModel>> ObterHorariosDisponiveisAsync(
             HttpClient client, string barbeiroId, DateTime data, IEnumerable<int> servicoIds)
         {
             var query = new List<string>
@@ -183,25 +303,30 @@ namespace Melobarbershop.UI.Controllers
             };
             query.AddRange(servicoIds.Select(id => $"servicoIds={id}"));
 
-            var url = $"/api/Agendamentos/horarios-disponiveis?{string.Join('&', query)}";
+            var url = $"/api/Agendamentos/horarios-do-dia?{string.Join('&', query)}";
             var response = await client.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning("Falha ao buscar horários disponíveis. Status: {StatusCode}", response.StatusCode);
-                return new List<string>();
+                _logger.LogWarning("Falha ao buscar horários do dia. Status: {StatusCode}", response.StatusCode);
+                return new List<HorarioDisponivelViewModel>();
             }
 
             var body = await response.Content.ReadAsStringAsync();
             var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var apiResult = JsonSerializer.Deserialize<ApiResposta<List<DateTime>>>(body, jsonOptions);
+            var apiResult = JsonSerializer.Deserialize<ApiResposta<List<HorarioSlotDto>>>(body, jsonOptions);
 
             if (apiResult == null || !apiResult.Sucesso || apiResult.Dados == null)
-                return new List<string>();
+                return new List<HorarioDisponivelViewModel>();
 
             return apiResult.Dados
-                .OrderBy(d => d)
-                .Select(d => d.ToString("HH:mm"))
+                .OrderBy(d => d.Horario)
+                .Select(d => new HorarioDisponivelViewModel
+                {
+                    Label = d.Horario.ToString("HH:mm"),
+                    Valor = d.Horario.ToString("o"), // ISO 8601 exato
+                    Disponivel = d.Disponivel
+                })
                 .ToList();
         }
 
@@ -226,5 +351,13 @@ namespace Melobarbershop.UI.Controllers
                 FotoUrl = dto.FotoUrl
             };
         }
+    }
+
+    public class CriarAgendamentoRequisicao
+    {
+        public string BarbeiroId { get; set; } = string.Empty;
+        public DateTime DataHoraInicio { get; set; }
+        public List<int> ServicoIds { get; set; } = new();
+        public string? Observacoes { get; set; }
     }
 }

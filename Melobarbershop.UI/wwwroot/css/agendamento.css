@@ -437,6 +437,22 @@ body.dark-theme .theme-toggle{
   border-color:#92cce0;
 }
 
+.time-btn.unavailable,
+.time-btn:disabled {
+  background: #e9ecef;
+  border-color: #dee2e6;
+  color: #adb5bd;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.time-btn.unavailable:hover,
+.time-btn:disabled:hover {
+  background: #e9ecef;
+  border-color: #dee2e6;
+  color: #adb5bd;
+}
+
 .time-btn.selected{
   background:#e5f6fd;
   border:2px solid var(--blue);

@@ -306,6 +306,20 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    private static List<DateTime> GerarSlotsTeoricos(DateTime data, int duracaoTotalMinutos)
+    {
+        var inicioExpediente = data.Date.AddHours(8);
+        var fimExpediente = data.Date.AddHours(19);
+        var slots = new List<DateTime>();
+
+        for (var horario = inicioExpediente; horario.AddMinutes(duracaoTotalMinutos) <= fimExpediente; horario = horario.AddMinutes(45))
+        {
+            slots.Add(horario);
+        }
+
+        return slots;
+    }
+
     public async Task<ApiResposta<IEnumerable<DateTime>>> ListarHorariosDisponiveisAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds)
     {
         try
@@ -323,8 +337,6 @@ public class AgendamentoService : IAgendamentoService
 
             var duracaoTotalMinutos = servicos.Any() ? servicos.Sum(s => s.DuracaoMinutos) : 45;
 
-            var inicioExpediente = data.Date.AddHours(8);
-            var fimExpediente = data.Date.AddHours(19);
             var inicioDia = data.Date;
             var fimDia = data.Date.AddDays(1);
 
@@ -335,10 +347,11 @@ public class AgendamentoService : IAgendamentoService
             var bloqueios = (await _usuarioRepository.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicioDia, fimDia))
                 .ToList();
 
+            var slotsTeoricos = GerarSlotsTeoricos(data, duracaoTotalMinutos);
             var horariosDisponiveis = new List<DateTime>();
             var agora = DateTime.UtcNow;
 
-            for (var horario = inicioExpediente; horario.AddMinutes(duracaoTotalMinutos) <= fimExpediente; horario = horario.AddMinutes(45))
+            foreach (var horario in slotsTeoricos)
             {
                 if (horario <= agora)
                     continue;
@@ -356,6 +369,61 @@ public class AgendamentoService : IAgendamentoService
         catch (Exception ex)
         {
             return ApiResposta<IEnumerable<DateTime>>.Falha($"Erro ao listar horarios disponiveis para o barbeiro '{barbeiroId}': {ex.Message}");
+        }
+    }
+
+    public async Task<ApiResposta<IEnumerable<HorarioSlotDto>>> ListarTodosHorariosDoDiaAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds)
+    {
+        try
+        {
+            var barbeiro = await _usuarioRepository.ObterPorIdAsync(barbeiroId);
+            if (barbeiro == null)
+                return ApiResposta<IEnumerable<HorarioSlotDto>>.Falha($"Barbeiro com ID '{barbeiroId}' nao encontrado.");
+
+            var servicos = (await _servicoRepository.ObterPorIdsAsync(servicoIds))
+                .Where(s => s.Ativo)
+                .ToList();
+
+            var duracaoTotalMinutos = servicos.Any() ? servicos.Sum(s => s.DuracaoMinutos) : 45;
+
+            var inicioDia = data.Date;
+            var fimDia = data.Date.AddDays(1);
+
+            var agendamentosExistentes = (await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicioDia, fimDia))
+                .Where(a => a.Status != StatusAgendamento.Cancelado && a.Status != StatusAgendamento.NaoCompareceu)
+                .ToList();
+
+            var bloqueios = (await _usuarioRepository.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicioDia, fimDia))
+                .ToList();
+
+            var slotsTeoricos = GerarSlotsTeoricos(data, duracaoTotalMinutos);
+            var todosHorarios = new List<HorarioSlotDto>();
+            var agora = DateTime.UtcNow;
+
+            foreach (var horario in slotsTeoricos)
+            {
+                if (data.Date < agora.Date || horario <= agora)
+                {
+                    todosHorarios.Add(new HorarioSlotDto { Horario = horario, Disponivel = false });
+                    continue;
+                }
+
+                var terminoEstimado = horario.AddMinutes(duracaoTotalMinutos);
+                var temConflito = agendamentosExistentes.Any(a => a.DataHoraInicio < terminoEstimado && a.DataHoraFim > horario);
+                var temBloqueio = bloqueios.Any(b => b.DataHoraInicio < terminoEstimado && b.DataHoraFim > horario);
+
+                todosHorarios.Add(new HorarioSlotDto
+                {
+                    Horario = horario,
+                    Disponivel = !temConflito && !temBloqueio
+                });
+            }
+
+            return ApiResposta<IEnumerable<HorarioSlotDto>>.Ok(todosHorarios);
+        }
+        catch (Exception ex)
+        {
+            return ApiResposta<IEnumerable<HorarioSlotDto>>.Falha($"Erro ao listar horarios do dia para o barbeiro '{barbeiroId}': {ex.Message}");
         }
     }
 }

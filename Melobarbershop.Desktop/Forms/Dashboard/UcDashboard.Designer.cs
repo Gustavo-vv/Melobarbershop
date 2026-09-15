@@ -195,11 +195,11 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
 
             lblAvisoTitulo.Location = new Point(15, 8);
             lblAvisoTitulo.Size = new Size(900, 20);
-            lblAvisoTitulo.Text = "ℹ️ Informação sobre Agendamentos e Faturamento";
+            lblAvisoTitulo.Text = "📅 Agendamentos Integrados";
 
             lblAvisoDesc.Location = new Point(15, 30);
             lblAvisoDesc.Size = new Size(900, 24);
-            lblAvisoDesc.Text = "A API atual possui apenas Auth, Serviços e Usuários. Endpoints de Agendamentos e Faturamento ainda não foram expostos na API.";
+            lblAvisoDesc.Text = "Acesse a nova aba 'Agendamentos' no menu lateral para visualizar, filtrar e gerenciar todos os atendimentos.";
 
             // lblSecaoResumo
             lblSecaoResumo.Location = new Point(25, 305);

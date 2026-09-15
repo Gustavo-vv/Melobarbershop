@@ -147,4 +147,75 @@ namespace Melobarbershop.Desktop.Models
 
         public string RolesFormatadas => Roles != null && Roles.Count > 0 ? string.Join(", ", Roles) : "Sem perfil";
     }
+
+    public enum StatusAgendamentoDto
+    {
+        Pendente = 1,
+        Confirmado = 2,
+        EmAtendimento = 3,
+        Concluido = 4,
+        Cancelado = 5,
+        NaoCompareceu = 6
+    }
+
+    public class AgendamentoItemDto
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("servicoId")]
+        public int ServicoId { get; set; }
+
+        [JsonPropertyName("nomeServico")]
+        public string NomeServico { get; set; } = string.Empty;
+
+        [JsonPropertyName("precoCobrado")]
+        public decimal PrecoCobrado { get; set; }
+    }
+
+    public class AgendamentoDto
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("clienteId")]
+        public string ClienteId { get; set; } = string.Empty;
+
+        [JsonPropertyName("nomeCliente")]
+        public string NomeCliente { get; set; } = string.Empty;
+
+        [JsonPropertyName("telefoneCliente")]
+        public string? TelefoneCliente { get; set; }
+
+        [JsonPropertyName("barbeiroId")]
+        public string BarbeiroId { get; set; } = string.Empty;
+
+        [JsonPropertyName("nomeBarbeiro")]
+        public string NomeBarbeiro { get; set; } = string.Empty;
+
+        [JsonPropertyName("dataHoraInicio")]
+        public DateTime DataHoraInicio { get; set; }
+
+        [JsonPropertyName("dataHoraFim")]
+        public DateTime DataHoraFim { get; set; }
+
+        [JsonPropertyName("status")]
+        public StatusAgendamentoDto Status { get; set; }
+
+        [JsonPropertyName("observacoes")]
+        public string? Observacoes { get; set; }
+
+        [JsonPropertyName("dataCriacao")]
+        public DateTime DataCriacao { get; set; }
+
+        [JsonPropertyName("valorTotal")]
+        public decimal ValorTotal { get; set; }
+
+        [JsonPropertyName("itens")]
+        public List<AgendamentoItemDto> Itens { get; set; } = new();
+
+        public string ServicosFormatados => Itens != null && Itens.Count > 0
+            ? string.Join(", ", Itens.Select(i => i.NomeServico))
+            : "-";
+    }
 }

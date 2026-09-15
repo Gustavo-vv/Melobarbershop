@@ -116,7 +116,8 @@ const state = {
   year: hoje.getFullYear(),
   month: hoje.getMonth(), // 0-based
   day: hoje.getDate(),
-  time: '',
+  time: '',         // Label "HH:mm" para exibição
+  timeValue: '',    // DateTime ISO exato calculado pela API
   barber: 'Guilherme',
   barberId: initialBarberId
 };
@@ -197,7 +198,7 @@ function getSlotsHeuristicos(day) {
 const cacheHorarios = new Map();
 
 // Busca os horários REALMENTE disponíveis na API (via proxy do AgendamentoController),
-// já considerando conflitos de agenda e bloqueios do barbeiro.
+// já considerando conflitos de agenda e bloqueios do barbeiro. Retorna objetos { label, valor }.
 async function buscarHorariosReais(day) {
   if (!day || !state.barberId) return [];
 
@@ -229,8 +230,6 @@ function renderDays() {
   const firstWeekday = new Date(state.year, state.month, 1).getDay();
 
   const visibleDays = [];
-  // Show the whole month with a horizontal calendar. The first row/day
-  // alignment is preserved via a spacer.
   for (let i = 0; i < firstWeekday; i++) {
     visibleDays.push(`<div class="day-spacer" aria-hidden="true"></div>`);
   }
@@ -270,6 +269,7 @@ if (daysWrap) {
 
     state.day = Number(btn.dataset.day);
     state.time = '';
+    state.timeValue = '';
     renderDays();
     renderTimes();
   });
@@ -306,21 +306,45 @@ async function renderTimes() {
     return;
   }
 
-  timeList.innerHTML = slots.map(t => `
-    <button class="time-btn ${t === state.time ? 'selected' : ''}" data-time="${t}" type="button">
-      ${t}
-    </button>
-  `).join('');
+  timeList.innerHTML = slots.map(slot => {
+    const label = typeof slot === 'object' ? slot.label : slot;
+    const valor = typeof slot === 'object' ? slot.valor : slot;
+    const disponivel = typeof slot === 'object' && typeof slot.disponivel === 'boolean' ? slot.disponivel : true;
+    const isSelected = disponivel && (valor === state.timeValue || label === state.time);
+    const classes = ['time-btn'];
+    if (isSelected) classes.push('selected');
+    if (!disponivel) classes.push('unavailable');
 
-  timeList.querySelectorAll('[data-time]').forEach(btn => {
+    return `
+      <button class="${classes.join(' ')}"
+              data-time="${label}"
+              data-value="${valor}"
+              ${!disponivel ? 'disabled aria-disabled="true"' : ''}
+              type="button">
+        ${label}
+      </button>
+    `;
+  }).join('');
+
+  vincularEventosBotoesHorario();
+  continueBtn.disabled = !state.timeValue;
+}
+
+function vincularEventosBotoesHorario() {
+  if (!timeList) return;
+  timeList.querySelectorAll('.time-btn:not([disabled])').forEach(btn => {
     btn.addEventListener('click', () => {
-      state.time = btn.dataset.time;
-      renderTimes();
+      timeList.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.time = btn.dataset.time || '';
+      state.timeValue = btn.dataset.value || btn.dataset.time || '';
+      if (continueBtn) continueBtn.disabled = !state.timeValue;
     });
   });
-
-  continueBtn.disabled = !state.time;
 }
+
+// Vincula eventos aos botões de horário iniciais (renderizados pelo Razor)
+vincularEventosBotoesHorario();
 
 function moveMonth(delta) {
   let nextMonthValue = state.month + delta;
@@ -338,6 +362,7 @@ function moveMonth(delta) {
   state.year = nextYear;
   state.day = null;
   state.time = '';
+  state.timeValue = '';
   renderDays();
   renderTimes();
 }
@@ -352,6 +377,7 @@ document.querySelectorAll('.barber').forEach(card => {
     state.barber = card.dataset.barber;
     state.barberId = card.dataset.barberId;
     state.time = '';
+    state.timeValue = '';
     const barberSummary = document.querySelector('#barberSummary');
     if (barberSummary) barberSummary.textContent = state.barber;
     renderTimes();
@@ -367,11 +393,70 @@ if (noticeClose) {
 }
 
 if (continueBtn) {
-  continueBtn.addEventListener('click', () => {
-    if (!state.day || !state.time) return;
+  continueBtn.addEventListener('click', async () => {
+    if (!state.day || !state.timeValue) return;
 
-    const selectedDate = `${pad(state.day)}/${pad(state.month + 1)}/${state.year}`;
-    alert(`Agendamento selecionado: ${selectedDate} às ${state.time} • ${state.barber}`);
+    // Checagem no cliente: se não estiver logado, redireciona direto para o login
+    const estaLogado = continueBtn.dataset.logado === 'true';
+    if (!estaLogado) {
+      const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+      window.location.href = `/Auth/Login?returnUrl=${returnUrl}`;
+      return;
+    }
+
+    if (!stateService.selected.id) {
+      alert('Selecione um serviço para continuar.');
+      return;
+    }
+
+    const payload = {
+      barbeiroId: state.barberId,
+      dataHoraInicio: state.timeValue, // Envia o DateTime ISO exato calculado pela API
+      servicoIds: [Number(stateService.selected.id)],
+      observacoes: null
+    };
+
+    const textoOriginal = continueBtn.textContent;
+    continueBtn.disabled = true;
+    continueBtn.textContent = 'Agendando...';
+
+    try {
+      const res = await fetch('/Agendamento/Criar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json().catch(() => null);
+
+      if (res.status === 401) {
+        alert('Sua sessão expirou ou você não está autenticado. Por favor, faça login.');
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/Auth/Login?returnUrl=${returnUrl}`;
+        return;
+      }
+
+      if (res.ok && json && json.sucesso) {
+        alert(`Agendamento confirmado com sucesso!\nBarbeiro: ${state.barber}\nHorário: ${state.time}`);
+        cacheHorarios.clear();
+        state.time = '';
+        state.timeValue = '';
+        await renderTimes();
+      } else {
+        const erroMsg = json?.mensagem || 'Não foi possível confirmar o agendamento. Tente outro horário.';
+        alert(`Atenção: ${erroMsg}`);
+        cacheHorarios.clear();
+        await renderTimes();
+      }
+    } catch (err) {
+      alert('Falha na comunicação com o servidor. Verifique sua conexão e tente novamente.');
+    } finally {
+      continueBtn.disabled = !state.timeValue;
+      continueBtn.textContent = textoOriginal;
+    }
   });
 }
 
@@ -404,7 +489,6 @@ if (daysScroller) {
   });
 
   daysScroller.addEventListener('click', (event) => {
-    // Avoid selecting a date when the user was dragging the strip.
     if (didDragDays) {
       event.preventDefault();
       event.stopPropagation();

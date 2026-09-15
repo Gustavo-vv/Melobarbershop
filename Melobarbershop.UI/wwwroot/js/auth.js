@@ -66,7 +66,9 @@ if (loginForm) {
                     message.className = "auth-message success";
                 }
 
-                const destination = data.redirectUrl || "/Home/Index";
+                const urlParams = new URLSearchParams(window.location.search);
+                const returnUrl = urlParams.get("returnUrl");
+                const destination = (returnUrl && returnUrl.startsWith("/")) ? returnUrl : (data.redirectUrl || "/Home/Index");
                 setTimeout(() => {
                     window.location.href = destination;
                 }, 600);

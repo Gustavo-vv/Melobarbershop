@@ -253,5 +253,51 @@ namespace Melobarbershop.Desktop.Services
                 };
             }
         }
+
+        public static async Task<ApiResposta<TResponse>> PatchAsync<TRequest, TResponse>(string endpoint, TRequest data)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(data, _jsonOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PatchAsync(endpoint, content);
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                if (!string.IsNullOrWhiteSpace(responseString))
+                {
+                    try
+                    {
+                        var parsed = JsonSerializer.Deserialize<ApiResposta<TResponse>>(responseString, _jsonOptions);
+                        if (parsed != null)
+                            return parsed;
+                    }
+                    catch
+                    {
+                        var directParsed = JsonSerializer.Deserialize<TResponse>(responseString, _jsonOptions);
+                        return new ApiResposta<TResponse>
+                        {
+                            Sucesso = response.IsSuccessStatusCode,
+                            Dados = directParsed,
+                            Mensagem = response.IsSuccessStatusCode ? "Sucesso" : "Resposta recebida"
+                        };
+                    }
+                }
+
+                return new ApiResposta<TResponse>
+                {
+                    Sucesso = response.IsSuccessStatusCode,
+                    Mensagem = response.ReasonPhrase ?? "Falha na operação"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResposta<TResponse>
+                {
+                    Sucesso = false,
+                    Mensagem = $"Erro: {ex.Message}"
+                };
+            }
+        }
     }
 }
