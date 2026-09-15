@@ -1,0 +1,127 @@
+using Melobarbershop.Desktop.Configuration;
+using Melobarbershop.Desktop.Services;
+using Melobarbershop.Desktop.Theme;
+
+namespace Melobarbershop.Desktop.Forms
+{
+    public partial class FormLogin : Form
+    {
+        private readonly AuthService _authService = new();
+
+        public FormLogin()
+        {
+            InitializeComponent();
+            ConfigurarEstilo();
+        }
+
+        private void ConfigurarEstilo()
+        {
+            this.BackColor = AppTheme.BackgroundDark;
+            this.ForeColor = AppTheme.TextPrimary;
+            this.Font = AppTheme.NormalFont;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Text = "Melo Barbershop — Acesso Administrativo";
+            this.Size = new Size(460, 520);
+
+            panelCard.BackColor = AppTheme.CardBackground;
+            lblTitulo.Font = AppTheme.TitleFont;
+            lblTitulo.ForeColor = AppTheme.GoldPrimary;
+            lblSubtitulo.Font = AppTheme.NormalFont;
+            lblSubtitulo.ForeColor = AppTheme.TextSecondary;
+
+            lblEmail.ForeColor = AppTheme.TextSecondary;
+            lblSenha.ForeColor = AppTheme.TextSecondary;
+
+            txtEmail.BackColor = AppTheme.InputBackground;
+            txtEmail.ForeColor = AppTheme.TextPrimary;
+            txtEmail.BorderStyle = BorderStyle.FixedSingle;
+
+            txtSenha.BackColor = AppTheme.InputBackground;
+            txtSenha.ForeColor = AppTheme.TextPrimary;
+            txtSenha.BorderStyle = BorderStyle.FixedSingle;
+            txtSenha.UseSystemPasswordChar = true;
+
+            AppTheme.AplicarEstiloBotaoPrimario(btnEntrar);
+            lblStatus.ForeColor = AppTheme.DangerColor;
+            lblStatus.Text = string.Empty;
+
+            lblApiUrl.Text = $"Conectando em: {AppConfig.ApiBaseUrl}";
+            lblApiUrl.ForeColor = AppTheme.TextMuted;
+            lblApiUrl.Font = AppTheme.SmallFont;
+
+            // Pré-preenchimento das credenciais de seed admin para conveniência
+            txtEmail.Text = "admin@melobarbershop.com";
+            txtSenha.Text = "Admin@123";
+        }
+
+        private async void btnEntrar_Click(object sender, EventArgs e)
+        {
+            var email = txtEmail.Text.Trim();
+            var senha = txtSenha.Text;
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(senha))
+            {
+                lblStatus.ForeColor = AppTheme.DangerColor;
+                lblStatus.Text = "Informe o e-mail e a senha.";
+                return;
+            }
+
+            btnEntrar.Enabled = false;
+            btnEntrar.Text = "Conectando...";
+            lblStatus.ForeColor = AppTheme.GoldPrimary;
+            lblStatus.Text = "Validando credenciais com a API...";
+
+            try
+            {
+                var resposta = await _authService.LoginAsync(email, senha);
+
+                if (resposta.Sucesso && resposta.Dados != null)
+                {
+                    // Valida se o usuário tem a Role Admin
+                    var perfis = resposta.Dados.Perfis ?? new List<string>();
+                    var ehAdmin = perfis.Any(p => p.Equals("Admin", StringComparison.OrdinalIgnoreCase));
+
+                    if (!ehAdmin)
+                    {
+                        _authService.Logout();
+                        lblStatus.ForeColor = AppTheme.DangerColor;
+                        lblStatus.Text = "Acesso negado: Este painel é restrito a administradores.";
+                        return;
+                    }
+
+                    lblStatus.ForeColor = AppTheme.SuccessColor;
+                    lblStatus.Text = "Login efetuado com sucesso! Abrindo painel...";
+
+                    await Task.Delay(300);
+
+                    this.Hide();
+                    var mainForm = new FormMain();
+                    mainForm.FormClosed += (s, args) => this.Close();
+                    mainForm.Show();
+                }
+                else
+                {
+                    lblStatus.ForeColor = AppTheme.DangerColor;
+                    var msg = !string.IsNullOrWhiteSpace(resposta.Mensagem) ? resposta.Mensagem : "Falha na autenticação.";
+                    if (resposta.Erros != null && resposta.Erros.Any())
+                    {
+                        msg += " " + string.Join(" ", resposta.Erros);
+                    }
+                    lblStatus.Text = msg;
+                }
+            }
+            catch (Exception ex)
+            {
+                lblStatus.ForeColor = AppTheme.DangerColor;
+                lblStatus.Text = $"Erro de conexão: {ex.Message}";
+            }
+            finally
+            {
+                btnEntrar.Enabled = true;
+                btnEntrar.Text = "ENTRAR NO SISTEMA";
+            }
+        }
+    }
+}
