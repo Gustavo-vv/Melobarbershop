@@ -62,5 +62,45 @@ namespace Melobarbershop.API.Controllers
             if (!response.Sucesso) return BadRequest(response);
             return Ok(response);
         }
+
+        [HttpPatch("{id}/iniciar-atendimento")]
+        public async Task<IActionResult> IniciarAtendimento(int id)
+        {
+            var response = await _agendamentoService.IniciarAtendimentoAsync(id);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpPatch("{id}/concluir")]
+        public async Task<IActionResult> Concluir(int id)
+        {
+            var response = await _agendamentoService.ConcluirAsync(id);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpPatch("{id}/cancelar")]
+        public async Task<IActionResult> Cancelar(int id, [FromQuery] string? motivo = null)
+        {
+            var response = await _agendamentoService.CancelarAsync(id, motivo);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpPatch("{id}/nao-comparecimento")]
+        public async Task<IActionResult> RegistrarNaoComparecimento(int id)
+        {
+            var response = await _agendamentoService.RegistrarNaoComparecimentoAsync(id);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpPatch("{id}/reagendar")]
+        public async Task<IActionResult> Reagendar(int id, [FromBody] ReagendarAgendamentoDto dto)
+        {
+            var response = await _agendamentoService.ReagendarAsync(id, dto);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
     }
 }
