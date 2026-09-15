@@ -26,20 +26,25 @@ public class AgendamentoService : IAgendamentoService
         _mapper = mapper;
     }
 
-    public async Task<AgendamentoDto?> ObterPorIdAsync(int id)
+    public async Task<ApiResposta<AgendamentoDto>> ObterPorIdAsync(int id)
     {
         try
         {
             var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(id);
-            return agendamento == null ? null : _mapper.Map<AgendamentoDto>(agendamento);
+
+            if (agendamento == null)
+                return ApiResposta<AgendamentoDto>.Falha("Agendamento não encontrado.");
+
+            var dto = _mapper.Map<AgendamentoDto>(agendamento);
+            return ApiResposta<AgendamentoDto>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao obter agendamento com ID {id}.", ex);
+            return ApiResposta<AgendamentoDto>.Falha($"Erro ao obter o agendamento: {ex.Message}.");
         }
     }
 
-    public async Task<IEnumerable<AgendamentoDto>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim, string? barbeiroId = null)
+    public async Task<ApiResposta<IEnumerable<AgendamentoDto>>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim, string? barbeiroId = null)
     {
         try
         {
@@ -50,155 +55,68 @@ public class AgendamentoService : IAgendamentoService
             else
                 agendamentos = await _agendamentoRepository.ObterPorPeriodoAsync(inicio, fim);
 
-            return _mapper.Map<IEnumerable<AgendamentoDto>>(agendamentos);
+            var dtos = _mapper.Map<IEnumerable<AgendamentoDto>>(agendamentos);
+            return ApiResposta<IEnumerable<AgendamentoDto>>.Ok(dtos);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao listar agendamentos por periodo.", ex);
+            return ApiResposta<IEnumerable<AgendamentoDto>>.Falha($"Erro ao listar agendamentos por periodo: {ex.Message}");
         }
     }
 
-    public async Task<IEnumerable<AgendamentoDto>> ListarPorClienteAsync(string clienteId)
+    public async Task<ApiResposta<IEnumerable<AgendamentoDto>>> ListarPorClienteAsync(string clienteId)
     {
         try
         {
             var agendamentos = await _agendamentoRepository.ObterPorClienteAsync(clienteId);
-            return _mapper.Map<IEnumerable<AgendamentoDto>>(agendamentos);
+            var dtos = _mapper.Map<IEnumerable<AgendamentoDto>>(agendamentos);
+            return ApiResposta<IEnumerable<AgendamentoDto>>.Ok(dtos);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao listar agendamentos do cliente '{clienteId}'.", ex);
+            return ApiResposta<IEnumerable<AgendamentoDto>>.Falha($"Erro ao listar agendamentos do cliente '{clienteId}': {ex.Message}");
         }
     }
 
-    public async Task ConfirmarAsync(int agendamentoId)
-    {
-        try
-        {
-            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.Confirmado);
-        }
-        catch (KeyNotFoundException) { throw; }
-        catch (InvalidOperationException) { throw; }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Erro ao confirmar agendamento com ID {agendamentoId}.", ex);
-        }
-    }
-
-    public async Task IniciarAtendimentoAsync(int agendamentoId)
-    {
-        try
-        {
-            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.EmAtendimento);
-        }
-        catch (KeyNotFoundException) { throw; }
-        catch (InvalidOperationException) { throw; }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Erro ao iniciar atendimento do agendamento com ID {agendamentoId}.", ex);
-        }
-    }
-
-    public async Task ConcluirAsync(int agendamentoId)
-    {
-        try
-        {
-            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.Concluido);
-        }
-        catch (KeyNotFoundException) { throw; }
-        catch (InvalidOperationException) { throw; }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Erro ao concluir agendamento com ID {agendamentoId}.", ex);
-        }
-    }
-
-    public async Task RegistrarNaoComparecimentoAsync(int agendamentoId)
-    {
-        try
-        {
-            await ValidarEAtualizarStatusAsync(agendamentoId, StatusAgendamento.NaoCompareceu);
-        }
-        catch (KeyNotFoundException) { throw; }
-        catch (InvalidOperationException) { throw; }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Erro ao registrar nao comparecimento do agendamento com ID {agendamentoId}.", ex);
-        }
-    }
-
-    public async Task CancelarAsync(int agendamentoId, string? motivo = null)
-    {
-        try
-        {
-            var agendamento = await _agendamentoRepository.ObterPorIdAsync(agendamentoId);
-            if (agendamento == null)
-                throw new KeyNotFoundException($"Agendamento com ID {agendamentoId} nao encontrado.");
-
-            if (agendamento.Status == StatusAgendamento.Concluido)
-                throw new InvalidOperationException("Nao e possivel cancelar um agendamento que ja foi concluido.");
-
-            if (agendamento.Status == StatusAgendamento.Cancelado)
-                throw new InvalidOperationException("Este agendamento ja se encontra cancelado.");
-
-            agendamento.Status = StatusAgendamento.Cancelado;
-
-            if (!string.IsNullOrWhiteSpace(motivo))
-            {
-                agendamento.Observacoes = string.IsNullOrWhiteSpace(agendamento.Observacoes)
-                    ? $"Cancelado: {motivo}"
-                    : $"{agendamento.Observacoes} | Cancelado: {motivo}";
-            }
-
-            await _agendamentoRepository.AtualizarAsync(agendamento);
-        }
-        catch (KeyNotFoundException) { throw; }
-        catch (InvalidOperationException) { throw; }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Erro ao cancelar agendamento com ID {agendamentoId}.", ex);
-        }
-    }
-
-    public async Task<AgendamentoDto> CriarAsync(CriarAgendamentoDto dto)
+    public async Task<ApiResposta<AgendamentoDto>> CriarAsync(CriarAgendamentoDto dto)
     {
         try
         {
             if (dto.ServicoIds == null || !dto.ServicoIds.Any())
-                throw new ArgumentException("Pelo menos um servico deve ser selecionado para o agendamento.", nameof(dto.ServicoIds));
+                return ApiResposta<AgendamentoDto>.Falha("Pelo menos um servico deve ser selecionado para o agendamento.");
 
             if (dto.DataHoraInicio < DateTime.UtcNow.AddMinutes(-5))
-                throw new ArgumentException("A data e hora do agendamento nao pode ser no passado.", nameof(dto.DataHoraInicio));
+                return ApiResposta<AgendamentoDto>.Falha("A data e hora do agendamento nao pode ser no passado.");
 
             var cliente = await _usuarioRepository.ObterPorIdAsync(dto.ClienteId);
             if (cliente == null)
-                throw new KeyNotFoundException($"Cliente com ID '{dto.ClienteId}' nao encontrado.");
+                return ApiResposta<AgendamentoDto>.Falha($"Cliente com ID '{dto.ClienteId}' nao encontrado.");
             if (!cliente.Ativo)
-                throw new InvalidOperationException("O cliente informado esta desativado no sistema.");
+                return ApiResposta<AgendamentoDto>.Falha("O cliente informado esta desativado no sistema.");
 
             var barbeiro = await _usuarioRepository.ObterPorIdAsync(dto.BarbeiroId);
             if (barbeiro == null)
-                throw new KeyNotFoundException($"Barbeiro com ID '{dto.BarbeiroId}' nao encontrado.");
+                return ApiResposta<AgendamentoDto>.Falha($"Barbeiro com ID '{dto.BarbeiroId}' nao encontrado.");
             if (!barbeiro.Ativo)
-                throw new InvalidOperationException("O barbeiro informado esta desativado no sistema.");
+                return ApiResposta<AgendamentoDto>.Falha("O barbeiro informado esta desativado no sistema.");
 
             var servicos = (await _servicoRepository.ObterPorIdsAsync(dto.ServicoIds))
                 .Where(s => s.Ativo)
                 .ToList();
 
             if (servicos.Count != dto.ServicoIds.Distinct().Count())
-                throw new InvalidOperationException("Um ou mais servicos selecionados nao foram encontrados ou estao inativos.");
+                return ApiResposta<AgendamentoDto>.Falha("Um ou mais servicos selecionados nao foram encontrados ou estao inativos.");
 
             var duracaoTotalMinutos = servicos.Sum(s => s.DuracaoMinutos);
             var dataHoraFim = dto.DataHoraInicio.AddMinutes(duracaoTotalMinutos);
 
             var possuiBloqueio = await _usuarioRepository.ExisteBloqueioNoPeriodoAsync(dto.BarbeiroId, dto.DataHoraInicio, dataHoraFim);
             if (possuiBloqueio)
-                throw new InvalidOperationException("O barbeiro selecionado possui um bloqueio de agenda no horario solicitado.");
+                return ApiResposta<AgendamentoDto>.Falha("O barbeiro selecionado possui um bloqueio de agenda no horario solicitado.");
 
             var possuiConflito = await _agendamentoRepository.ExisteConflitoDeHorarioAsync(dto.BarbeiroId, dto.DataHoraInicio, dataHoraFim, null);
             if (possuiConflito)
-                throw new InvalidOperationException("Ja existe outro agendamento para este barbeiro no horario solicitado.");
+                return ApiResposta<AgendamentoDto>.Falha("Ja existe outro agendamento para este barbeiro no horario solicitado.");
 
             var agendamento = new Agendamento
             {
@@ -218,49 +136,161 @@ public class AgendamentoService : IAgendamentoService
             };
 
             await _agendamentoRepository.AdicionarAsync(agendamento);
-            return (await ObterPorIdAsync(agendamento.Id))!;
+            return await ObterPorIdAsync(agendamento.Id);
         }
-        catch (KeyNotFoundException) { throw; }
-        catch (ArgumentException) { throw; }
-        catch (InvalidOperationException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao criar agendamento.", ex);
+            return ApiResposta<AgendamentoDto>.Falha($"Erro ao criar agendamento: {ex.Message}");
         }
     }
-
-    public async Task<AgendamentoDto> ReagendarAsync(int agendamentoId, ReagendarAgendamentoDto dto)
+    public async Task<ApiResposta<AgendamentoDto>> ConfirmarAsync(int agendamentoId)
     {
         try
         {
             var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(agendamentoId);
             if (agendamento == null)
-                throw new KeyNotFoundException($"Agendamento com ID {agendamentoId} nao encontrado.");
+                return ApiResposta<AgendamentoDto>.Falha($"Agendamento com ID {agendamentoId} nao encontrado.");
+
+            if (agendamento.Status != StatusAgendamento.Pendente)
+                return ApiResposta<AgendamentoDto>.Falha("Somente agendamentos pendentes podem ser confirmados.");
+
+            agendamento.Status = StatusAgendamento.Confirmado;
+            await _agendamentoRepository.AtualizarAsync(agendamento);
+
+            return await ObterPorIdAsync(agendamento.Id);
+        }
+        catch (Exception ex)
+        {
+            return ApiResposta<AgendamentoDto>.Falha($"Erro ao confirmar agendamento com ID {agendamentoId}: {ex.Message}");
+        }
+    }
+
+    public async Task<ApiResposta<AgendamentoDto>> IniciarAtendimentoAsync(int agendamentoId)
+    {
+        try
+        {
+            var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(agendamentoId);
+            if (agendamento == null)
+                return ApiResposta<AgendamentoDto>.Falha($"Agendamento com ID {agendamentoId} nao encontrado.");
+
+            if (agendamento.Status != StatusAgendamento.Confirmado)
+                return ApiResposta<AgendamentoDto>.Falha("Somente agendamentos confirmados podem ter o atendimento iniciado.");
+
+            agendamento.Status = StatusAgendamento.EmAtendimento;
+            await _agendamentoRepository.AtualizarAsync(agendamento);
+
+            return await ObterPorIdAsync(agendamento.Id);
+        }
+        catch (Exception ex)
+        {
+            return ApiResposta<AgendamentoDto>.Falha($"Erro ao iniciar atendimento do agendamento com ID {agendamentoId}: {ex.Message}");
+        }
+    }
+
+    public async Task<ApiResposta<AgendamentoDto>> ConcluirAsync(int agendamentoId)
+    {
+        try
+        {
+            var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(agendamentoId);
+            if (agendamento == null)
+                return ApiResposta<AgendamentoDto>.Falha($"Agendamento com ID {agendamentoId} nao encontrado.");
+
+            if (agendamento.Status != StatusAgendamento.EmAtendimento)
+                return ApiResposta<AgendamentoDto>.Falha("Somente agendamentos em atendimento podem ser concluidos.");
+
+            agendamento.Status = StatusAgendamento.Concluido;
+            await _agendamentoRepository.AtualizarAsync(agendamento);
+
+            return await ObterPorIdAsync(agendamento.Id);
+        }
+        catch (Exception ex)
+        {
+            return ApiResposta<AgendamentoDto>.Falha($"Erro ao concluir agendamento com ID {agendamentoId}: {ex.Message}");
+        }
+    }
+
+    public async Task<ApiResposta<AgendamentoDto>> CancelarAsync(int agendamentoId, string? motivo = null)
+    {
+        try
+        {
+            var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(agendamentoId);
+            if (agendamento == null)
+                return ApiResposta<AgendamentoDto>.Falha($"Agendamento com ID {agendamentoId} nao encontrado.");
 
             if (agendamento.Status == StatusAgendamento.Concluido || agendamento.Status == StatusAgendamento.Cancelado)
-                throw new InvalidOperationException("Nao e possivel reagendar um atendimento que ja foi concluido ou cancelado.");
+                return ApiResposta<AgendamentoDto>.Falha("Nao e possivel cancelar um agendamento ja concluido ou ja cancelado.");
+
+            agendamento.Status = StatusAgendamento.Cancelado;
+
+            if (!string.IsNullOrWhiteSpace(motivo))
+                agendamento.Observacoes = string.IsNullOrWhiteSpace(agendamento.Observacoes)
+                    ? $"Cancelado: {motivo}"
+                    : $"{agendamento.Observacoes} | Cancelado: {motivo}";
+
+            await _agendamentoRepository.AtualizarAsync(agendamento);
+
+            return await ObterPorIdAsync(agendamento.Id);
+        }
+        catch (Exception ex)
+        {
+            return ApiResposta<AgendamentoDto>.Falha($"Erro ao cancelar agendamento com ID {agendamentoId}: {ex.Message}");
+        }
+    }
+
+    public async Task<ApiResposta<AgendamentoDto>> RegistrarNaoComparecimentoAsync(int agendamentoId)
+    {
+        try
+        {
+            var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(agendamentoId);
+            if (agendamento == null)
+                return ApiResposta<AgendamentoDto>.Falha($"Agendamento com ID {agendamentoId} nao encontrado.");
+
+            if (agendamento.Status != StatusAgendamento.Pendente && agendamento.Status != StatusAgendamento.Confirmado)
+                return ApiResposta<AgendamentoDto>.Falha("Somente agendamentos pendentes ou confirmados podem ser marcados como nao comparecimento.");
+
+            agendamento.Status = StatusAgendamento.NaoCompareceu;
+            await _agendamentoRepository.AtualizarAsync(agendamento);
+
+            return await ObterPorIdAsync(agendamento.Id);
+        }
+        catch (Exception ex)
+        {
+            return ApiResposta<AgendamentoDto>.Falha($"Erro ao registrar nao comparecimento do agendamento com ID {agendamentoId}: {ex.Message}");
+        }
+    }
+
+    public async Task<ApiResposta<AgendamentoDto>> ReagendarAsync(int agendamentoId, ReagendarAgendamentoDto dto)
+    {
+        try
+        {
+            var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(agendamentoId);
+            if (agendamento == null)
+                return ApiResposta<AgendamentoDto>.Falha($"Agendamento com ID {agendamentoId} nao encontrado.");
+
+            if (agendamento.Status == StatusAgendamento.Concluido || agendamento.Status == StatusAgendamento.Cancelado)
+                return ApiResposta<AgendamentoDto>.Falha("Nao e possivel reagendar um atendimento que ja foi concluido ou cancelado.");
 
             if (dto.NovoDataHoraInicio < DateTime.UtcNow.AddMinutes(-5))
-                throw new ArgumentException("O novo horario nao pode ser no passado.", nameof(dto.NovoDataHoraInicio));
+                return ApiResposta<AgendamentoDto>.Falha("O novo horario nao pode ser no passado.");
 
             var barbeiroId = !string.IsNullOrWhiteSpace(dto.NovoBarbeiroId) ? dto.NovoBarbeiroId : agendamento.BarbeiroId;
 
             var barbeiro = await _usuarioRepository.ObterPorIdAsync(barbeiroId);
             if (barbeiro == null)
-                throw new KeyNotFoundException($"Barbeiro com ID '{barbeiroId}' nao encontrado.");
+                return ApiResposta<AgendamentoDto>.Falha($"Barbeiro com ID '{barbeiroId}' nao encontrado.");
             if (!barbeiro.Ativo)
-                throw new InvalidOperationException("O barbeiro selecionado esta desativado no sistema.");
+                return ApiResposta<AgendamentoDto>.Falha("O barbeiro selecionado esta desativado no sistema.");
 
             var duracaoOriginal = agendamento.DataHoraFim - agendamento.DataHoraInicio;
             var novoDataHoraFim = dto.NovoDataHoraInicio.Add(duracaoOriginal);
 
             var possuiBloqueio = await _usuarioRepository.ExisteBloqueioNoPeriodoAsync(barbeiroId, dto.NovoDataHoraInicio, novoDataHoraFim);
             if (possuiBloqueio)
-                throw new InvalidOperationException("O barbeiro possui um bloqueio de agenda no novo horario selecionado.");
+                return ApiResposta<AgendamentoDto>.Falha("O barbeiro possui um bloqueio de agenda no novo horario selecionado.");
 
             var possuiConflito = await _agendamentoRepository.ExisteConflitoDeHorarioAsync(barbeiroId, dto.NovoDataHoraInicio, novoDataHoraFim, agendamento.Id);
             if (possuiConflito)
-                throw new InvalidOperationException("Ja existe outro agendamento para este barbeiro no novo horario selecionado.");
+                return ApiResposta<AgendamentoDto>.Falha("Ja existe outro agendamento para este barbeiro no novo horario selecionado.");
 
             agendamento.BarbeiroId = barbeiroId;
             agendamento.DataHoraInicio = dto.NovoDataHoraInicio;
@@ -268,33 +298,30 @@ public class AgendamentoService : IAgendamentoService
             agendamento.Status = StatusAgendamento.Pendente;
 
             await _agendamentoRepository.AtualizarAsync(agendamento);
-            return (await ObterPorIdAsync(agendamento.Id))!;
+            return await ObterPorIdAsync(agendamento.Id);
         }
-        catch (KeyNotFoundException) { throw; }
-        catch (InvalidOperationException) { throw; }
-        catch (ArgumentException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao reagendar agendamento com ID {agendamentoId}.", ex);
+            return ApiResposta<AgendamentoDto>.Falha($"Erro ao reagendar agendamento com ID {agendamentoId}: {ex.Message}");
         }
     }
 
-    public async Task<IEnumerable<DateTime>> ListarHorariosDisponiveisAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds)
+    public async Task<ApiResposta<IEnumerable<DateTime>>> ListarHorariosDisponiveisAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds)
     {
         try
         {
             if (data.Date < DateTime.UtcNow.Date)
-                return Enumerable.Empty<DateTime>();
+                return ApiResposta<IEnumerable<DateTime>>.Ok(Enumerable.Empty<DateTime>());
 
             var barbeiro = await _usuarioRepository.ObterPorIdAsync(barbeiroId);
             if (barbeiro == null)
-                throw new KeyNotFoundException($"Barbeiro com ID '{barbeiroId}' nao encontrado.");
+                return ApiResposta<IEnumerable<DateTime>>.Falha($"Barbeiro com ID '{barbeiroId}' nao encontrado.");
 
             var servicos = (await _servicoRepository.ObterPorIdsAsync(servicoIds))
                 .Where(s => s.Ativo)
                 .ToList();
 
-            var duracaoTotalMinutos = servicos.Any() ? servicos.Sum(s => s.DuracaoMinutos) : 30;
+            var duracaoTotalMinutos = servicos.Any() ? servicos.Sum(s => s.DuracaoMinutos) : 45;
 
             var inicioExpediente = data.Date.AddHours(8);
             var fimExpediente = data.Date.AddHours(19);
@@ -311,7 +338,7 @@ public class AgendamentoService : IAgendamentoService
             var horariosDisponiveis = new List<DateTime>();
             var agora = DateTime.UtcNow;
 
-            for (var horario = inicioExpediente; horario.AddMinutes(duracaoTotalMinutos) <= fimExpediente; horario = horario.AddMinutes(30))
+            for (var horario = inicioExpediente; horario.AddMinutes(duracaoTotalMinutos) <= fimExpediente; horario = horario.AddMinutes(45))
             {
                 if (horario <= agora)
                     continue;
@@ -324,36 +351,11 @@ public class AgendamentoService : IAgendamentoService
                     horariosDisponiveis.Add(horario);
             }
 
-            return horariosDisponiveis;
+            return ApiResposta<IEnumerable<DateTime>>.Ok(horariosDisponiveis);
         }
-        catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao listar horarios disponiveis para o barbeiro '{barbeiroId}'.", ex);
-        }
-    }
-
-    private async Task ValidarEAtualizarStatusAsync(int agendamentoId, StatusAgendamento novoStatus)
-    {
-        try
-        {
-            var agendamento = await _agendamentoRepository.ObterPorIdAsync(agendamentoId);
-            if (agendamento == null)
-                throw new KeyNotFoundException($"Agendamento com ID {agendamentoId} nao encontrado.");
-
-            if (agendamento.Status == StatusAgendamento.Cancelado)
-                throw new InvalidOperationException("Nao e possivel alterar o status de um agendamento cancelado.");
-
-            if (agendamento.Status == StatusAgendamento.Concluido)
-                throw new InvalidOperationException("Nao e possivel alterar o status de um agendamento ja concluido.");
-
-            await _agendamentoRepository.AtualizarStatusAsync(agendamentoId, novoStatus);
-        }
-        catch (KeyNotFoundException) { throw; }
-        catch (InvalidOperationException) { throw; }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Erro ao atualizar status do agendamento com ID {agendamentoId}.", ex);
+            return ApiResposta<IEnumerable<DateTime>>.Falha($"Erro ao listar horarios disponiveis para o barbeiro '{barbeiroId}': {ex.Message}");
         }
     }
 }
