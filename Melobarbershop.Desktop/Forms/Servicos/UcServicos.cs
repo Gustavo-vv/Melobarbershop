@@ -3,7 +3,7 @@ using Melobarbershop.Desktop.Models;
 using Melobarbershop.Desktop.Services;
 using Melobarbershop.Desktop.Theme;
 
-namespace Melobarbershop.Desktop.UserControls
+namespace Melobarbershop.Desktop.Forms.Servicos
 {
     public partial class UcServicos : UserControl
     {
@@ -18,21 +18,21 @@ namespace Melobarbershop.Desktop.UserControls
 
         private void ConfigurarEstilo()
         {
-            this.BackColor = AppTheme.BackgroundDark;
-            this.ForeColor = AppTheme.TextPrimary;
+            this.BackColor = TemaMelobarbershop.BackgroundDark;
+            this.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            lblTitulo.Font = AppTheme.TitleFont;
-            lblTitulo.ForeColor = AppTheme.GoldPrimary;
-            lblSubtitulo.Font = AppTheme.NormalFont;
-            lblSubtitulo.ForeColor = AppTheme.TextSecondary;
+            lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
+            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
+            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
 
-            AppTheme.AplicarEstiloBotaoPrimario(btnNovo);
-            AppTheme.AplicarEstiloBotaoSecundario(btnEditar);
-            AppTheme.AplicarEstiloBotaoSecundario(btnAlternarStatus);
-            AppTheme.AplicarEstiloBotaoPerigo(btnExcluir);
-            AppTheme.AplicarEstiloBotaoSecundario(btnAtualizar);
+            TemaMelobarbershop.AplicarEstiloBotaoPrimario(btnNovo);
+            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnEditar);
+            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAlternarStatus);
+            TemaMelobarbershop.AplicarEstiloBotaoPerigo(btnExcluir);
+            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
 
-            AppTheme.EstilizarDataGridView(dgvServicos);
+            TemaMelobarbershop.EstilizarDataGridView(dgvServicos);
         }
 
         public async Task CarregarServicosAsync()

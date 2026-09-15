@@ -1,4 +1,4 @@
-namespace Melobarbershop.Desktop.Forms
+namespace Melobarbershop.Desktop.Forms.Servicos
 {
     partial class FormEditarServico
     {

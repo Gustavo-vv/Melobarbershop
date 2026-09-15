@@ -1,42 +1,81 @@
 namespace Melobarbershop.Desktop.Theme
 {
-    public static class AppTheme
+    public static class TemaMelobarbershop
     {
-        // Paleta Dark & Gold Barbershop Premium
-        public static readonly Color BackgroundDark = Color.FromArgb(18, 18, 22);
-        public static readonly Color SidebarBackground = Color.FromArgb(26, 26, 32);
-        public static readonly Color CardBackground = Color.FromArgb(32, 33, 41);
-        public static readonly Color CardBorder = Color.FromArgb(48, 50, 62);
+        // ================================================================
+        // PALETA OFICIAL EXTRAÍDA DO SITE (style.css, login.css, theme.css)
+        // ================================================================
 
-        public static readonly Color GoldPrimary = Color.FromArgb(212, 175, 55);
-        public static readonly Color GoldHover = Color.FromArgb(232, 195, 75);
-        public static readonly Color GoldText = Color.FromArgb(240, 210, 100);
+        // Fundo Principal (--bg: #070809 / #090a0c)
+        public static readonly Color BackgroundDark = Color.FromArgb(7, 8, 9);
 
-        public static readonly Color TextPrimary = Color.FromArgb(245, 245, 247);
-        public static readonly Color TextSecondary = Color.FromArgb(160, 163, 175);
-        public static readonly Color TextMuted = Color.FromArgb(115, 118, 130);
+        // Superfície dos Cards e Painéis (--surface: #0e1013 / #101215)
+        public static readonly Color SurfaceCard = Color.FromArgb(14, 16, 19);
 
-        public static readonly Color SuccessColor = Color.FromArgb(46, 204, 113);
-        public static readonly Color DangerColor = Color.FromArgb(231, 76, 60);
+        // Superfície Secundária (Inputs, Sidebar, Topbar: #14171b / #17191d)
+        public static readonly Color SurfaceSecondary = Color.FromArgb(20, 23, 27);
+
+        // Cor Primária da Marca (--blue / .btn-auth: #087cff)
+        public static readonly Color BluePrimary = Color.FromArgb(8, 124, 255);
+
+        // Cor de Destaque / Hover (--blue-2: #35a1ff)
+        public static readonly Color BlueAccent = Color.FromArgb(53, 161, 255);
+
+        // Bordas (--border: #2a2e33 / rgba(53, 161, 255, 0.22))
+        public static readonly Color BorderColor = Color.FromArgb(42, 46, 51);
+        public static readonly Color BorderAccent = Color.FromArgb(60, 95, 140);
+
+        // Textos (--text: #f6f7f8 / --muted: #a9afb7)
+        public static readonly Color TextPrimary = Color.FromArgb(246, 247, 248);
+        public static readonly Color TextMuted = Color.FromArgb(169, 175, 183);
+        public static readonly Color TextDisabled = Color.FromArgb(110, 115, 122);
+
+        // Cores Semânticas (--green: #25d366 / --red: #e53935)
+        public static readonly Color SuccessColor = Color.FromArgb(37, 211, 102);
+        public static readonly Color DangerColor = Color.FromArgb(229, 57, 53);
         public static readonly Color WarningColor = Color.FromArgb(243, 156, 18);
-        public static readonly Color InfoColor = Color.FromArgb(52, 152, 219);
 
-        public static readonly Color InputBackground = Color.FromArgb(40, 42, 52);
-        public static readonly Color InputBorder = Color.FromArgb(60, 63, 78);
-
-        public static readonly Font TitleFont = new Font("Segoe UI", 16F, FontStyle.Bold);
-        public static readonly Font SubtitleFont = new Font("Segoe UI", 12F, FontStyle.Bold);
-        public static readonly Font HeaderFont = new Font("Segoe UI", 10F, FontStyle.Bold);
-        public static readonly Font NormalFont = new Font("Segoe UI", 9.5F, FontStyle.Regular);
+        // ================================================================
+        // TIPOGRAFIA (Segoe UI com pesos análogos a Oswald e Open Sans)
+        // ================================================================
+        public static readonly Font BrandTitleFont = new Font("Segoe UI", 16F, FontStyle.Bold);
+        public static readonly Font SectionHeadingFont = new Font("Segoe UI", 13F, FontStyle.Bold);
+        public static readonly Font CardTitleFont = new Font("Segoe UI", 10F, FontStyle.Bold);
+        public static readonly Font BodyFont = new Font("Segoe UI", 9.5F, FontStyle.Regular);
+        public static readonly Font BodyBoldFont = new Font("Segoe UI", 9.5F, FontStyle.Bold);
         public static readonly Font SmallFont = new Font("Segoe UI", 8.5F, FontStyle.Regular);
-        public static readonly Font MetricFont = new Font("Segoe UI", 24F, FontStyle.Bold);
+        public static readonly Font MetricValueFont = new Font("Segoe UI", 26F, FontStyle.Bold);
+
+        // ================================================================
+        // LOGO E RECURSOS VISUAIS
+        // ================================================================
+        public static Image? CarregarLogo()
+        {
+            try
+            {
+                var caminho = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo.png");
+                if (File.Exists(caminho))
+                {
+                    return Image.FromFile(caminho);
+                }
+            }
+            catch
+            {
+                // Fallback silencioso
+            }
+            return null;
+        }
+
+        // ================================================================
+        // ESTILOS DE COMPONENTES
+        // ================================================================
 
         public static void AplicarEstiloBotaoPrimario(Button btn)
         {
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
-            btn.BackColor = GoldPrimary;
-            btn.ForeColor = Color.FromArgb(18, 18, 22);
+            btn.BackColor = BluePrimary;
+            btn.ForeColor = Color.White;
             btn.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btn.Cursor = Cursors.Hand;
         }
@@ -45,9 +84,9 @@ namespace Melobarbershop.Desktop.Theme
         {
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 1;
-            btn.FlatAppearance.BorderColor = GoldPrimary;
-            btn.BackColor = Color.Transparent;
-            btn.ForeColor = GoldPrimary;
+            btn.FlatAppearance.BorderColor = BlueAccent;
+            btn.BackColor = Color.FromArgb(18, 26, 36);
+            btn.ForeColor = BlueAccent;
             btn.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btn.Cursor = Cursors.Hand;
         }
@@ -64,39 +103,76 @@ namespace Melobarbershop.Desktop.Theme
 
         public static void EstilizarDataGridView(DataGridView dgv)
         {
-            dgv.BackgroundColor = CardBackground;
+            dgv.BackgroundColor = SurfaceCard;
             dgv.BorderStyle = BorderStyle.None;
             dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgv.GridColor = Color.FromArgb(50, 52, 65);
+            dgv.GridColor = BorderColor;
             dgv.EnableHeadersVisualStyles = false;
             dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgv.MultiSelect = false;
             dgv.RowHeadersVisible = false;
             dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgv.RowTemplate.Height = 36;
+            dgv.RowTemplate.Height = 38;
 
-            // Cabeçalho
-            dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(24, 25, 31);
-            dgv.ColumnHeadersDefaultCellStyle.ForeColor = GoldPrimary;
-            dgv.ColumnHeadersDefaultCellStyle.Font = HeaderFont;
+            // Cabeçalho Oficial
+            dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(10, 12, 15);
+            dgv.ColumnHeadersDefaultCellStyle.ForeColor = BlueAccent;
+            dgv.ColumnHeadersDefaultCellStyle.Font = CardTitleFont;
             dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dgv.ColumnHeadersDefaultCellStyle.Padding = new Padding(8, 0, 8, 0);
-            dgv.ColumnHeadersHeight = 42;
+            dgv.ColumnHeadersDefaultCellStyle.Padding = new Padding(10, 0, 10, 0);
+            dgv.ColumnHeadersHeight = 44;
             dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
 
             // Linhas
-            dgv.DefaultCellStyle.BackColor = CardBackground;
+            dgv.DefaultCellStyle.BackColor = SurfaceCard;
             dgv.DefaultCellStyle.ForeColor = TextPrimary;
-            dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(60, 55, 30);
+            dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 50, 90);
             dgv.DefaultCellStyle.SelectionForeColor = Color.White;
-            dgv.DefaultCellStyle.Font = NormalFont;
-            dgv.DefaultCellStyle.Padding = new Padding(8, 0, 8, 0);
+            dgv.DefaultCellStyle.Font = BodyFont;
+            dgv.DefaultCellStyle.Padding = new Padding(10, 0, 10, 0);
 
-            // Linhas Alternadas
-            dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(28, 29, 36);
+            // Zebra Striping Neutro elegante
+            dgv.AlternatingRowsDefaultCellStyle.BackColor = SurfaceSecondary;
             dgv.AlternatingRowsDefaultCellStyle.ForeColor = TextPrimary;
-            dgv.AlternatingRowsDefaultCellStyle.SelectionBackColor = Color.FromArgb(60, 55, 30);
+            dgv.AlternatingRowsDefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 50, 90);
             dgv.AlternatingRowsDefaultCellStyle.SelectionForeColor = Color.White;
         }
+    }
+
+    // Alias de compatibilidade retroativa para evitar qualquer breaking change
+    public static class AppTheme
+    {
+        public static Color BackgroundDark => TemaMelobarbershop.BackgroundDark;
+        public static Color SidebarBackground => TemaMelobarbershop.SurfaceSecondary;
+        public static Color CardBackground => TemaMelobarbershop.SurfaceCard;
+        public static Color CardBorder => TemaMelobarbershop.BorderColor;
+
+        public static Color GoldPrimary => TemaMelobarbershop.BlueAccent;
+        public static Color GoldHover => TemaMelobarbershop.BluePrimary;
+        public static Color GoldText => TemaMelobarbershop.BlueAccent;
+
+        public static Color TextPrimary => TemaMelobarbershop.TextPrimary;
+        public static Color TextSecondary => TemaMelobarbershop.TextMuted;
+        public static Color TextMuted => TemaMelobarbershop.TextMuted;
+
+        public static Color SuccessColor => TemaMelobarbershop.SuccessColor;
+        public static Color DangerColor => TemaMelobarbershop.DangerColor;
+        public static Color WarningColor => TemaMelobarbershop.WarningColor;
+        public static Color InfoColor => TemaMelobarbershop.BlueAccent;
+
+        public static Color InputBackground => TemaMelobarbershop.SurfaceSecondary;
+        public static Color InputBorder => TemaMelobarbershop.BorderColor;
+
+        public static Font TitleFont => TemaMelobarbershop.BrandTitleFont;
+        public static Font SubtitleFont => TemaMelobarbershop.SectionHeadingFont;
+        public static Font HeaderFont => TemaMelobarbershop.CardTitleFont;
+        public static Font NormalFont => TemaMelobarbershop.BodyFont;
+        public static Font SmallFont => TemaMelobarbershop.SmallFont;
+        public static Font MetricFont => TemaMelobarbershop.MetricValueFont;
+
+        public static void AplicarEstiloBotaoPrimario(Button btn) => TemaMelobarbershop.AplicarEstiloBotaoPrimario(btn);
+        public static void AplicarEstiloBotaoSecundario(Button btn) => TemaMelobarbershop.AplicarEstiloBotaoSecundario(btn);
+        public static void AplicarEstiloBotaoPerigo(Button btn) => TemaMelobarbershop.AplicarEstiloBotaoPerigo(btn);
+        public static void EstilizarDataGridView(DataGridView dgv) => TemaMelobarbershop.EstilizarDataGridView(dgv);
     }
 }

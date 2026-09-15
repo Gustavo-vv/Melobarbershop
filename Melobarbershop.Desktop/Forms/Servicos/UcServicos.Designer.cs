@@ -1,6 +1,6 @@
-namespace Melobarbershop.Desktop.UserControls
+namespace Melobarbershop.Desktop.Forms.Servicos
 {
-    partial class UcUsuarios
+    partial class UcServicos
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -8,17 +8,17 @@ namespace Melobarbershop.Desktop.UserControls
         private Label lblSubtitulo;
 
         private Panel panelBarraAcoes;
+        private Button btnNovo;
+        private Button btnEditar;
         private Button btnAlternarStatus;
+        private Button btnExcluir;
         private Button btnAtualizar;
-
-        private Label lblFiltro;
-        private ComboBox cmbFiltroRole;
 
         private Label lblBusca;
         private TextBox txtBusca;
         private Label lblStatus;
 
-        private DataGridView dgvUsuarios;
+        private DataGridView dgvServicos;
 
         protected override void Dispose(bool disposing)
         {
@@ -35,58 +35,65 @@ namespace Melobarbershop.Desktop.UserControls
             lblSubtitulo = new Label();
 
             panelBarraAcoes = new Panel();
+            btnNovo = new Button();
+            btnEditar = new Button();
             btnAlternarStatus = new Button();
+            btnExcluir = new Button();
             btnAtualizar = new Button();
-
-            lblFiltro = new Label();
-            cmbFiltroRole = new ComboBox();
 
             lblBusca = new Label();
             txtBusca = new TextBox();
             lblStatus = new Label();
 
-            dgvUsuarios = new DataGridView();
+            dgvServicos = new DataGridView();
 
             panelBarraAcoes.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvUsuarios).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvServicos).BeginInit();
             SuspendLayout();
 
             // lblTitulo
             lblTitulo.Location = new Point(25, 20);
             lblTitulo.Size = new Size(400, 32);
-            lblTitulo.Text = "Gestão de Usuários e Equipe";
+            lblTitulo.Text = "Gestão de Serviços";
 
             // lblSubtitulo
             lblSubtitulo.Location = new Point(25, 52);
             lblSubtitulo.Size = new Size(450, 24);
-            lblSubtitulo.Text = "Consulta e controle de status de barbeiros, clientes e administradores";
+            lblSubtitulo.Text = "Cadastro, edição, precificação e visibilidade no catálogo";
 
             // panelBarraAcoes
             panelBarraAcoes.Location = new Point(25, 90);
             panelBarraAcoes.Size = new Size(935, 45);
             panelBarraAcoes.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            panelBarraAcoes.Controls.Add(btnNovo);
+            panelBarraAcoes.Controls.Add(btnEditar);
             panelBarraAcoes.Controls.Add(btnAlternarStatus);
-            panelBarraAcoes.Controls.Add(lblFiltro);
-            panelBarraAcoes.Controls.Add(cmbFiltroRole);
+            panelBarraAcoes.Controls.Add(btnExcluir);
             panelBarraAcoes.Controls.Add(btnAtualizar);
 
+            // btnNovo
+            btnNovo.Location = new Point(0, 3);
+            btnNovo.Size = new Size(130, 36);
+            btnNovo.Text = "➕ Novo Serviço";
+            btnNovo.Click += btnNovo_Click;
+
+            // btnEditar
+            btnEditar.Location = new Point(140, 3);
+            btnEditar.Size = new Size(110, 36);
+            btnEditar.Text = "✏️ Editar";
+            btnEditar.Click += btnEditar_Click;
+
             // btnAlternarStatus
-            btnAlternarStatus.Location = new Point(0, 3);
-            btnAlternarStatus.Size = new Size(180, 36);
-            btnAlternarStatus.Text = "⚡ Ativar/Desativar Usuário";
+            btnAlternarStatus.Location = new Point(260, 3);
+            btnAlternarStatus.Size = new Size(160, 36);
+            btnAlternarStatus.Text = "⚡ Ativar/Desativar";
             btnAlternarStatus.Click += btnAlternarStatus_Click;
 
-            // lblFiltro
-            lblFiltro.Location = new Point(200, 10);
-            lblFiltro.Size = new Size(90, 22);
-            lblFiltro.Text = "Filtrar perfil:";
-            lblFiltro.ForeColor = Color.FromArgb(160, 163, 175);
-
-            // cmbFiltroRole
-            cmbFiltroRole.Location = new Point(295, 7);
-            cmbFiltroRole.Size = new Size(180, 28);
-            cmbFiltroRole.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbFiltroRole.SelectedIndexChanged += cmbFiltroRole_SelectedIndexChanged;
+            // btnExcluir
+            btnExcluir.Location = new Point(430, 3);
+            btnExcluir.Size = new Size(140, 36);
+            btnExcluir.Text = "🗑️ Excluir";
+            btnExcluir.Click += btnExcluir_Click;
 
             // btnAtualizar
             btnAtualizar.Location = new Point(815, 3);
@@ -98,12 +105,12 @@ namespace Melobarbershop.Desktop.UserControls
             // lblBusca
             lblBusca.Location = new Point(25, 148);
             lblBusca.Size = new Size(120, 22);
-            lblBusca.Text = "Buscar por nome:";
+            lblBusca.Text = "Buscar serviço:";
             lblBusca.ForeColor = Color.FromArgb(160, 163, 175);
 
             // txtBusca
-            txtBusca.Location = new Point(155, 145);
-            txtBusca.Size = new Size(280, 28);
+            txtBusca.Location = new Point(135, 145);
+            txtBusca.Size = new Size(300, 28);
             txtBusca.BackColor = Color.FromArgb(40, 42, 52);
             txtBusca.ForeColor = Color.White;
             txtBusca.BorderStyle = BorderStyle.FixedSingle;
@@ -115,13 +122,13 @@ namespace Melobarbershop.Desktop.UserControls
             lblStatus.TextAlign = ContentAlignment.MiddleRight;
             lblStatus.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 
-            // dgvUsuarios
-            dgvUsuarios.Location = new Point(25, 185);
-            dgvUsuarios.Size = new Size(935, 425);
-            dgvUsuarios.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dgvUsuarios.ReadOnly = true;
-            dgvUsuarios.AllowUserToAddRows = false;
-            dgvUsuarios.AllowUserToDeleteRows = false;
+            // dgvServicos
+            dgvServicos.Location = new Point(25, 185);
+            dgvServicos.Size = new Size(935, 425);
+            dgvServicos.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dgvServicos.ReadOnly = true;
+            dgvServicos.AllowUserToAddRows = false;
+            dgvServicos.AllowUserToDeleteRows = false;
 
             // UserControl
             Controls.Add(lblTitulo);
@@ -130,12 +137,12 @@ namespace Melobarbershop.Desktop.UserControls
             Controls.Add(lblBusca);
             Controls.Add(txtBusca);
             Controls.Add(lblStatus);
-            Controls.Add(dgvUsuarios);
+            Controls.Add(dgvServicos);
 
             Size = new Size(980, 630);
 
             panelBarraAcoes.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dgvUsuarios).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvServicos).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }

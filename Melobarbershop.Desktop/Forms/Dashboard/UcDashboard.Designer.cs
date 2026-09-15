@@ -1,4 +1,4 @@
-namespace Melobarbershop.Desktop.UserControls
+namespace Melobarbershop.Desktop.Forms.Dashboard
 {
     partial class UcDashboard
     {

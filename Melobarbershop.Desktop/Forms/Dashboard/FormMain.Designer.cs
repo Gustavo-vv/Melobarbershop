@@ -1,10 +1,11 @@
-namespace Melobarbershop.Desktop.Forms
+namespace Melobarbershop.Desktop.Forms.Dashboard
 {
     partial class FormMain
     {
         private System.ComponentModel.IContainer components = null;
 
         private Panel panelSidebar;
+        private PictureBox picLogoSidebar;
         private Label lblLogo;
         private Label lblLogoSub;
         private Button btnMenuDashboard;
@@ -30,6 +31,7 @@ namespace Melobarbershop.Desktop.Forms
         private void InitializeComponent()
         {
             panelSidebar = new Panel();
+            picLogoSidebar = new PictureBox();
             lblLogo = new Label();
             lblLogoSub = new Label();
             btnMenuDashboard = new Button();
@@ -44,12 +46,14 @@ namespace Melobarbershop.Desktop.Forms
             panelConteudo = new Panel();
 
             panelSidebar.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)picLogoSidebar).BeginInit();
             panelRodape.SuspendLayout();
             SuspendLayout();
 
             // panelSidebar
             panelSidebar.Dock = DockStyle.Left;
-            panelSidebar.Width = 240;
+            panelSidebar.Width = 250;
+            panelSidebar.Controls.Add(picLogoSidebar);
             panelSidebar.Controls.Add(lblLogo);
             panelSidebar.Controls.Add(lblLogoSub);
             panelSidebar.Controls.Add(btnMenuDashboard);
@@ -57,16 +61,21 @@ namespace Melobarbershop.Desktop.Forms
             panelSidebar.Controls.Add(btnMenuUsuarios);
             panelSidebar.Controls.Add(btnMenuSair);
 
+            // picLogoSidebar
+            picLogoSidebar.Location = new Point(20, 18);
+            picLogoSidebar.Size = new Size(50, 45);
+            picLogoSidebar.SizeMode = PictureBoxSizeMode.Zoom;
+
             // lblLogo
-            lblLogo.Location = new Point(20, 25);
-            lblLogo.Size = new Size(200, 30);
+            lblLogo.Location = new Point(78, 20);
+            lblLogo.Size = new Size(165, 24);
             lblLogo.Text = "MELO BARBERSHOP";
 
             // lblLogoSub
-            lblLogoSub.Location = new Point(20, 55);
-            lblLogoSub.Size = new Size(200, 20);
+            lblLogoSub.Location = new Point(78, 44);
+            lblLogoSub.Size = new Size(165, 18);
             lblLogoSub.Text = "PAINEL ADMINISTRATIVO";
-            lblLogoSub.Font = new Font("Segoe UI", 8F);
+            lblLogoSub.Font = new Font("Segoe UI", 7.5F, FontStyle.Bold);
 
             // btnMenuDashboard
             btnMenuDashboard.Location = new Point(0, 110);

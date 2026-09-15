@@ -1,7 +1,7 @@
 using Melobarbershop.Desktop.Services;
 using Melobarbershop.Desktop.Theme;
 
-namespace Melobarbershop.Desktop.UserControls
+namespace Melobarbershop.Desktop.Forms.Dashboard
 {
     public partial class UcDashboard : UserControl
     {
@@ -20,27 +20,27 @@ namespace Melobarbershop.Desktop.UserControls
             this.BackColor = AppTheme.BackgroundDark;
             this.ForeColor = AppTheme.TextPrimary;
 
-            lblTitulo.Font = AppTheme.TitleFont;
-            lblTitulo.ForeColor = AppTheme.GoldPrimary;
-            lblSubtitulo.Font = AppTheme.NormalFont;
-            lblSubtitulo.ForeColor = AppTheme.TextSecondary;
+            lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
+            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
+            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
 
-            AppTheme.AplicarEstiloBotaoPrimario(btnAtualizar);
+            TemaMelobarbershop.AplicarEstiloBotaoPrimario(btnAtualizar);
 
-            // Estilos dos Cards
-            EstilizarCard(cardServicos, lblCardServicosValor, lblCardServicosTitulo, lblCardServicosSub, AppTheme.GoldPrimary);
-            EstilizarCard(cardServicosAtivos, lblCardAtivosValor, lblCardAtivosTitulo, lblCardAtivosSub, AppTheme.SuccessColor);
-            EstilizarCard(cardClientes, lblCardClientesValor, lblCardClientesTitulo, lblCardClientesSub, AppTheme.InfoColor);
-            EstilizarCard(cardBarbeiros, lblCardBarbeirosValor, lblCardBarbeirosTitulo, lblCardBarbeirosSub, AppTheme.WarningColor);
+            // Estilos dos Cards Oficiais
+            EstilizarCard(cardServicos, lblCardServicosValor, lblCardServicosTitulo, lblCardServicosSub, TemaMelobarbershop.BlueAccent);
+            EstilizarCard(cardServicosAtivos, lblCardAtivosValor, lblCardAtivosTitulo, lblCardAtivosSub, TemaMelobarbershop.SuccessColor);
+            EstilizarCard(cardClientes, lblCardClientesValor, lblCardClientesTitulo, lblCardClientesSub, TemaMelobarbershop.BluePrimary);
+            EstilizarCard(cardBarbeiros, lblCardBarbeirosValor, lblCardBarbeirosTitulo, lblCardBarbeirosSub, TemaMelobarbershop.WarningColor);
 
             // Aviso sobre Agendamentos na API
-            panelAviso.BackColor = Color.FromArgb(35, 30, 20);
-            lblAvisoTitulo.Font = AppTheme.HeaderFont;
-            lblAvisoTitulo.ForeColor = AppTheme.GoldPrimary;
-            lblAvisoDesc.Font = AppTheme.NormalFont;
-            lblAvisoDesc.ForeColor = AppTheme.TextSecondary;
+            panelAviso.BackColor = Color.FromArgb(16, 26, 40);
+            lblAvisoTitulo.Font = TemaMelobarbershop.CardTitleFont;
+            lblAvisoTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblAvisoDesc.Font = TemaMelobarbershop.BodyFont;
+            lblAvisoDesc.ForeColor = TemaMelobarbershop.TextMuted;
 
-            AppTheme.EstilizarDataGridView(dgvResumo);
+            TemaMelobarbershop.EstilizarDataGridView(dgvResumo);
         }
 
         private void EstilizarCard(Panel card, Label lblValor, Label lblTitulo, Label lblSub, Color corDestaque)

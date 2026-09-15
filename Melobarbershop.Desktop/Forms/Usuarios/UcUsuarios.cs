@@ -2,7 +2,7 @@ using Melobarbershop.Desktop.Models;
 using Melobarbershop.Desktop.Services;
 using Melobarbershop.Desktop.Theme;
 
-namespace Melobarbershop.Desktop.UserControls
+namespace Melobarbershop.Desktop.Forms.Usuarios
 {
     public partial class UcUsuarios : UserControl
     {
@@ -17,24 +17,24 @@ namespace Melobarbershop.Desktop.UserControls
 
         private void ConfigurarEstilo()
         {
-            this.BackColor = AppTheme.BackgroundDark;
-            this.ForeColor = AppTheme.TextPrimary;
+            this.BackColor = TemaMelobarbershop.BackgroundDark;
+            this.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            lblTitulo.Font = AppTheme.TitleFont;
-            lblTitulo.ForeColor = AppTheme.GoldPrimary;
-            lblSubtitulo.Font = AppTheme.NormalFont;
-            lblSubtitulo.ForeColor = AppTheme.TextSecondary;
+            lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
+            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
+            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
 
-            AppTheme.AplicarEstiloBotaoSecundario(btnAlternarStatus);
-            AppTheme.AplicarEstiloBotaoSecundario(btnAtualizar);
+            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAlternarStatus);
+            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
 
-            cmbFiltroRole.BackColor = AppTheme.InputBackground;
-            cmbFiltroRole.ForeColor = AppTheme.TextPrimary;
+            cmbFiltroRole.BackColor = TemaMelobarbershop.SurfaceSecondary;
+            cmbFiltroRole.ForeColor = TemaMelobarbershop.TextPrimary;
             cmbFiltroRole.Items.Clear();
             cmbFiltroRole.Items.AddRange(new object[] { "Todos os Usuários", "Barbeiros", "Clientes", "Administradores" });
             cmbFiltroRole.SelectedIndex = 0;
 
-            AppTheme.EstilizarDataGridView(dgvUsuarios);
+            TemaMelobarbershop.EstilizarDataGridView(dgvUsuarios);
         }
 
         public async Task CarregarUsuariosAsync()

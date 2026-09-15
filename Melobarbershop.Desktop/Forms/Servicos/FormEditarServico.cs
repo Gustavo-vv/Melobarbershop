@@ -1,7 +1,7 @@
 using Melobarbershop.Desktop.Models;
 using Melobarbershop.Desktop.Theme;
 
-namespace Melobarbershop.Desktop.Forms
+namespace Melobarbershop.Desktop.Forms.Servicos
 {
     public partial class FormEditarServico : Form
     {
@@ -24,9 +24,9 @@ namespace Melobarbershop.Desktop.Forms
 
         private void ConfigurarEstilo()
         {
-            this.BackColor = AppTheme.BackgroundDark;
-            this.ForeColor = AppTheme.TextPrimary;
-            this.Font = AppTheme.NormalFont;
+            this.BackColor = TemaMelobarbershop.BackgroundDark;
+            this.ForeColor = TemaMelobarbershop.TextPrimary;
+            this.Font = TemaMelobarbershop.BodyFont;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -34,29 +34,29 @@ namespace Melobarbershop.Desktop.Forms
             this.Size = new Size(500, 480);
             this.Text = _modoEdicao ? "Editar Serviço" : "Novo Serviço";
 
-            lblTitulo.Font = AppTheme.SubtitleFont;
-            lblTitulo.ForeColor = AppTheme.GoldPrimary;
+            lblTitulo.Font = TemaMelobarbershop.SectionHeadingFont;
+            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
             lblTitulo.Text = _modoEdicao ? "Editar Informações do Serviço" : "Cadastrar Novo Serviço";
 
-            txtNome.BackColor = AppTheme.InputBackground;
-            txtNome.ForeColor = AppTheme.TextPrimary;
+            txtNome.BackColor = TemaMelobarbershop.SurfaceSecondary;
+            txtNome.ForeColor = TemaMelobarbershop.TextPrimary;
             txtNome.BorderStyle = BorderStyle.FixedSingle;
 
-            txtDescricao.BackColor = AppTheme.InputBackground;
-            txtDescricao.ForeColor = AppTheme.TextPrimary;
+            txtDescricao.BackColor = TemaMelobarbershop.SurfaceSecondary;
+            txtDescricao.ForeColor = TemaMelobarbershop.TextPrimary;
             txtDescricao.BorderStyle = BorderStyle.FixedSingle;
 
-            nudPreco.BackColor = AppTheme.InputBackground;
-            nudPreco.ForeColor = AppTheme.TextPrimary;
+            nudPreco.BackColor = TemaMelobarbershop.SurfaceSecondary;
+            nudPreco.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            nudDuracao.BackColor = AppTheme.InputBackground;
-            nudDuracao.ForeColor = AppTheme.TextPrimary;
+            nudDuracao.BackColor = TemaMelobarbershop.SurfaceSecondary;
+            nudDuracao.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            chkAtivo.ForeColor = AppTheme.TextPrimary;
-            chkExibirSite.ForeColor = AppTheme.TextPrimary;
+            chkAtivo.ForeColor = TemaMelobarbershop.TextPrimary;
+            chkExibirSite.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            AppTheme.AplicarEstiloBotaoPrimario(btnSalvar);
-            AppTheme.AplicarEstiloBotaoSecundario(btnCancelar);
+            TemaMelobarbershop.AplicarEstiloBotaoPrimario(btnSalvar);
+            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnCancelar);
 
             if (!_modoEdicao)
             {

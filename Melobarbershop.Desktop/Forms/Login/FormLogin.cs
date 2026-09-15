@@ -2,7 +2,9 @@ using Melobarbershop.Desktop.Configuration;
 using Melobarbershop.Desktop.Services;
 using Melobarbershop.Desktop.Theme;
 
-namespace Melobarbershop.Desktop.Forms
+using Melobarbershop.Desktop.Forms.Dashboard;
+
+namespace Melobarbershop.Desktop.Forms.Login
 {
     public partial class FormLogin : Form
     {
@@ -23,13 +25,15 @@ namespace Melobarbershop.Desktop.Forms
             this.MaximizeBox = false;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = "Melo Barbershop — Acesso Administrativo";
-            this.Size = new Size(460, 520);
+            this.Size = new Size(465, 540);
 
             panelCard.BackColor = AppTheme.CardBackground;
-            lblTitulo.Font = AppTheme.TitleFont;
-            lblTitulo.ForeColor = AppTheme.GoldPrimary;
-            lblSubtitulo.Font = AppTheme.NormalFont;
-            lblSubtitulo.ForeColor = AppTheme.TextSecondary;
+            picLogo.Image = TemaMelobarbershop.CarregarLogo();
+
+            lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
+            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
+            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
 
             lblEmail.ForeColor = AppTheme.TextSecondary;
             lblSenha.ForeColor = AppTheme.TextSecondary;

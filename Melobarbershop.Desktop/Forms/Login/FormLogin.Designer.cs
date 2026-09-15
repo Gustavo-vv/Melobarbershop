@@ -1,9 +1,10 @@
-namespace Melobarbershop.Desktop.Forms
+namespace Melobarbershop.Desktop.Forms.Login
 {
     partial class FormLogin
     {
         private System.ComponentModel.IContainer components = null;
         private Panel panelCard;
+        private PictureBox picLogo;
         private Label lblTitulo;
         private Label lblSubtitulo;
         private Label lblEmail;
@@ -26,6 +27,7 @@ namespace Melobarbershop.Desktop.Forms
         private void InitializeComponent()
         {
             panelCard = new Panel();
+            picLogo = new PictureBox();
             lblTitulo = new Label();
             lblSubtitulo = new Label();
             lblEmail = new Label();
@@ -37,11 +39,13 @@ namespace Melobarbershop.Desktop.Forms
             lblApiUrl = new Label();
 
             panelCard.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)picLogo).BeginInit();
             SuspendLayout();
 
             // panelCard
-            panelCard.Location = new Point(35, 30);
-            panelCard.Size = new Size(375, 420);
+            panelCard.Location = new Point(35, 25);
+            panelCard.Size = new Size(375, 480);
+            panelCard.Controls.Add(picLogo);
             panelCard.Controls.Add(lblTitulo);
             panelCard.Controls.Add(lblSubtitulo);
             panelCard.Controls.Add(lblEmail);
@@ -52,59 +56,65 @@ namespace Melobarbershop.Desktop.Forms
             panelCard.Controls.Add(lblStatus);
             panelCard.Controls.Add(lblApiUrl);
 
+            // picLogo
+            picLogo.Location = new Point(137, 18);
+            picLogo.Size = new Size(100, 65);
+            picLogo.SizeMode = PictureBoxSizeMode.Zoom;
+
             // lblTitulo
             lblTitulo.Text = "MELO BARBERSHOP";
-            lblTitulo.Location = new Point(20, 25);
-            lblTitulo.Size = new Size(335, 35);
+            lblTitulo.Location = new Point(20, 88);
+            lblTitulo.Size = new Size(335, 30);
             lblTitulo.TextAlign = ContentAlignment.MiddleCenter;
 
             // lblSubtitulo
             lblSubtitulo.Text = "Painel Administrativo do Gestor";
-            lblSubtitulo.Location = new Point(20, 60);
-            lblSubtitulo.Size = new Size(335, 25);
+            lblSubtitulo.Location = new Point(20, 118);
+            lblSubtitulo.Size = new Size(335, 22);
             lblSubtitulo.TextAlign = ContentAlignment.MiddleCenter;
 
             // lblEmail
             lblEmail.Text = "E-mail de Acesso";
-            lblEmail.Location = new Point(25, 105);
+            lblEmail.Location = new Point(25, 150);
             lblEmail.Size = new Size(325, 20);
 
             // txtEmail
-            txtEmail.Location = new Point(25, 128);
+            txtEmail.Location = new Point(25, 172);
             txtEmail.Size = new Size(325, 28);
             txtEmail.Font = new Font("Segoe UI", 10.5F);
 
             // lblSenha
             lblSenha.Text = "Senha";
-            lblSenha.Location = new Point(25, 175);
+            lblSenha.Location = new Point(25, 212);
             lblSenha.Size = new Size(325, 20);
 
             // txtSenha
-            txtSenha.Location = new Point(25, 198);
+            txtSenha.Location = new Point(25, 234);
             txtSenha.Size = new Size(325, 28);
             txtSenha.Font = new Font("Segoe UI", 10.5F);
 
             // btnEntrar
-            btnEntrar.Location = new Point(25, 250);
+            btnEntrar.Location = new Point(25, 285);
             btnEntrar.Size = new Size(325, 42);
             btnEntrar.Text = "ENTRAR NO SISTEMA";
             btnEntrar.Click += btnEntrar_Click;
 
             // lblStatus
-            lblStatus.Location = new Point(25, 305);
-            lblStatus.Size = new Size(325, 55);
+            lblStatus.Location = new Point(25, 335);
+            lblStatus.Size = new Size(325, 50);
             lblStatus.TextAlign = ContentAlignment.MiddleCenter;
 
             // lblApiUrl
-            lblApiUrl.Location = new Point(25, 375);
+            lblApiUrl.Location = new Point(25, 395);
             lblApiUrl.Size = new Size(325, 20);
             lblApiUrl.TextAlign = ContentAlignment.MiddleCenter;
 
             // FormLogin
-            ClientSize = new Size(445, 480);
+            ClientSize = new Size(445, 520);
             Controls.Add(panelCard);
             panelCard.ResumeLayout(false);
             panelCard.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)picLogo).EndInit();
             ResumeLayout(false);
         }
     }

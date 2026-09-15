@@ -1,9 +1,11 @@
 using Melobarbershop.Desktop.Configuration;
 using Melobarbershop.Desktop.Services;
 using Melobarbershop.Desktop.Theme;
-using Melobarbershop.Desktop.UserControls;
+using Melobarbershop.Desktop.Forms.Login;
+using Melobarbershop.Desktop.Forms.Servicos;
+using Melobarbershop.Desktop.Forms.Usuarios;
 
-namespace Melobarbershop.Desktop.Forms
+namespace Melobarbershop.Desktop.Forms.Dashboard
 {
     public partial class FormMain : Form
     {
@@ -32,19 +34,21 @@ namespace Melobarbershop.Desktop.Forms
             this.MinimumSize = new Size(1050, 650);
             this.Text = "Melo Barbershop — Painel Administrativo de Gestão";
 
-            panelSidebar.BackColor = AppTheme.SidebarBackground;
-            lblLogo.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            lblLogo.ForeColor = AppTheme.GoldPrimary;
-            lblLogoSub.ForeColor = AppTheme.TextMuted;
+            panelSidebar.BackColor = TemaMelobarbershop.SurfaceSecondary;
+            picLogoSidebar.Image = TemaMelobarbershop.CarregarLogo();
+
+            lblLogo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblLogo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblLogoSub.ForeColor = TemaMelobarbershop.TextMuted;
 
             EstilizarBotaoMenu(btnMenuDashboard);
             EstilizarBotaoMenu(btnMenuServicos);
             EstilizarBotaoMenu(btnMenuUsuarios);
             EstilizarBotaoMenu(btnMenuSair);
 
-            panelRodape.BackColor = Color.FromArgb(20, 21, 26);
-            lblUsuarioLogado.ForeColor = AppTheme.GoldPrimary;
-            lblStatusApi.ForeColor = AppTheme.SuccessColor;
+            panelRodape.BackColor = Color.FromArgb(12, 14, 18);
+            lblUsuarioLogado.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblStatusApi.ForeColor = TemaMelobarbershop.SuccessColor;
 
             if (ApiClient.UsuarioLogado != null)
             {
@@ -59,7 +63,7 @@ namespace Melobarbershop.Desktop.Forms
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
             btn.BackColor = Color.Transparent;
-            btn.ForeColor = AppTheme.TextPrimary;
+            btn.ForeColor = TemaMelobarbershop.TextPrimary;
             btn.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
             btn.TextAlign = ContentAlignment.MiddleLeft;
             btn.Padding = new Padding(20, 0, 0, 0);
@@ -73,13 +77,13 @@ namespace Melobarbershop.Desktop.Forms
             {
                 if (b == btnAtivo)
                 {
-                    b.BackColor = Color.FromArgb(40, 42, 54);
-                    b.ForeColor = AppTheme.GoldPrimary;
+                    b.BackColor = Color.FromArgb(15, 35, 65);
+                    b.ForeColor = TemaMelobarbershop.BlueAccent;
                 }
                 else
                 {
                     b.BackColor = Color.Transparent;
-                    b.ForeColor = AppTheme.TextPrimary;
+                    b.ForeColor = TemaMelobarbershop.TextPrimary;
                 }
             }
         }
