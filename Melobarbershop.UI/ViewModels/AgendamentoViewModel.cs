@@ -15,6 +15,14 @@ namespace Melobarbershop.UI.ViewModels
         public List<BarbeiroItemViewModel> BarbeirosDisponiveis { get; set; } = new();
         public string? MensagemErro { get; set; }
 
+        /// <summary>
+        /// Horários disponíveis (formato "HH:mm") para o barbeiro/serviço/dia usados
+        /// na carga inicial da página (hoje, primeiro barbeiro da lista).
+        /// A troca de dia/barbeiro no cliente é feita via AJAX em
+        /// GET /Agendamento/HorariosDisponiveis, que consulta a mesma regra de negócio.
+        /// </summary>
+        public List<string> HorariosDisponiveis { get; set; } = new();
+
         public bool TemServicoSelecionado => ServicoSelecionado != null;
     }
 

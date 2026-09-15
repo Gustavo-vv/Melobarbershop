@@ -64,6 +64,8 @@ async function carregarServicoDaApi() {
         price: encontrado.preco
       };
       renderServiceSummary();
+      cacheHorarios.clear();
+      renderTimes();
     }
   } catch (e) {
     // Silencioso: mantém o fallback da URL
@@ -103,12 +105,20 @@ if (themeToggle) {
   });
 }
 
+// Lê os dados que o servidor já carregou no ViewModel (data de hoje, barbeiro
+// padrão e os horários já renderizados em #timeList na carga inicial da página).
+const timeListEl = document.querySelector('#timeList');
+const initialDateStr = timeListEl?.dataset.initialDate; // "yyyy-MM-dd"
+const initialBarberId = timeListEl?.dataset.initialBarberId || null;
+const hoje = initialDateStr ? new Date(`${initialDateStr}T00:00:00`) : new Date();
+
 const state = {
-  year: 2026,
-  month: 8, // setembro (0-based)
-  day: null,
+  year: hoje.getFullYear(),
+  month: hoje.getMonth(), // 0-based
+  day: hoje.getDate(),
   time: '',
-  barber: 'Guilherme'
+  barber: 'Guilherme',
+  barberId: initialBarberId
 };
 
 const businessHours = {
@@ -163,7 +173,11 @@ function getDayKey(day) {
   return `${state.year}-${pad(state.month + 1)}-${pad(day)}`;
 }
 
-function getAvailableSlots(day) {
+// Estimativa client-side usada SOMENTE para desenhar o calendário (dia aberto/fechado
+// e o texto "X horários disponíveis" no tooltip), evitando 1 chamada de API por dia do mês.
+// Não é a fonte real de horários — quem decide os horários exibidos ao usuário é sempre
+// a API, via buscarHorariosReais(), que já aplica ExisteConflitoDeHorarioAsync e bloqueios.
+function getSlotsHeuristicos(day) {
   const date = new Date(state.year, state.month, day);
   const hours = businessHours[date.getDay()];
   if (!hours) return [];
@@ -173,11 +187,38 @@ function getAvailableSlots(day) {
   const end = toMinutes(hours.end);
   const duration = 45;
 
-  // An appointment must finish by closing time.
   for (let minute = start; minute + duration <= end; minute += duration) {
     slots.push(toTime(minute));
   }
   return slots;
+}
+
+// Cache simples para não repetir a mesma chamada (mesmo dia + mesmo barbeiro + mesmo serviço)
+const cacheHorarios = new Map();
+
+// Busca os horários REALMENTE disponíveis na API (via proxy do AgendamentoController),
+// já considerando conflitos de agenda e bloqueios do barbeiro.
+async function buscarHorariosReais(day) {
+  if (!day || !state.barberId) return [];
+
+  const dataStr = `${state.year}-${pad(state.month + 1)}-${pad(day)}`;
+  const servicoId = stateService.selected.id;
+  const chave = `${state.barberId}|${dataStr}|${servicoId || ''}`;
+
+  if (cacheHorarios.has(chave)) return cacheHorarios.get(chave);
+
+  const params = new URLSearchParams({ barbeiroId: state.barberId, data: dataStr });
+  if (servicoId) params.set('servicoIds', String(servicoId));
+
+  try {
+    const res = await fetch(`/Agendamento/HorariosDisponiveis?${params.toString()}`);
+    const json = await res.json();
+    const horarios = json.sucesso && Array.isArray(json.dados) ? json.dados : [];
+    cacheHorarios.set(chave, horarios);
+    return horarios;
+  } catch (e) {
+    return [];
+  }
 }
 
 function renderDays() {
@@ -198,7 +239,7 @@ function renderDays() {
     const date = new Date(state.year, state.month, day);
     const weekday = date.getDay();
     const open = Boolean(businessHours[weekday]);
-    const slots = getAvailableSlots(day);
+    const slots = getSlotsHeuristicos(day);
     const selected = state.day === day;
 
     visibleDays.push(`
@@ -228,14 +269,17 @@ if (daysWrap) {
     if (!btn || btn.disabled) return;
 
     state.day = Number(btn.dataset.day);
-    const slots = getAvailableSlots(state.day);
-    state.time = slots[0] || '';
+    state.time = '';
     renderDays();
     renderTimes();
   });
 }
 
-function renderTimes() {
+// Evita que uma resposta antiga (de um dia/barbeiro trocado rapidamente) sobrescreva
+// o resultado mais recente, caso as chamadas cheguem fora de ordem.
+let requisicaoHorariosAtual = 0;
+
+async function renderTimes() {
   if (!timeList || !dayLabel || !continueBtn) return;
 
   if (!state.day) {
@@ -245,11 +289,16 @@ function renderTimes() {
     return;
   }
 
-  const slots = getAvailableSlots(state.day);
-  const weekday = new Date(state.year, state.month, state.day).getDay();
-  const hours = businessHours[weekday];
-
   dayLabel.textContent = `${state.day} de ${monthNames[state.month].toLowerCase()}`;
+
+  const minhaRequisicao = ++requisicaoHorariosAtual;
+  timeList.innerHTML = '<div class="empty-time">Carregando horários...</div>';
+  continueBtn.disabled = true;
+
+  const slots = await buscarHorariosReais(state.day);
+
+  // Descarta o resultado se o usuário já mudou de dia/barbeiro enquanto isso carregava.
+  if (minhaRequisicao !== requisicaoHorariosAtual) return;
 
   if (!slots.length) {
     timeList.innerHTML = '<div class="empty-time">Não há horários disponíveis para este dia.</div>';
@@ -301,8 +350,11 @@ document.querySelectorAll('.barber').forEach(card => {
     document.querySelectorAll('.barber').forEach(b => b.classList.remove('selected'));
     card.classList.add('selected');
     state.barber = card.dataset.barber;
+    state.barberId = card.dataset.barberId;
+    state.time = '';
     const barberSummary = document.querySelector('#barberSummary');
     if (barberSummary) barberSummary.textContent = state.barber;
+    renderTimes();
   });
 });
 

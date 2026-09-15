@@ -77,7 +77,21 @@
 
         <div class="times">
           <div class="available-times-title">Horários disponíveis</div>
-          <div class="time-list" id="timeList"></div>
+          <div class="time-list" id="timeList"
+               data-initial-date="@DateTime.Today.ToString("yyyy-MM-dd")"
+               data-initial-barber-id="@(Model.BarbeirosDisponiveis.FirstOrDefault()?.Id ?? "")">
+            @if (Model.HorariosDisponiveis.Any())
+            {
+              @foreach (var horario in Model.HorariosDisponiveis)
+              {
+                <button class="time-btn" data-time="@horario" type="button">@horario</button>
+              }
+            }
+            else
+            {
+              <div class="empty-time">Não há horários disponíveis para hoje. Escolha outro dia.</div>
+            }
+          </div>
         </div>
       </section>
 

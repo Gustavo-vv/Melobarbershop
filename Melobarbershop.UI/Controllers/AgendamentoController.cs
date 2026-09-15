@@ -104,6 +104,20 @@ namespace Melobarbershop.UI.Controllers
                         Nome = "Guilherme"
                     });
                 }
+
+                // 3. Busca os horários disponíveis para o barbeiro/serviço padrão (hoje),
+                // apenas para a renderização inicial da página. Trocas de dia/barbeiro
+                // no cliente são resolvidas via AJAX em GET /Agendamento/HorariosDisponiveis.
+                var barbeiroPadrao = viewModel.BarbeirosDisponiveis.FirstOrDefault();
+                if (barbeiroPadrao != null)
+                {
+                    var servicoIds = viewModel.ServicoSelecionado != null
+                        ? new List<int> { viewModel.ServicoSelecionado.Id }
+                        : new List<int>();
+
+                    viewModel.HorariosDisponiveis = await ObterHorariosDisponiveisAsync(
+                        client, barbeiroPadrao.Id, DateTime.Today, servicoIds);
+                }
             }
             catch (HttpRequestException ex)
             {
@@ -117,6 +131,78 @@ namespace Melobarbershop.UI.Controllers
             }
 
             return View(viewModel);
+        }
+
+        /// <summary>
+        /// Retorna os horários disponíveis (formato "HH:mm") para um barbeiro/dia/serviço(s),
+        /// consumido via AJAX pela tela de Agendamento quando o cliente troca o dia ou o barbeiro.
+        /// Espelha a regra de negócio de GET /api/Agendamentos/horarios-disponiveis, que já
+        /// desconsidera horários com conflito de agenda (ExisteConflitoDeHorarioAsync) ou bloqueio.
+        /// </summary>
+        /// <param name="servicoIds">IDs dos serviços selecionados, separados por vírgula (ex: "1,3").</param>
+        [HttpGet]
+        public async Task<IActionResult> HorariosDisponiveis(
+            [FromQuery] string barbeiroId,
+            [FromQuery] DateTime data,
+            [FromQuery] string? servicoIds)
+        {
+            if (string.IsNullOrWhiteSpace(barbeiroId))
+                return Json(new { sucesso = false, mensagem = "Barbeiro não informado.", dados = Array.Empty<string>() });
+
+            var ids = (servicoIds ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(s => int.TryParse(s, out var n) ? n : (int?)null)
+                .Where(n => n.HasValue)
+                .Select(n => n!.Value)
+                .ToList();
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("ApiClient");
+                var horarios = await ObterHorariosDisponiveisAsync(client, barbeiroId, data.Date, ids);
+                return Json(new { sucesso = true, dados = horarios });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao buscar horários disponíveis para o barbeiro {BarbeiroId} em {Data}.", barbeiroId, data);
+                return Json(new { sucesso = false, mensagem = "Não foi possível carregar os horários disponíveis.", dados = Array.Empty<string>() });
+            }
+        }
+
+        /// <summary>
+        /// Chama GET /api/Agendamentos/horarios-disponiveis e converte o resultado
+        /// (lista de DateTime em UTC) para strings "HH:mm" prontas para exibição.
+        /// </summary>
+        private async Task<List<string>> ObterHorariosDisponiveisAsync(
+            HttpClient client, string barbeiroId, DateTime data, IEnumerable<int> servicoIds)
+        {
+            var query = new List<string>
+            {
+                $"barbeiroId={Uri.EscapeDataString(barbeiroId)}",
+                $"data={data:yyyy-MM-dd}"
+            };
+            query.AddRange(servicoIds.Select(id => $"servicoIds={id}"));
+
+            var url = $"/api/Agendamentos/horarios-disponiveis?{string.Join('&', query)}";
+            var response = await client.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Falha ao buscar horários disponíveis. Status: {StatusCode}", response.StatusCode);
+                return new List<string>();
+            }
+
+            var body = await response.Content.ReadAsStringAsync();
+            var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var apiResult = JsonSerializer.Deserialize<ApiResposta<List<DateTime>>>(body, jsonOptions);
+
+            if (apiResult == null || !apiResult.Sucesso || apiResult.Dados == null)
+                return new List<string>();
+
+            return apiResult.Dados
+                .OrderBy(d => d)
+                .Select(d => d.ToString("HH:mm"))
+                .ToList();
         }
 
         private static ServicoItemViewModel MapearServicoParaViewModel(ServicoDto dto)
