@@ -4,17 +4,17 @@ namespace Melobarbershop.Application.Servicos.Services;
 
 public interface IProdutoService
 {
-    Task<ProdutoDto?> ObterPorIdAsync(int id);
-    Task<ProdutoDto?> ObterPorCodigoBarrasAsync(string codigoBarras);
-    Task<IEnumerable<ProdutoDto>> ListarAtivosAsync();
-    Task<IEnumerable<ProdutoDto>> ListarTodosAsync();
-    Task<IEnumerable<ProdutoDto>> ListarComEstoqueAbaixoDoMinimoAsync();
-    Task<ProdutoDto> CriarAsync(CriarProdutoDto dto);
-    Task<ProdutoDto> AtualizarAsync(int id, AtualizarProdutoDto dto);
-    Task MovimentarEstoqueAsync(MovimentarEstoqueDto dto);
-    Task<IEnumerable<MovimentacaoEstoqueDto>> ListarMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null);
-    Task<bool> PossuiEstoqueAsync(int produtoId, int quantidade);
-    Task DesativarAsync(int id);
-    Task AtivarAsync(int id);
-    Task RemoverPermanentementeAsync(int id);
+    Task<ApiResposta<ProdutoDto>> ObterPorIdAsync(int id);
+    Task<ApiResposta<ProdutoDto>> ObterPorCodigoBarrasAsync(string codigoBarras);
+    Task<ApiResposta<IEnumerable<ProdutoDto>>> ListarAtivosAsync();
+    Task<ApiResposta<IEnumerable<ProdutoDto>>> ListarTodosAsync();
+    Task<ApiResposta<IEnumerable<ProdutoDto>>> ListarComEstoqueAbaixoDoMinimoAsync();
+    Task<ApiResposta<ProdutoDto>> CriarAsync(CriarProdutoDto dto);
+    Task<ApiResposta<ProdutoDto>> AtualizarAsync(int id, AtualizarProdutoDto dto);
+    Task<ApiResposta<ProdutoDto>> MovimentarEstoqueAsync(MovimentarEstoqueDto dto);
+    Task<ApiResposta<IEnumerable<MovimentacaoEstoqueDto>>> ListarMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null);
+    Task<ApiResposta<bool>> PossuiEstoqueAsync(int produtoId, int quantidade);
+    Task<ApiResposta<ProdutoDto>> DesativarAsync(int id);
+    Task<ApiResposta<ProdutoDto>> AtivarAsync(int id);
+    Task<ApiResposta<ProdutoDto>> RemoverPermanentementeAsync(int id);
 }
