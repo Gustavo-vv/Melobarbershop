@@ -264,6 +264,17 @@ function renderDays() {
   daysWrap.innerHTML = visibleDays.join('');
   if (prevMonth) prevMonth.disabled = state.year === 2026 && state.month === 0;
   if (nextMonth) nextMonth.disabled = state.year === 2035 && state.month === 11;
+
+  // Bug 2 fix: rola automaticamente até o dia selecionado (ou o primeiro
+  // disponível do mês) para que o usuário não precise arrastar o carrossel.
+  requestAnimationFrame(() => {
+    const btnAlvo =
+      daysWrap.querySelector('.day-item.selected') ||
+      daysWrap.querySelector('.day-item:not([disabled])');
+    if (btnAlvo) {
+      btnAlvo.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+    }
+  });
 }
 
 if (daysWrap) {

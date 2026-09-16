@@ -14,6 +14,19 @@ public class AgendamentoService : IAgendamentoService
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IMapper _mapper;
 
+    // Fuso horário fixo da barbearia (Brasil/Brasília = UTC-3).
+    // Usar TimeZoneInfo explícito garante que o servidor sempre opere
+    // em horário local brasileiro, independentemente do fuso configurado no SO.
+    private static readonly TimeZoneInfo _fusoHorarioBrasilia =
+        TimeZoneInfo.FindSystemTimeZoneById(
+            OperatingSystem.IsWindows()
+                ? "E. South America Standard Time"   // ID no Windows
+                : "America/Sao_Paulo");               // ID no Linux/Docker
+
+    /// <summary>Retorna o DateTime atual no fuso horário de São Paulo.</summary>
+    private static DateTime AgoraBrt() =>
+        TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _fusoHorarioBrasilia);
+
     public AgendamentoService(
         IAgendamentoRepository agendamentoRepository,
         IServicoRepository servicoRepository,
@@ -85,7 +98,9 @@ public class AgendamentoService : IAgendamentoService
             if (dto.ServicoIds == null || !dto.ServicoIds.Any())
                 return ApiResposta<AgendamentoDto>.Falha("Pelo menos um servico deve ser selecionado para o agendamento.");
 
-            if (dto.DataHoraInicio < DateTime.UtcNow.AddMinutes(-5))
+            // Compara contra hora local BRT para evitar falsa rejeição quando o
+            // servidor está em UTC e o slot foi gerado em hora local.
+            if (dto.DataHoraInicio < AgoraBrt().AddMinutes(-5))
                 return ApiResposta<AgendamentoDto>.Falha("A data e hora do agendamento nao pode ser no passado.");
 
             var cliente = await _usuarioRepository.ObterPorIdAsync(dto.ClienteId);
@@ -270,7 +285,7 @@ public class AgendamentoService : IAgendamentoService
             if (agendamento.Status == StatusAgendamento.Concluido || agendamento.Status == StatusAgendamento.Cancelado)
                 return ApiResposta<AgendamentoDto>.Falha("Nao e possivel reagendar um atendimento que ja foi concluido ou cancelado.");
 
-            if (dto.NovoDataHoraInicio < DateTime.UtcNow.AddMinutes(-5))
+            if (dto.NovoDataHoraInicio < AgoraBrt().AddMinutes(-5))
                 return ApiResposta<AgendamentoDto>.Falha("O novo horario nao pode ser no passado.");
 
             var barbeiroId = !string.IsNullOrWhiteSpace(dto.NovoBarbeiroId) ? dto.NovoBarbeiroId : agendamento.BarbeiroId;
@@ -324,7 +339,10 @@ public class AgendamentoService : IAgendamentoService
     {
         try
         {
-            if (data.Date < DateTime.UtcNow.Date)
+            // Comparar sempre contra horário local BRT para não rejeitar
+            // o dia atual quando o servidor operar em UTC (ex.: UTC-3 = dia seguinte após 21h).
+            var agoraBrt = AgoraBrt();
+            if (data.Date < agoraBrt.Date)
                 return ApiResposta<IEnumerable<DateTime>>.Ok(Enumerable.Empty<DateTime>());
 
             var barbeiro = await _usuarioRepository.ObterPorIdAsync(barbeiroId);
@@ -349,11 +367,10 @@ public class AgendamentoService : IAgendamentoService
 
             var slotsTeoricos = GerarSlotsTeoricos(data, duracaoTotalMinutos);
             var horariosDisponiveis = new List<DateTime>();
-            var agora = DateTime.UtcNow;
 
             foreach (var horario in slotsTeoricos)
             {
-                if (horario <= agora)
+                if (horario <= agoraBrt)
                     continue;
 
                 var terminoEstimado = horario.AddMinutes(duracaoTotalMinutos);
@@ -398,12 +415,12 @@ public class AgendamentoService : IAgendamentoService
 
             var slotsTeoricos = GerarSlotsTeoricos(data, duracaoTotalMinutos);
             var todosHorarios = new List<HorarioSlotDto>();
-            var agora = DateTime.Now;
+            var agoraBrt = AgoraBrt(); // hora local BRT — fonte única de verdade
 
             foreach (var horario in slotsTeoricos)
             {
                 // Se a data do agendamento for anterior a hoje, ou se for hoje e o horário já passou
-                if (horario.Date < agora.Date || horario <= agora)
+                if (horario.Date < agoraBrt.Date || horario <= agoraBrt)
                 {
                     todosHorarios.Add(new HorarioSlotDto { Horario = horario, Disponivel = false });
                     continue;
