@@ -15,7 +15,7 @@ namespace Melobarbershop.API.Controllers
             _agendamentoService = agendamentoService;
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> ObterPorId(int id)
         {
             var response = await _agendamentoService.ObterPorIdAsync(id);
