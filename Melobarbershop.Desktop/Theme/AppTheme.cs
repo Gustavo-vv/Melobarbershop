@@ -76,29 +76,72 @@ namespace Melobarbershop.Desktop.Theme
             btn.FlatAppearance.BorderSize = 0;
             btn.BackColor = BluePrimary;
             btn.ForeColor = Color.White;
-            btn.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btn.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             btn.Cursor = Cursors.Hand;
+            btn.Padding = new Padding(6, 2, 6, 2);
         }
 
         public static void AplicarEstiloBotaoSecundario(Button btn)
         {
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 1;
-            btn.FlatAppearance.BorderColor = BlueAccent;
-            btn.BackColor = Color.FromArgb(18, 26, 36);
+            btn.FlatAppearance.BorderColor = Color.FromArgb(45, 75, 115);
+            btn.BackColor = Color.FromArgb(16, 22, 30);
             btn.ForeColor = BlueAccent;
-            btn.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btn.Cursor = Cursors.Hand;
+            btn.Padding = new Padding(6, 2, 6, 2);
         }
 
         public static void AplicarEstiloBotaoPerigo(Button btn)
         {
             btn.FlatStyle = FlatStyle.Flat;
-            btn.FlatAppearance.BorderSize = 0;
-            btn.BackColor = DangerColor;
-            btn.ForeColor = Color.White;
-            btn.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btn.FlatAppearance.BorderSize = 1;
+            btn.FlatAppearance.BorderColor = Color.FromArgb(180, 40, 40);
+            btn.BackColor = Color.FromArgb(35, 14, 16);
+            btn.ForeColor = Color.FromArgb(248, 113, 113);
+            btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btn.Cursor = Cursors.Hand;
+            btn.Padding = new Padding(6, 2, 6, 2);
+        }
+
+        public static void AplicarBordaCardElevado(Panel card)
+        {
+            card.BackColor = SurfaceCard;
+            card.BorderStyle = BorderStyle.None;
+            card.Paint -= Card_Paint;
+            card.Paint += Card_Paint;
+        }
+
+        private static void Card_Paint(object? sender, PaintEventArgs e)
+        {
+            if (sender is not Panel panel) return;
+
+            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            var rect = new Rectangle(0, 0, panel.Width - 1, panel.Height - 1);
+            using var penBorder = new Pen(Color.FromArgb(35, 40, 48), 1);
+            e.Graphics.DrawRectangle(penBorder, rect);
+
+            // Realce superior sutil de iluminação
+            using var penHighlight = new Pen(Color.FromArgb(25, 55, 95), 1);
+            e.Graphics.DrawLine(penHighlight, 1, 1, panel.Width - 2, 1);
+        }
+
+        public static void EstilizarTextBox(TextBox txt)
+        {
+            txt.BackColor = SurfaceSecondary;
+            txt.ForeColor = TextPrimary;
+            txt.BorderStyle = BorderStyle.FixedSingle;
+            txt.Font = BodyFont;
+        }
+
+        public static void EstilizarComboBox(ComboBox cmb)
+        {
+            cmb.BackColor = SurfaceSecondary;
+            cmb.ForeColor = TextPrimary;
+            cmb.FlatStyle = FlatStyle.Flat;
+            cmb.Font = BodyFont;
         }
 
         public static void EstilizarDataGridView(DataGridView dgv)
@@ -106,35 +149,35 @@ namespace Melobarbershop.Desktop.Theme
             dgv.BackgroundColor = SurfaceCard;
             dgv.BorderStyle = BorderStyle.None;
             dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgv.GridColor = BorderColor;
+            dgv.GridColor = Color.FromArgb(25, 30, 36);
             dgv.EnableHeadersVisualStyles = false;
             dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgv.MultiSelect = false;
             dgv.RowHeadersVisible = false;
             dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgv.RowTemplate.Height = 38;
+            dgv.RowTemplate.Height = 40;
 
             // Cabeçalho Oficial
-            dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(10, 12, 15);
+            dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(12, 15, 19);
             dgv.ColumnHeadersDefaultCellStyle.ForeColor = BlueAccent;
             dgv.ColumnHeadersDefaultCellStyle.Font = CardTitleFont;
             dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dgv.ColumnHeadersDefaultCellStyle.Padding = new Padding(10, 0, 10, 0);
+            dgv.ColumnHeadersDefaultCellStyle.Padding = new Padding(12, 0, 12, 0);
             dgv.ColumnHeadersHeight = 44;
             dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
 
             // Linhas
             dgv.DefaultCellStyle.BackColor = SurfaceCard;
             dgv.DefaultCellStyle.ForeColor = TextPrimary;
-            dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 50, 90);
+            dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 50, 95);
             dgv.DefaultCellStyle.SelectionForeColor = Color.White;
             dgv.DefaultCellStyle.Font = BodyFont;
-            dgv.DefaultCellStyle.Padding = new Padding(10, 0, 10, 0);
+            dgv.DefaultCellStyle.Padding = new Padding(12, 0, 12, 0);
 
             // Zebra Striping Neutro elegante
             dgv.AlternatingRowsDefaultCellStyle.BackColor = SurfaceSecondary;
             dgv.AlternatingRowsDefaultCellStyle.ForeColor = TextPrimary;
-            dgv.AlternatingRowsDefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 50, 90);
+            dgv.AlternatingRowsDefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 50, 95);
             dgv.AlternatingRowsDefaultCellStyle.SelectionForeColor = Color.White;
         }
     }

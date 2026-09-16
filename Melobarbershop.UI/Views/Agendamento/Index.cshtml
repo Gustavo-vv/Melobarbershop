@@ -153,9 +153,43 @@
         <p style="color:#7e8a97;font-size:11px;margin-top:12px;text-align:center">
           <span id="selectedDayLabel">11 de setembro</span> • <span id="barberSummary">@(Model.BarbeirosDisponiveis.FirstOrDefault()?.Nome ?? "Guilherme")</span>
         </p>
-      </aside>
     </div>
   </main>
+
+  <!-- Modal / Popup pós-agendamento -->
+  <div class="booking-modal-backdrop" id="bookingModalBackdrop" style="display:none;">
+    <div class="booking-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="booking-modal-header">
+        <div class="modal-badge">✨ Agendamento Confirmado!</div>
+        <button class="modal-close-btn" id="btnFecharModal" type="button" aria-label="Fechar">✕</button>
+      </div>
+      <div class="booking-modal-body">
+        <p class="modal-intro">Seu horário foi reservado com sucesso no sistema da barbearia.</p>
+        <div class="modal-summary-box">
+          <div class="summary-item">
+            <span class="summary-label">Serviço:</span>
+            <span class="summary-val" id="modalServico">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Profissional:</span>
+            <span class="summary-val" id="modalBarbeiro">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Data e Horário:</span>
+            <span class="summary-val" id="modalDataHora">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Valor:</span>
+            <span class="summary-val highlight" id="modalValor">-</span>
+          </div>
+        </div>
+      </div>
+      <div class="booking-modal-footer">
+        <button class="btn-modal-action secondary" id="btnNovoAgendamento" type="button">Agendar Outro</button>
+        <button class="btn-modal-action primary" id="btnConcluirModal" type="button" onclick="location.href='/'">Voltar ao Início</button>
+      </div>
+    </div>
+  </div>
 
   <script src="~/js/agendamento.js" asp-append-version="true"></script>
 </body>

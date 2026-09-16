@@ -158,6 +158,14 @@ namespace Melobarbershop.Desktop.Models
         NaoCompareceu = 6
     }
 
+    public enum OrigemAgendamentoDto
+    {
+        Site = 1,
+        WhatsApp = 2,
+        Aplicativo = 3,
+        PresencialBalcao = 4
+    }
+
     public class AgendamentoItemDto
     {
         [JsonPropertyName("id")]
@@ -201,6 +209,9 @@ namespace Melobarbershop.Desktop.Models
 
         [JsonPropertyName("status")]
         public StatusAgendamentoDto Status { get; set; }
+
+        [JsonPropertyName("origem")]
+        public OrigemAgendamentoDto Origem { get; set; } = OrigemAgendamentoDto.Site;
 
         [JsonPropertyName("observacoes")]
         public string? Observacoes { get; set; }

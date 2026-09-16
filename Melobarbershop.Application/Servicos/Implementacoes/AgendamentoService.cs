@@ -398,24 +398,26 @@ public class AgendamentoService : IAgendamentoService
 
             var slotsTeoricos = GerarSlotsTeoricos(data, duracaoTotalMinutos);
             var todosHorarios = new List<HorarioSlotDto>();
-            var agora = DateTime.UtcNow;
+            var agora = DateTime.Now;
 
             foreach (var horario in slotsTeoricos)
             {
-                if (data.Date < agora.Date || horario <= agora)
+                // Se a data do agendamento for anterior a hoje, ou se for hoje e o horário já passou
+                if (horario.Date < agora.Date || horario <= agora)
                 {
                     todosHorarios.Add(new HorarioSlotDto { Horario = horario, Disponivel = false });
                     continue;
                 }
 
                 var terminoEstimado = horario.AddMinutes(duracaoTotalMinutos);
+                var estrapolaExpediente = terminoEstimado > fimDia.Date.AddHours(19);
                 var temConflito = agendamentosExistentes.Any(a => a.DataHoraInicio < terminoEstimado && a.DataHoraFim > horario);
                 var temBloqueio = bloqueios.Any(b => b.DataHoraInicio < terminoEstimado && b.DataHoraFim > horario);
 
                 todosHorarios.Add(new HorarioSlotDto
                 {
                     Horario = horario,
-                    Disponivel = !temConflito && !temBloqueio
+                    Disponivel = !estrapolaExpediente && !temConflito && !temBloqueio
                 });
             }
 

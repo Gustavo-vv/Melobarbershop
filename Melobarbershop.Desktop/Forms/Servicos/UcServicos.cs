@@ -32,6 +32,7 @@ namespace Melobarbershop.Desktop.Forms.Servicos
             TemaMelobarbershop.AplicarEstiloBotaoPerigo(btnExcluir);
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
 
+            TemaMelobarbershop.EstilizarTextBox(txtBusca);
             TemaMelobarbershop.EstilizarDataGridView(dgvServicos);
         }
 

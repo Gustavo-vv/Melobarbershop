@@ -27,6 +27,11 @@ namespace Melobarbershop.Desktop.Services
             return await ApiClient.PatchAsync<object, AgendamentoDto>($"/api/Agendamentos/{id}/confirmar", new { });
         }
 
+        public async Task<ApiResposta<AgendamentoDto>> IniciarAtendimentoAsync(int id)
+        {
+            return await ApiClient.PatchAsync<object, AgendamentoDto>($"/api/Agendamentos/{id}/iniciar-atendimento", new { });
+        }
+
         public async Task<ApiResposta<AgendamentoDto>> ConcluirAsync(int id)
         {
             return await ApiClient.PatchAsync<object, AgendamentoDto>($"/api/Agendamentos/{id}/concluir", new { });

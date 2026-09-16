@@ -234,17 +234,27 @@ function renderDays() {
     visibleDays.push(`<div class="day-spacer" aria-hidden="true"></div>`);
   }
 
+  const hojeZeroHora = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+
   for (let day = 1; day <= days; day++) {
     const date = new Date(state.year, state.month, day);
     const weekday = date.getDay();
-    const open = Boolean(businessHours[weekday]);
+    const isPast = date < hojeZeroHora;
+    const open = !isPast && Boolean(businessHours[weekday]);
     const slots = getSlotsHeuristicos(day);
     const selected = state.day === day;
+
+    let tooltip = 'Fechado';
+    if (isPast) {
+      tooltip = 'Data passada';
+    } else if (open) {
+      tooltip = `${slots.length} horários disponíveis`;
+    }
 
     visibleDays.push(`
       <button class="day-item ${selected ? 'selected' : ''} ${!open ? 'disabled' : ''}"
         ${!open ? 'disabled' : ''} data-day="${day}" type="button"
-        title="${open ? `${slots.length} horários disponíveis` : 'Fechado'}">
+        title="${tooltip}">
         <span class="day-circle">${day}</span>
         <span class="weekday">${weekdayLabels[weekday]}</span>
       </button>
@@ -440,7 +450,23 @@ if (continueBtn) {
       }
 
       if (res.ok && json && json.sucesso) {
-        alert(`Agendamento confirmado com sucesso!\nBarbeiro: ${state.barber}\nHorário: ${state.time}`);
+        const modalBackdrop = document.querySelector('#bookingModalBackdrop');
+        if (modalBackdrop) {
+          const modalServico = document.querySelector('#modalServico');
+          const modalBarbeiro = document.querySelector('#modalBarbeiro');
+          const modalDataHora = document.querySelector('#modalDataHora');
+          const modalValor = document.querySelector('#modalValor');
+
+          if (modalServico) modalServico.textContent = stateService.selected.name || 'Serviço';
+          if (modalBarbeiro) modalBarbeiro.textContent = state.barber || 'Barbeiro';
+          if (modalDataHora) modalDataHora.textContent = `${pad(state.day)} de ${monthNames[state.month].toLowerCase()} às ${state.time}`;
+          if (modalValor) modalValor.textContent = stateService.selected.price ? `R$ ${Number(stateService.selected.price).toFixed(2).replace('.', ',')}` : '-';
+
+          modalBackdrop.style.display = 'flex';
+        } else {
+          alert(`Agendamento confirmado com sucesso!\nBarbeiro: ${state.barber}\nHorário: ${state.time}`);
+        }
+
         cacheHorarios.clear();
         state.time = '';
         state.timeValue = '';
@@ -509,3 +535,20 @@ function stopDaysDrag(event) {
 renderServiceSummary();
 renderDays();
 renderTimes();
+
+// Fechamento do Modal pós-agendamento
+const bookingModalBackdrop = document.querySelector('#bookingModalBackdrop');
+const btnFecharModal = document.querySelector('#btnFecharModal');
+const btnNovoAgendamento = document.querySelector('#btnNovoAgendamento');
+
+function fecharModalAgendamento() {
+  if (bookingModalBackdrop) bookingModalBackdrop.style.display = 'none';
+}
+
+if (btnFecharModal) btnFecharModal.addEventListener('click', fecharModalAgendamento);
+if (btnNovoAgendamento) btnNovoAgendamento.addEventListener('click', fecharModalAgendamento);
+if (bookingModalBackdrop) {
+  bookingModalBackdrop.addEventListener('click', (e) => {
+    if (e.target === bookingModalBackdrop) fecharModalAgendamento();
+  });
+}

@@ -29,9 +29,11 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private Label lblCardBarbeirosTitulo;
         private Label lblCardBarbeirosSub;
 
-        private Panel panelAviso;
-        private Label lblAvisoTitulo;
-        private Label lblAvisoDesc;
+        private Panel cardFilaAgendamentos;
+        private Label lblFilaTitulo;
+        private Label lblFilaRestantes;
+        private Panel pnlFilaLista;
+        private Label lblFilaVazia;
 
         private Label lblSecaoResumo;
         private DataGridView dgvResumo;
@@ -72,9 +74,11 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             lblCardBarbeirosTitulo = new Label();
             lblCardBarbeirosSub = new Label();
 
-            panelAviso = new Panel();
-            lblAvisoTitulo = new Label();
-            lblAvisoDesc = new Label();
+            cardFilaAgendamentos = new Panel();
+            lblFilaTitulo = new Label();
+            lblFilaRestantes = new Label();
+            pnlFilaLista = new Panel();
+            lblFilaVazia = new Label();
 
             lblSecaoResumo = new Label();
             dgvResumo = new DataGridView();
@@ -83,7 +87,8 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             cardServicosAtivos.SuspendLayout();
             cardClientes.SuspendLayout();
             cardBarbeiros.SuspendLayout();
-            panelAviso.SuspendLayout();
+            cardFilaAgendamentos.SuspendLayout();
+            pnlFilaLista.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvResumo).BeginInit();
             SuspendLayout();
 
@@ -186,30 +191,48 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             lblCardBarbeirosSub.Size = new Size(185, 20);
             lblCardBarbeirosSub.Text = "Carregando...";
 
-            // panelAviso
-            panelAviso.Location = new Point(25, 225);
-            panelAviso.Size = new Size(935, 60);
-            panelAviso.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            panelAviso.Controls.Add(lblAvisoTitulo);
-            panelAviso.Controls.Add(lblAvisoDesc);
+            // cardFilaAgendamentos
+            cardFilaAgendamentos.Location = new Point(25, 210);
+            cardFilaAgendamentos.Size = new Size(935, 245);
+            cardFilaAgendamentos.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            cardFilaAgendamentos.Controls.Add(lblFilaTitulo);
+            cardFilaAgendamentos.Controls.Add(lblFilaRestantes);
+            cardFilaAgendamentos.Controls.Add(pnlFilaLista);
 
-            lblAvisoTitulo.Location = new Point(15, 8);
-            lblAvisoTitulo.Size = new Size(900, 20);
-            lblAvisoTitulo.Text = "📅 Agendamentos Integrados";
+            // lblFilaTitulo
+            lblFilaTitulo.Location = new Point(15, 12);
+            lblFilaTitulo.Size = new Size(300, 26);
+            lblFilaTitulo.Text = "🕒  Fila do Agendamento Web";
 
-            lblAvisoDesc.Location = new Point(15, 30);
-            lblAvisoDesc.Size = new Size(900, 24);
-            lblAvisoDesc.Text = "Acesse a nova aba 'Agendamentos' no menu lateral para visualizar, filtrar e gerenciar todos os atendimentos.";
+            // lblFilaRestantes
+            lblFilaRestantes.Location = new Point(780, 10);
+            lblFilaRestantes.Size = new Size(140, 26);
+            lblFilaRestantes.TextAlign = ContentAlignment.MiddleRight;
+            lblFilaRestantes.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            lblFilaRestantes.Text = "0 Restantes";
+
+            // pnlFilaLista
+            pnlFilaLista.Location = new Point(15, 45);
+            pnlFilaLista.Size = new Size(905, 185);
+            pnlFilaLista.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlFilaLista.AutoScroll = true;
+            pnlFilaLista.Controls.Add(lblFilaVazia);
+
+            // lblFilaVazia
+            lblFilaVazia.Dock = DockStyle.Fill;
+            lblFilaVazia.TextAlign = ContentAlignment.MiddleCenter;
+            lblFilaVazia.Text = "Nenhum agendamento marcado para hoje até o momento.";
+            lblFilaVazia.ForeColor = Color.FromArgb(140, 145, 155);
 
             // lblSecaoResumo
-            lblSecaoResumo.Location = new Point(25, 305);
-            lblSecaoResumo.Size = new Size(400, 25);
+            lblSecaoResumo.Location = new Point(25, 465);
+            lblSecaoResumo.Size = new Size(400, 24);
             lblSecaoResumo.Text = "Catálogo de Serviços da Barbearia";
-            lblSecaoResumo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblSecaoResumo.Font = new Font("Segoe UI", 11.5F, FontStyle.Bold);
 
             // dgvResumo
-            dgvResumo.Location = new Point(25, 335);
-            dgvResumo.Size = new Size(935, 270);
+            dgvResumo.Location = new Point(25, 495);
+            dgvResumo.Size = new Size(935, 120);
             dgvResumo.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvResumo.ReadOnly = true;
             dgvResumo.AllowUserToAddRows = false;
@@ -224,7 +247,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             Controls.Add(cardServicosAtivos);
             Controls.Add(cardClientes);
             Controls.Add(cardBarbeiros);
-            Controls.Add(panelAviso);
+            Controls.Add(cardFilaAgendamentos);
             Controls.Add(lblSecaoResumo);
             Controls.Add(dgvResumo);
 
@@ -234,7 +257,8 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             cardServicosAtivos.ResumeLayout(false);
             cardClientes.ResumeLayout(false);
             cardBarbeiros.ResumeLayout(false);
-            panelAviso.ResumeLayout(false);
+            cardFilaAgendamentos.ResumeLayout(false);
+            pnlFilaLista.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvResumo).EndInit();
             ResumeLayout(false);
         }

@@ -32,8 +32,7 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnConcluir);
             TemaMelobarbershop.AplicarEstiloBotaoPerigo(btnCancelar);
 
-            cmbFiltroPeriodo.BackColor = TemaMelobarbershop.SurfaceSecondary;
-            cmbFiltroPeriodo.ForeColor = TemaMelobarbershop.TextPrimary;
+            TemaMelobarbershop.EstilizarComboBox(cmbFiltroPeriodo);
             cmbFiltroPeriodo.Items.Clear();
             cmbFiltroPeriodo.Items.AddRange(new object[] { "Hoje", "Esta Semana", "Este Mês", "Próximos 7 Dias", "Personalizado" });
             cmbFiltroPeriodo.SelectedIndex = 0;
@@ -43,6 +42,7 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             dtpInicio.Value = DateTime.Today;
             dtpFim.Value = DateTime.Today;
 
+            TemaMelobarbershop.EstilizarTextBox(txtBusca);
             TemaMelobarbershop.EstilizarDataGridView(dgvAgendamentos);
         }
 

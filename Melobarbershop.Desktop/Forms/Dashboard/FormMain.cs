@@ -65,9 +65,11 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         {
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
+            btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(20, 28, 38);
+            btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(15, 35, 65);
             btn.BackColor = Color.Transparent;
-            btn.ForeColor = TemaMelobarbershop.TextPrimary;
-            btn.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
+            btn.ForeColor = TemaMelobarbershop.TextMuted;
+            btn.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btn.TextAlign = ContentAlignment.MiddleLeft;
             btn.Padding = new Padding(20, 0, 0, 0);
             btn.Cursor = Cursors.Hand;
@@ -80,13 +82,13 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             {
                 if (b == btnAtivo)
                 {
-                    b.BackColor = Color.FromArgb(15, 35, 65);
+                    b.BackColor = Color.FromArgb(16, 32, 54);
                     b.ForeColor = TemaMelobarbershop.BlueAccent;
                 }
                 else
                 {
                     b.BackColor = Color.Transparent;
-                    b.ForeColor = TemaMelobarbershop.TextPrimary;
+                    b.ForeColor = TemaMelobarbershop.TextMuted;
                 }
             }
         }

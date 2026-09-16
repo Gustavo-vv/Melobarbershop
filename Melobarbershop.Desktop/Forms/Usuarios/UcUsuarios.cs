@@ -28,12 +28,12 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAlternarStatus);
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
 
-            cmbFiltroRole.BackColor = TemaMelobarbershop.SurfaceSecondary;
-            cmbFiltroRole.ForeColor = TemaMelobarbershop.TextPrimary;
+            TemaMelobarbershop.EstilizarComboBox(cmbFiltroRole);
             cmbFiltroRole.Items.Clear();
             cmbFiltroRole.Items.AddRange(new object[] { "Todos os Usuários", "Barbeiros", "Clientes", "Administradores" });
             cmbFiltroRole.SelectedIndex = 0;
 
+            TemaMelobarbershop.EstilizarTextBox(txtBusca);
             TemaMelobarbershop.EstilizarDataGridView(dgvUsuarios);
         }
 
