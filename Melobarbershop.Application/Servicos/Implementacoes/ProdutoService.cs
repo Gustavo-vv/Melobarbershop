@@ -18,78 +18,89 @@ public class ProdutoService : IProdutoService
         _mapper = mapper;
     }
 
-    public async Task<ProdutoDto?> ObterPorIdAsync(int id)
+    public async Task<ApiResposta<ProdutoDto>> ObterPorIdAsync(int id)
     {
         try
         {
             var produto = await _produtoRepository.ObterPorIdAsync(id);
-            return produto == null ? null : _mapper.Map<ProdutoDto>(produto);
+            if (produto == null)
+                return ApiResposta<ProdutoDto>.Falha("Produto não encontrado.");
+
+            var dto = _mapper.Map<ProdutoDto>(produto);
+            return ApiResposta<ProdutoDto>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao obter produto com ID {id}.", ex);
+            return ApiResposta<ProdutoDto>.Falha($"Erro ao obter produto com ID {ex.Message}.");
         }
     }
 
-    public async Task<ProdutoDto?> ObterPorCodigoBarrasAsync(string codigoBarras)
+    public async Task<ApiResposta<ProdutoDto>> ObterPorCodigoBarrasAsync(string codigoBarras)
     {
         try
         {
             var produto = await _produtoRepository.ObterPorCodigoBarrasAsync(codigoBarras);
-            return produto == null ? null : _mapper.Map<ProdutoDto>(produto);
+            if (produto == null)
+                return ApiResposta<ProdutoDto>.Falha($"Produto com código de barras: {codigoBarras} não encontrado.");
+
+            var dto = _mapper.Map<ProdutoDto>(produto);
+            return ApiResposta<ProdutoDto>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao obter produto com codigo de barras '{codigoBarras}'.", ex);
+            return ApiResposta<ProdutoDto>.Falha($"Erro ao obter produto com codigo de barras {ex.Message}.");
         }
     }
 
-    public async Task<IEnumerable<ProdutoDto>> ListarAtivosAsync()
+    public async Task<ApiResposta<IEnumerable<ProdutoDto>>> ListarAtivosAsync()
     {
         try
         {
             var produtos = await _produtoRepository.ObterAtivosAsync();
-            return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+            var dto = _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+            return ApiResposta<IEnumerable<ProdutoDto>>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao listar produtos ativos.", ex);
+            return ApiResposta<IEnumerable<ProdutoDto>>.Falha($"Erro ao listar produtos ativos {ex.Message}.");
         }
     }
 
-    public async Task<IEnumerable<ProdutoDto>> ListarTodosAsync()
+    public async Task<ApiResposta<IEnumerable<ProdutoDto>>> ListarTodosAsync()
     {
         try
         {
             var produtos = await _produtoRepository.ObterTodosAsync();
-            return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+            var dto = _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+            return ApiResposta<IEnumerable<ProdutoDto>>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao listar todos os produtos.", ex);
+            return ApiResposta<IEnumerable<ProdutoDto>>.Falha($"Erro ao listar todos os produtos: {ex.Message}");
         }
     }
 
-    public async Task<IEnumerable<ProdutoDto>> ListarComEstoqueAbaixoDoMinimoAsync()
+    public async Task<ApiResposta<IEnumerable<ProdutoDto>>> ListarComEstoqueAbaixoDoMinimoAsync()
     {
         try
         {
             var produtos = await _produtoRepository.ObterComEstoqueAbaixoDoMinimoAsync();
-            return _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+            var dto = _mapper.Map<IEnumerable<ProdutoDto>>(produtos);
+            return ApiResposta<IEnumerable<ProdutoDto>>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao listar produtos com estoque abaixo do minimo.", ex);
+            return ApiResposta<IEnumerable<ProdutoDto>>.Falha($"Erro ao listar produtos com estoque abaixo do mínimo: {ex.Message}");
         }
     }
 
-    public async Task<ProdutoDto> CriarAsync(CriarProdutoDto dto)
+    public async Task<ApiResposta<ProdutoDto>> CriarAsync(CriarProdutoDto dto)
     {
         try
         {
             var existente = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras);
             if (existente != null)
-                throw new InvalidOperationException($"Ja existe um produto cadastrado com o codigo de barras '{dto.CodigoBarras}'.");
+                return ApiResposta<ProdutoDto>.Falha($"Já existe um produto cadastrado com o código de barras '{dto.CodigoBarras}'.");
 
             var produto = _mapper.Map<Produto>(dto);
             await _produtoRepository.AdicionarAsync(produto);
@@ -107,52 +118,52 @@ public class ProdutoService : IProdutoService
                 await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacaoInicial);
             }
 
-            return _mapper.Map<ProdutoDto>(produto);
+            var produtoDto = _mapper.Map<ProdutoDto>(produto);
+            return ApiResposta<ProdutoDto>.Ok(produtoDto);
         }
-        catch (InvalidOperationException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao criar produto.", ex);
+            return ApiResposta<ProdutoDto>.Falha($"Erro ao criar produto: {ex.Message}");
         }
     }
 
-    public async Task<ProdutoDto> AtualizarAsync(int id, AtualizarProdutoDto dto)
+    public async Task<ApiResposta<ProdutoDto>> AtualizarAsync(int id, AtualizarProdutoDto dto)
     {
         try
         {
             var produto = await _produtoRepository.ObterPorIdAsync(id);
             if (produto == null)
-                throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
+                return ApiResposta<ProdutoDto>.Falha($"Produto com ID {id} não encontrado.");
 
             if (!string.Equals(produto.CodigoBarras, dto.CodigoBarras, StringComparison.OrdinalIgnoreCase))
             {
                 var outroComMesmoCodigo = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras);
                 if (outroComMesmoCodigo != null && outroComMesmoCodigo.Id != id)
-                    throw new InvalidOperationException($"O codigo de barras '{dto.CodigoBarras}' ja esta em uso por outro produto.");
+                    return ApiResposta<ProdutoDto>.Falha($"O código de barras '{dto.CodigoBarras}' já está em uso por outro produto.");
             }
 
             _mapper.Map(dto, produto);
             await _produtoRepository.AtualizarAsync(produto);
-            return _mapper.Map<ProdutoDto>(produto);
+
+            var produtoDto = _mapper.Map<ProdutoDto>(produto);
+            return ApiResposta<ProdutoDto>.Ok(produtoDto);
         }
-        catch (KeyNotFoundException) { throw; }
-        catch (InvalidOperationException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao atualizar produto com ID {id}.", ex);
+            return ApiResposta<ProdutoDto>.Falha($"Erro ao atualizar produto com ID {id}: {ex.Message}");
         }
     }
 
-    public async Task MovimentarEstoqueAsync(MovimentarEstoqueDto dto)
+    public async Task<ApiResposta<ProdutoDto>> MovimentarEstoqueAsync(MovimentarEstoqueDto dto)
     {
         if (dto.Quantidade <= 0)
-            throw new ArgumentException("A quantidade movimentada deve ser maior que zero.", nameof(dto.Quantidade));
+            return ApiResposta<ProdutoDto>.Falha("A quantidade movimentada deve ser maior que zero.");
 
         try
         {
             var produto = await _produtoRepository.ObterPorIdAsync(dto.ProdutoId);
             if (produto == null)
-                throw new KeyNotFoundException($"Produto com ID {dto.ProdutoId} nao encontrado.");
+                return ApiResposta<ProdutoDto>.Falha($"Produto com ID {dto.ProdutoId} não encontrado.");
 
             switch (dto.Tipo)
             {
@@ -164,12 +175,12 @@ public class ProdutoService : IProdutoService
                 case TipoMovimentacaoEstoque.UsoInternoBancada:
                 case TipoMovimentacaoEstoque.AjustePerda:
                     if (produto.EstoqueAtual < dto.Quantidade)
-                        throw new InvalidOperationException($"Estoque insuficiente. Estoque atual: {produto.EstoqueAtual}, solicitado: {dto.Quantidade}.");
+                        return ApiResposta<ProdutoDto>.Falha($"Estoque insuficiente. Estoque atual: {produto.EstoqueAtual}, solicitado: {dto.Quantidade}.");
                     produto.EstoqueAtual -= dto.Quantidade;
                     break;
 
                 default:
-                    throw new NotSupportedException($"Tipo de movimentacao '{dto.Tipo}' nao suportado.");
+                    return ApiResposta<ProdutoDto>.Falha($"Tipo de movimentação '{dto.Tipo}' não suportado.");
             }
 
             var movimentacao = new MovimentacaoEstoque
@@ -183,95 +194,103 @@ public class ProdutoService : IProdutoService
 
             await _produtoRepository.AdicionarMovimentacaoEstoqueAsync(movimentacao);
             await _produtoRepository.AtualizarAsync(produto);
+
+            var produtoDto = _mapper.Map<ProdutoDto>(produto);
+            return ApiResposta<ProdutoDto>.Ok(produtoDto);
         }
-        catch (KeyNotFoundException) { throw; }
-        catch (InvalidOperationException) { throw; }
-        catch (NotSupportedException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao movimentar estoque.", ex);
+            return ApiResposta<ProdutoDto>.Falha($"Erro ao movimentar estoque: {ex.Message}");
         }
     }
 
-    public async Task<IEnumerable<MovimentacaoEstoqueDto>> ListarMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null)
+    public async Task<ApiResposta<IEnumerable<MovimentacaoEstoqueDto>>> ListarMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null)
     {
         try
         {
             var movimentacoes = await _produtoRepository.ObterMovimentacoesPorProdutoAsync(produtoId, inicio, fim);
-            return _mapper.Map<IEnumerable<MovimentacaoEstoqueDto>>(movimentacoes);
+            var dto = _mapper.Map<IEnumerable<MovimentacaoEstoqueDto>>(movimentacoes);
+            return ApiResposta<IEnumerable<MovimentacaoEstoqueDto>>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao listar movimentacoes do produto com ID {produtoId}.", ex);
+            return ApiResposta<IEnumerable<MovimentacaoEstoqueDto>>.Falha($"Erro ao listar movimentações do produto com ID {produtoId}: {ex.Message}");
         }
     }
 
-    public async Task<bool> PossuiEstoqueAsync(int produtoId, int quantidade)
+    public async Task<ApiResposta<bool>> PossuiEstoqueAsync(int produtoId, int quantidade)
     {
         try
         {
             var produto = await _produtoRepository.ObterPorIdAsync(produtoId);
             if (produto == null || !produto.Ativo)
-                return false;
-            return produto.EstoqueAtual >= quantidade;
+                return ApiResposta<bool>.Ok(false);
+
+            return ApiResposta<bool>.Ok(produto.EstoqueAtual >= quantidade);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao verificar estoque do produto com ID {produtoId}.", ex);
+            return ApiResposta<bool>.Falha($"Erro ao verificar estoque do produto com ID {produtoId}: {ex.Message}");
         }
     }
 
-    public async Task DesativarAsync(int id)
+    public async Task<ApiResposta<ProdutoDto>> DesativarAsync(int id)
     {
         try
         {
             var produto = await _produtoRepository.ObterPorIdAsync(id);
             if (produto == null)
-                throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
+                return ApiResposta<ProdutoDto>.Falha($"Produto com ID {id} não encontrado.");
 
             produto.Ativo = false;
             await _produtoRepository.AtualizarAsync(produto);
+
+            var produtoDto = _mapper.Map<ProdutoDto>(produto);
+            return ApiResposta<ProdutoDto>.Ok(produtoDto);
         }
-        catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao desativar produto com ID {id}.", ex);
+            return ApiResposta<ProdutoDto>.Falha($"Erro ao desativar produto com ID {id}: {ex.Message}");
         }
     }
 
-    public async Task AtivarAsync(int id)
+    public async Task<ApiResposta<ProdutoDto>> AtivarAsync(int id)
     {
         try
         {
             var produto = await _produtoRepository.ObterPorIdAsync(id);
             if (produto == null)
-                throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
+                return ApiResposta<ProdutoDto>.Falha($"Produto com ID {id} não encontrado.");
 
             produto.Ativo = true;
             await _produtoRepository.AtualizarAsync(produto);
+
+            var produtoDto = _mapper.Map<ProdutoDto>(produto);
+            return ApiResposta<ProdutoDto>.Ok(produtoDto);
         }
-        catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao ativar produto com ID {id}.", ex);
+            return ApiResposta<ProdutoDto>.Falha($"Erro ao ativar produto com ID {id}: {ex.Message}");
         }
     }
 
-    public async Task RemoverPermanentementeAsync(int id)
+    public async Task<ApiResposta<ProdutoDto>> RemoverPermanentementeAsync(int id)
     {
         try
         {
             var produto = await _produtoRepository.ObterPorIdAsync(id);
             if (produto == null)
-                throw new KeyNotFoundException($"Produto com ID {id} nao encontrado.");
+                return ApiResposta<ProdutoDto>.Falha($"Produto com ID {id} não encontrado.");
 
             await _produtoRepository.RemoverAsync(produto);
+
+            var produtoDto = _mapper.Map<ProdutoDto>(produto);
+            return ApiResposta<ProdutoDto>.Ok(produtoDto);
         }
-        catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException(
-                "Nao e possivel remover este produto permanentemente pois ele possui vendas ou movimentacoes associadas. Recomenda-se desativa-lo em vez de remover permanentemente.", ex);
+            return ApiResposta<ProdutoDto>.Falha(
+                $"Não é possível remover este produto permanentemente pois ele possui vendas ou movimentações associadas. Recomenda-se desativá-lo em vez de remover permanentemente. ({ex.Message})");
         }
     }
 }

@@ -11,12 +11,10 @@ namespace Melobarbershop.API.Controllers
     public class ServicosController : ControllerBase
     {
         private readonly IServicoService _servicoService;
-        private readonly IMapper _mapper;
 
-        public ServicosController(IServicoService servicoService, IMapper mapper)
+        public ServicosController(IServicoService servicoService)
         {
-            _servicoService = servicoService;
-            _mapper = mapper;            
+            _servicoService = servicoService;        
         }
 
         [HttpGet("todos")]
