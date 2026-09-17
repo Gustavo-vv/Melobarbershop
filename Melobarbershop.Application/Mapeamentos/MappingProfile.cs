@@ -16,6 +16,13 @@ public class MappingProfile : Profile
         CreateMap<AtualizarServicoDto, Servico>()
             .ForMember(dest => dest.Id, opt => opt.Ignore());
 
+        // Pacote
+        CreateMap<Pacote, PacoteDto>()
+            .ForMember(dest => dest.Servicos, opt => opt.MapFrom(
+                src => src.Itens != null
+                    ? src.Itens.Where(i => i.Servico != null).Select(i => i.Servico)
+                    : Enumerable.Empty<Servico>()));
+
         // Produto
         CreateMap<Produto, ProdutoDto>()
             .ForMember(dest => dest.EstoqueBaixo, opt => opt.MapFrom(src => src.EstoqueAtual <= src.EstoqueMinimoAlerta));

@@ -16,6 +16,9 @@ public static class ApplicationServiceExtensions
         {
             cfg.AddProfile<MappingProfile>();
         }, NullLoggerFactory.Instance);
+
+        mapperConfig.AssertConfigurationIsValid();
+
         services.AddSingleton<IMapper>(mapperConfig.CreateMapper());
 
         // ServiÃ§os de AplicaÃ§Ã£o

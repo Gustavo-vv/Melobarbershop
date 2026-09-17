@@ -4,11 +4,11 @@ namespace Melobarbershop.Application.Servicos.Services;
 
 public interface IPacoteService
 {
-    Task<PacoteDto?> ObterPorIdAsync(int id);
-    Task<IEnumerable<PacoteDto>> ListarAtivosAsync();
-    Task<IEnumerable<PacoteDto>> ListarTodosAsync();
-    Task<PacoteDto> CriarAsync(CriarPacoteDto dto);
-    Task<PacoteDto> AtualizarAsync(int id, AtualizarPacoteDto dto);
-    Task DesativarAsync(int id);
-    Task AtivarAsync(int id);
+    Task<ApiResposta<PacoteDto>> ObterPorIdAsync(int id);
+    Task<ApiResposta<IEnumerable<PacoteDto>>> ListarAtivosAsync();
+    Task<ApiResposta<IEnumerable<PacoteDto>>> ListarTodosAsync();
+    Task<ApiResposta<PacoteDto>> CriarAsync(CriarPacoteDto dto);
+    Task<ApiResposta<PacoteDto>> AtualizarAsync(int id, AtualizarPacoteDto dto);
+    Task<ApiResposta<PacoteDto>> DesativarAsync(int id);
+    Task<ApiResposta<PacoteDto>> AtivarAsync(int id);
 }

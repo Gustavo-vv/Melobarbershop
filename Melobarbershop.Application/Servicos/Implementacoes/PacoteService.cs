@@ -8,177 +8,218 @@ namespace Melobarbershop.Application.Servicos.Implementacoes;
 
 public class PacoteService : IPacoteService
 {
-    private readonly IPacoteRepository _pacoteRepo;
-    private readonly IServicoRepository _servicoRepo;
+    private readonly IPacoteRepository _pacoteRepository;
+    private readonly IServicoRepository _servicoRepository;
     private readonly IMapper _mapper;
 
-    public PacoteService(IPacoteRepository pacoteRepo, IServicoRepository servicoRepo, IMapper mapper)
+    public PacoteService(
+        IPacoteRepository pacoteRepository,
+        IServicoRepository servicoRepository,
+        IMapper mapper)
     {
-        _pacoteRepo = pacoteRepo;
-        _servicoRepo = servicoRepo;
+        _pacoteRepository = pacoteRepository;
+        _servicoRepository = servicoRepository;
         _mapper = mapper;
     }
 
-    public async Task<PacoteDto?> ObterPorIdAsync(int id)
+    public async Task<ApiResposta<PacoteDto>> ObterPorIdAsync(int id)
     {
         try
         {
-            var pacote = await _pacoteRepo.ObterPorIdComItensAsync(id);
-            if (pacote == null) return null;
-            return MapToDto(pacote);
+            var pacote = await _pacoteRepository.ObterPorIdComItensAsync(id);
+
+            if (pacote == null)
+                return ApiResposta<PacoteDto>.Falha("Pacote não encontrado");
+
+            var dto = _mapper.Map<PacoteDto>(pacote);
+            return ApiResposta<PacoteDto>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao obter pacote com ID {id}.", ex);
+            return ApiResposta<PacoteDto>.Falha($"Erro ao obter pacote: {ex.Message}");
         }
     }
 
-    public async Task<IEnumerable<PacoteDto>> ListarAtivosAsync()
+    public async Task<ApiResposta<IEnumerable<PacoteDto>>> ListarAtivosAsync()
     {
         try
         {
-            var pacotes = await _pacoteRepo.ObterAtivosAsync();
-            return pacotes.Select(MapToDto);
+            var pacotes = await _pacoteRepository.ObterAtivosAsync();
+
+            var dto = _mapper.Map<IEnumerable<PacoteDto>>(pacotes);
+            return ApiResposta<IEnumerable<PacoteDto>>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao listar pacotes ativos.", ex);
+            return ApiResposta<IEnumerable<PacoteDto>>.Falha(
+                $"Erro ao listar pacotes ativos: {ex.Message}");
         }
     }
 
-    public async Task<IEnumerable<PacoteDto>> ListarTodosAsync()
+    public async Task<ApiResposta<IEnumerable<PacoteDto>>> ListarTodosAsync()
     {
         try
         {
-            var pacotes = await _pacoteRepo.ObterTodosAsync();
-            return pacotes.Select(MapToDto);
+            var pacotes = await _pacoteRepository.ObterTodosAsync();
+
+            var dto = _mapper.Map<IEnumerable<PacoteDto>>(pacotes);
+            return ApiResposta<IEnumerable<PacoteDto>>.Ok(dto);
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao listar todos os pacotes.", ex);
+            return ApiResposta<IEnumerable<PacoteDto>>.Falha(
+                $"Erro ao listar todos os pacotes: {ex.Message}");
         }
     }
 
-    public async Task<PacoteDto> CriarAsync(CriarPacoteDto dto)
+    public async Task<ApiResposta<PacoteDto>> CriarAsync(CriarPacoteDto criarDto)
     {
         try
         {
             var servicos = new List<Servico>();
-            foreach (var sid in dto.ServicoIds)
+
+            foreach (var sid in criarDto.ServicoIds)
             {
-                var s = await _servicoRepo.ObterPorIdAsync(sid);
+                var s = await _servicoRepository.ObterPorIdAsync(sid);
+
                 if (s == null)
-                    throw new KeyNotFoundException($"Servico {sid} nao encontrado.");
+                    return ApiResposta<PacoteDto>.Falha(
+                        $"Serviço {sid} não encontrado");
+
                 servicos.Add(s);
             }
 
             var pacote = new Pacote
             {
-                Nome = dto.Nome,
-                PrecoTotal = dto.PrecoTotal,
+                Nome = criarDto.Nome,
+                PrecoTotal = criarDto.PrecoTotal,
                 Ativo = true,
-                Itens = servicos.Select(s => new PacoteItem { ServicoId = s.Id }).ToList()
+                Itens = servicos
+                    .Select(s => new PacoteItem
+                    {
+                        ServicoId = s.Id
+                    })
+                    .ToList()
             };
 
-            await _pacoteRepo.AdicionarAsync(pacote);
+            await _pacoteRepository.AdicionarAsync(pacote);
 
-            var salvo = await _pacoteRepo.ObterPorIdComItensAsync(pacote.Id);
-            return MapToDto(salvo!);
+            var salvo = await _pacoteRepository
+                .ObterPorIdComItensAsync(pacote.Id);
+
+            var dto = _mapper.Map<PacoteDto>(salvo);
+            return ApiResposta<PacoteDto>.Ok(dto);
         }
-        catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("Erro ao criar pacote.", ex);
+            return ApiResposta<PacoteDto>.Falha($"Erro ao criar pacote: {ex.Message}");
         }
     }
 
-    public async Task<PacoteDto> AtualizarAsync(int id, AtualizarPacoteDto dto)
+    public async Task<ApiResposta<PacoteDto>> AtualizarAsync(
+        int id,
+        AtualizarPacoteDto atualizarDto)
     {
         try
         {
-            var pacote = await _pacoteRepo.ObterPorIdComItensAsync(id);
+            var pacote = await _pacoteRepository
+                .ObterPorIdComItensAsync(id);
+
             if (pacote == null)
-                throw new KeyNotFoundException($"Pacote {id} nao encontrado.");
+                return ApiResposta<PacoteDto>.Falha(
+                    $"Pacote {id} não encontrado");
 
             var servicos = new List<Servico>();
-            foreach (var sid in dto.ServicoIds)
+
+            foreach (var sid in atualizarDto.ServicoIds)
             {
-                var s = await _servicoRepo.ObterPorIdAsync(sid);
+                var s = await _servicoRepository.ObterPorIdAsync(sid);
+
                 if (s == null)
-                    throw new KeyNotFoundException($"Servico {sid} nao encontrado.");
+                    return ApiResposta<PacoteDto>.Falha(
+                        $"Serviço {sid} não encontrado");
+
                 servicos.Add(s);
             }
 
-            pacote.Nome = dto.Nome;
-            pacote.PrecoTotal = dto.PrecoTotal;
-            pacote.Ativo = dto.Ativo;
-            pacote.Itens = servicos.Select(s => new PacoteItem { ServicoId = s.Id, PacoteId = pacote.Id }).ToList();
+            pacote.Nome = atualizarDto.Nome;
+            pacote.PrecoTotal = atualizarDto.PrecoTotal;
+            pacote.Ativo = atualizarDto.Ativo;
 
-            await _pacoteRepo.AtualizarAsync(pacote);
+            pacote.Itens = servicos
+                .Select(s => new PacoteItem
+                {
+                    ServicoId = s.Id,
+                    PacoteId = pacote.Id
+                })
+                .ToList();
 
-            var atualizado = await _pacoteRepo.ObterPorIdComItensAsync(pacote.Id);
-            return MapToDto(atualizado!);
+            await _pacoteRepository.AtualizarAsync(pacote);
+
+            var atualizado = await _pacoteRepository
+                .ObterPorIdComItensAsync(pacote.Id);
+
+            var dto = _mapper.Map<PacoteDto>(atualizado);
+            return ApiResposta<PacoteDto>.Ok(dto);
         }
-        catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao atualizar pacote com ID {id}.", ex);
+            return ApiResposta<PacoteDto>.Falha(
+                $"Erro ao atualizar pacote com ID {id}: {ex.Message}");
         }
     }
 
-    public async Task DesativarAsync(int id)
+    public async Task<ApiResposta<PacoteDto>> DesativarAsync(int id)
     {
         try
         {
-            var pacote = await _pacoteRepo.ObterPorIdAsync(id);
+            var pacote = await _pacoteRepository.ObterPorIdAsync(id);
+
             if (pacote == null)
-                throw new KeyNotFoundException($"Pacote {id} nao encontrado.");
+                return ApiResposta<PacoteDto>.Falha(
+                    $"Pacote {id} não encontrado");
 
             pacote.Ativo = false;
-            await _pacoteRepo.AtualizarAsync(pacote);
+
+            await _pacoteRepository.AtualizarAsync(pacote);
+
+            var atualizado = await _pacoteRepository
+                .ObterPorIdComItensAsync(pacote.Id);
+
+            var dto = _mapper.Map<PacoteDto>(atualizado);
+            return ApiResposta<PacoteDto>.Ok(dto);
         }
-        catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao desativar pacote com ID {id}.", ex);
+            return ApiResposta<PacoteDto>.Falha(
+                $"Erro ao desativar pacote com ID {id}: {ex.Message}");
         }
     }
 
-    public async Task AtivarAsync(int id)
+    public async Task<ApiResposta<PacoteDto>> AtivarAsync(int id)
     {
         try
         {
-            var pacote = await _pacoteRepo.ObterPorIdAsync(id);
+            var pacote = await _pacoteRepository.ObterPorIdAsync(id);
+
             if (pacote == null)
-                throw new KeyNotFoundException($"Pacote {id} nao encontrado.");
+                return ApiResposta<PacoteDto>.Falha(
+                    $"Pacote {id} não encontrado");
 
             pacote.Ativo = true;
-            await _pacoteRepo.AtualizarAsync(pacote);
+
+            await _pacoteRepository.AtualizarAsync(pacote);
+
+            var atualizado = await _pacoteRepository
+                .ObterPorIdComItensAsync(pacote.Id);
+
+            var dto = _mapper.Map<PacoteDto>(atualizado);
+            return ApiResposta<PacoteDto>.Ok(dto);
         }
-        catch (KeyNotFoundException) { throw; }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Erro ao ativar pacote com ID {id}.", ex);
+            return ApiResposta<PacoteDto>.Falha(
+                $"Erro ao ativar pacote com ID {id}: {ex.Message}");
         }
     }
-
-    private static PacoteDto MapToDto(Pacote p) => new()
-    {
-        Id = p.Id,
-        Nome = p.Nome,
-        PrecoTotal = p.PrecoTotal,
-        Ativo = p.Ativo,
-        Servicos = p.Itens
-            .Where(i => i.Servico != null)
-            .Select(i => new ServicoDto
-            {
-                Id = i.Servico!.Id,
-                Nome = i.Servico.Nome,
-                Descricao = i.Servico.Descricao,
-                Preco = i.Servico.Preco,
-                DuracaoMinutos = i.Servico.DuracaoMinutos,
-                Ativo = i.Servico.Ativo,
-                ExibirNoSite = i.Servico.ExibirNoSite
-            }).ToList()
-    };
 }
