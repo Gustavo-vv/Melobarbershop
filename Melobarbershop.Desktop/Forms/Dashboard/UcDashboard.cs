@@ -52,11 +52,14 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             EstilizarCard(cardClientes, lblCardClientesValor, lblCardClientesTitulo, lblCardClientesSub, TemaMelobarbershop.BluePrimary);
             EstilizarCard(cardBarbeiros, lblCardBarbeirosValor, lblCardBarbeirosTitulo, lblCardBarbeirosSub, TemaMelobarbershop.WarningColor);
 
+            lblFilaTitulo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblFilaTitulo.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            lblFilaRestantes.ForeColor = TemaMelobarbershop.DangerColor;
-            lblFilaRestantes.BackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(254, 226, 226) : Color.FromArgb(45, 20, 25);
-            lblFilaRestantes.Padding = new Padding(8, 4, 8, 4);
+            lblFilaRestantes.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+            lblFilaRestantes.ForeColor = Color.FromArgb(248, 113, 113);
+            lblFilaRestantes.BackColor = Color.FromArgb(50, 18, 24);
+            lblFilaRestantes.Padding = new Padding(10, 4, 10, 4);
+            TemaMelobarbershop.ArredondarRegiaoControle(lblFilaRestantes, 12);
 
             pnlFilaLista.BackColor = Color.Transparent;
             lblFilaVazia.ForeColor = TemaMelobarbershop.TextMuted;
@@ -187,6 +190,10 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         {
             pnlFilaLista.SuspendLayout();
             pnlFilaLista.Controls.Clear();
+            pnlFilaLista.AutoScroll = false;
+            pnlFilaLista.HorizontalScroll.Maximum = 0;
+            pnlFilaLista.HorizontalScroll.Visible = false;
+            pnlFilaLista.AutoScroll = true;
 
             // Restantes = agendamentos ainda não atendidos e não cancelados
             var restantes = _agendamentosHoje.Count(a =>
@@ -202,13 +209,15 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
                 return;
             }
 
+            int itemWidth = Math.Max(200, pnlFilaLista.ClientSize.Width - (pnlFilaLista.VerticalScroll.Visible ? 20 : 10));
             int top = 5;
+
             foreach (var ag in _agendamentosHoje)
             {
                 var cardLinha = CriarCardAgendamentoLinha(ag);
                 cardLinha.Top = top;
-                cardLinha.Left = 5;
-                cardLinha.Width = pnlFilaLista.ClientSize.Width - 25;
+                cardLinha.Left = 4;
+                cardLinha.Width = itemWidth;
                 cardLinha.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
                 pnlFilaLista.Controls.Add(cardLinha);
@@ -222,29 +231,40 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         {
             var pnl = new Panel
             {
-                Height = 72,
-                BackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(240, 243, 248) : Color.FromArgb(18, 22, 28),
-                Padding = new Padding(12, 8, 12, 8)
+                Height = 78,
+                BackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(244, 246, 250) : Color.FromArgb(10, 15, 24),
+                Padding = new Padding(16, 10, 16, 10)
             };
 
-            // Nome do Cliente
+            // Borda elegante ao redor de cada card de agendamento (como no print)
+            pnl.Paint += (s, e) =>
+            {
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                var rect = new Rectangle(0, 0, pnl.Width - 1, pnl.Height - 1);
+                using var path = TemaMelobarbershop.CriarCaminhoArredondado(rect, 8);
+                var corBorda = TemaMelobarbershop.ModoClaro ? Color.FromArgb(210, 220, 235) : Color.FromArgb(25, 45, 75);
+                using var pen = new Pen(corBorda, 1);
+                e.Graphics.DrawPath(pen, path);
+            };
+
+            // 1. Nome do Cliente
             var lblNome = new Label
             {
                 Text = ag.NomeCliente,
                 Font = new Font("Segoe UI", 10.5F, FontStyle.Bold),
                 ForeColor = TemaMelobarbershop.TextPrimary,
                 AutoSize = true,
-                Location = new Point(12, 8)
+                Location = new Point(14, 10)
             };
 
-            // Tag de Origem (SITE / BALCÃO)
+            // 2. Tag de Origem (SITE ou BALCÃO com visual de pill arredondado)
             var tagOrigem = ag.Origem == OrigemAgendamentoDto.PresencialBalcao ? "BALCÃO" : "SITE";
             var corTagBg = ag.Origem == OrigemAgendamentoDto.PresencialBalcao
-                ? (TemaMelobarbershop.ModoClaro ? Color.FromArgb(243, 232, 255) : Color.FromArgb(45, 25, 55))
-                : (TemaMelobarbershop.ModoClaro ? Color.FromArgb(224, 242, 254) : Color.FromArgb(15, 38, 65));
+                ? (TemaMelobarbershop.ModoClaro ? Color.FromArgb(243, 232, 255) : Color.FromArgb(42, 18, 52))
+                : (TemaMelobarbershop.ModoClaro ? Color.FromArgb(224, 242, 254) : Color.FromArgb(12, 36, 62));
             var corTagFg = ag.Origem == OrigemAgendamentoDto.PresencialBalcao
-                ? (TemaMelobarbershop.ModoClaro ? Color.FromArgb(126, 34, 206) : Color.FromArgb(216, 180, 254))
-                : TemaMelobarbershop.BlueAccent;
+                ? (TemaMelobarbershop.ModoClaro ? Color.FromArgb(147, 51, 234) : Color.FromArgb(216, 180, 254))
+                : Color.FromArgb(56, 189, 248);
 
             var lblTag = new Label
             {
@@ -252,44 +272,45 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
                 Font = new Font("Segoe UI", 7.5F, FontStyle.Bold),
                 ForeColor = corTagFg,
                 BackColor = corTagBg,
-                Padding = new Padding(4, 1, 4, 1),
+                Padding = new Padding(6, 2, 6, 2),
                 AutoSize = true,
-                Location = new Point(lblNome.Right + 8, 10)
+                Location = new Point(lblNome.Right + 8, 11)
             };
+            TemaMelobarbershop.ArredondarRegiaoControle(lblTag, 4);
 
-            // Serviço + Barbeiro
+            // 3. Serviço(s) • Barbeiro
             var servicosBarbeiro = $"{ag.ServicosFormatados} • {ag.NomeBarbeiro}";
             var lblServico = new Label
             {
                 Text = servicosBarbeiro,
                 Font = new Font("Segoe UI", 9F),
-                ForeColor = TemaMelobarbershop.TextMuted,
+                ForeColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(80, 85, 95) : Color.FromArgb(160, 168, 180),
                 AutoSize = true,
-                Location = new Point(12, 30)
+                Location = new Point(14, 32)
             };
 
-            // Telefone com ícone discreto
-            var telefoneTxt = !string.IsNullOrWhiteSpace(ag.TelefoneCliente) ? $"📞 {ag.TelefoneCliente}" : "📞 (Não informado)";
+            // 4. Telefone com ícone de telefone em tom rosa/magenta suave (idêntico ao print)
+            var telefoneTxt = !string.IsNullOrWhiteSpace(ag.TelefoneCliente) ? $"📞  {ag.TelefoneCliente}" : "📞  (Não informado)";
             var lblTelefone = new Label
             {
                 Text = telefoneTxt,
                 Font = new Font("Segoe UI", 8.5F),
-                ForeColor = TemaMelobarbershop.TextMuted,
+                ForeColor = Color.FromArgb(244, 114, 182), // Rosa suave idêntico ao print
                 AutoSize = true,
-                Location = new Point(12, 49)
+                Location = new Point(14, 52)
             };
 
-            // Horário do agendamento (lado direito)
+            // 5. Horário (verde água / ciano brilhante)
             var lblHorario = new Label
             {
                 Text = ag.DataHoraInicio.ToString("HH:mm"),
-                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(37, 211, 102),
+                Font = new Font("Segoe UI", 11.5F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(52, 211, 153), // Verde/ciano brilhante
                 TextAlign = ContentAlignment.MiddleRight,
-                Size = new Size(80, 24),
+                Size = new Size(100, 22),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
-            lblHorario.Location = new Point(pnl.ClientSize.Width - 95, 10);
+            lblHorario.Location = new Point(pnl.ClientSize.Width - 115, 10);
 
             pnl.Controls.Add(lblNome);
             pnl.Controls.Add(lblTag);
@@ -297,11 +318,39 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             pnl.Controls.Add(lblTelefone);
             pnl.Controls.Add(lblHorario);
 
-            // ── Botões de ação por status (fluxo: Pendente → Confirmar → Iniciar → Concluir) ──
-            if (ag.Status == StatusAgendamentoDto.Pendente)
+            // 6. Botão de Ação ou Status (lado direito, embaixo do horário)
+            if (ag.Status == StatusAgendamentoDto.Confirmado)
             {
-                // Pendente: precisa ser confirmado primeiro
-                var btnConfirmar = CriarBotaoAcao("✔ Confirmar", TemaMelobarbershop.SuccessColor, pnl);
+                // Botão "Check-in" azul em destaque como na imagem
+                var btnCheckin = CriarBotaoAcao("Check-in", Color.FromArgb(2, 132, 199), pnl);
+                btnCheckin.Click += async (s, e) =>
+                {
+                    btnCheckin.Enabled = false;
+                    btnCheckin.Text = "...";
+                    try
+                    {
+                        var resp = await _agendamentoService.IniciarAtendimentoAsync(ag.Id);
+                        if (resp.Sucesso) await CarregarDadosAsync();
+                        else
+                        {
+                            MessageBox.Show($"Falha ao iniciar: {resp.Mensagem}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            btnCheckin.Enabled = true;
+                            btnCheckin.Text = "Check-in";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        btnCheckin.Enabled = true;
+                        btnCheckin.Text = "Check-in";
+                    }
+                };
+                pnl.Controls.Add(btnCheckin);
+            }
+            else if (ag.Status == StatusAgendamentoDto.Pendente)
+            {
+                // Se pendente, botão de confirmar ou texto de status discreto
+                var btnConfirmar = CriarBotaoAcao("Confirmar", Color.FromArgb(14, 116, 144), pnl);
                 btnConfirmar.Click += async (s, e) =>
                 {
                     btnConfirmar.Enabled = false;
@@ -314,50 +363,21 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
                         {
                             MessageBox.Show($"Falha ao confirmar: {resp.Mensagem}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             btnConfirmar.Enabled = true;
-                            btnConfirmar.Text = "✔ Confirmar";
+                            btnConfirmar.Text = "Confirmar";
                         }
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         btnConfirmar.Enabled = true;
-                        btnConfirmar.Text = "✔ Confirmar";
+                        btnConfirmar.Text = "Confirmar";
                     }
                 };
                 pnl.Controls.Add(btnConfirmar);
             }
-            else if (ag.Status == StatusAgendamentoDto.Confirmado)
-            {
-                // Confirmado: pode iniciar o atendimento (Check-in)
-                var btnIniciar = CriarBotaoAcao("▶ Iniciar", TemaMelobarbershop.BluePrimary, pnl);
-                btnIniciar.Click += async (s, e) =>
-                {
-                    btnIniciar.Enabled = false;
-                    btnIniciar.Text = "...";
-                    try
-                    {
-                        var resp = await _agendamentoService.IniciarAtendimentoAsync(ag.Id);
-                        if (resp.Sucesso) await CarregarDadosAsync();
-                        else
-                        {
-                            MessageBox.Show($"Falha ao iniciar: {resp.Mensagem}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            btnIniciar.Enabled = true;
-                            btnIniciar.Text = "▶ Iniciar";
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        btnIniciar.Enabled = true;
-                        btnIniciar.Text = "▶ Iniciar";
-                    }
-                };
-                pnl.Controls.Add(btnIniciar);
-            }
             else if (ag.Status == StatusAgendamentoDto.EmAtendimento)
             {
-                // Em Atendimento: pode concluir
-                var btnConcluir = CriarBotaoAcao("🏁 Concluir", Color.FromArgb(243, 156, 18), pnl);
+                var btnConcluir = CriarBotaoAcao("Concluir", Color.FromArgb(16, 185, 129), pnl);
                 btnConcluir.Click += async (s, e) =>
                 {
                     btnConcluir.Enabled = false;
@@ -370,72 +390,66 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
                         {
                             MessageBox.Show($"Falha ao concluir: {resp.Mensagem}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             btnConcluir.Enabled = true;
-                            btnConcluir.Text = "🏁 Concluir";
+                            btnConcluir.Text = "Concluir";
                         }
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         btnConcluir.Enabled = true;
-                        btnConcluir.Text = "🏁 Concluir";
+                        btnConcluir.Text = "Concluir";
                     }
                 };
                 pnl.Controls.Add(btnConcluir);
             }
             else
             {
-                // Concluído / Cancelado / Faltou — apenas label de status
-                var statusTxt = ag.Status switch
+                // Rótulo elegante de status à direita (ex: Confirmado em dourado/laranja, Aguardando em cinza, etc.)
+                var (statusTxt, corStatus) = ag.Status switch
                 {
-                    StatusAgendamentoDto.Concluido => "✅ Concluído",
-                    StatusAgendamentoDto.Cancelado => "❌ Cancelado",
-                    StatusAgendamentoDto.NaoCompareceu => "⚠ Faltou",
-                    _ => ag.Status.ToString()
+                    StatusAgendamentoDto.Concluido => ("Concluído", Color.FromArgb(56, 189, 248)),
+                    StatusAgendamentoDto.Cancelado => ("Cancelado", Color.FromArgb(248, 113, 113)),
+                    StatusAgendamentoDto.NaoCompareceu => ("Faltou", Color.FromArgb(156, 163, 175)),
+                    _ => (ag.Status.ToString(), Color.FromArgb(251, 191, 36))
                 };
-                var corStatus = ag.Status switch
-                {
-                    StatusAgendamentoDto.Concluido => Color.FromArgb(70, 190, 240),
-                    StatusAgendamentoDto.Cancelado => TemaMelobarbershop.DangerColor,
-                    _ => Color.FromArgb(150, 155, 165)
-                };
+
                 var lblStatusLinha = new Label
                 {
                     Text = statusTxt,
-                    Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
+                    Font = new Font("Segoe UI", 9F, FontStyle.Bold),
                     ForeColor = corStatus,
                     TextAlign = ContentAlignment.MiddleRight,
-                    Size = new Size(115, 22),
+                    Size = new Size(110, 22),
                     Anchor = AnchorStyles.Top | AnchorStyles.Right,
-                    Location = new Point(pnl.ClientSize.Width - 124, 39)
+                    Location = new Point(pnl.ClientSize.Width - 125, 38)
                 };
                 pnl.Controls.Add(lblStatusLinha);
             }
 
-            TemaMelobarbershop.ArredondarRegiaoControle(pnl, 6);
+            TemaMelobarbershop.ArredondarRegiaoControle(pnl, 8);
             return pnl;
         }
 
-        /// <summary>Cria um botão de ação padronizado ancorado à direita do card pai.</summary>
+        /// <summary>Cria um botão de ação com cantos arredondados e cores do estilo de referência.</summary>
         private static Button CriarBotaoAcao(string texto, Color cor, Panel pai)
         {
             var btn = new Button
             {
                 Text = texto,
-                Size = new Size(95, 28),
+                Size = new Size(92, 28),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right,
                 Cursor = Cursors.Hand,
                 FlatStyle = FlatStyle.Flat,
                 BackColor = cor,
                 ForeColor = Color.White,
-                Font = TemaMelobarbershop.SmallBoldFont
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
             };
             btn.FlatAppearance.BorderSize = 0;
-            TemaMelobarbershop.ArredondarRegiaoControle(btn, 4);
+            TemaMelobarbershop.ArredondarRegiaoControle(btn, 6);
 
-            // Posição calculada após o pai ser dimensionado — usa evento de layout
             pai.Layout += (s, e) =>
             {
-                btn.Location = new Point(pai.ClientSize.Width - 104, 36);
+                btn.Location = new Point(pai.ClientSize.Width - 106, 36);
             };
             return btn;
         }
