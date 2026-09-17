@@ -42,5 +42,10 @@ namespace Melobarbershop.Desktop.Services
             var query = string.IsNullOrWhiteSpace(motivo) ? "" : $"?motivo={Uri.EscapeDataString(motivo)}";
             return await ApiClient.PatchAsync<object, AgendamentoDto>($"/api/Agendamentos/{id}/cancelar{query}", new { });
         }
+
+        public async Task<ApiResposta<AgendamentoDto>> RegistrarNaoComparecimentoAsync(int id)
+        {
+            return await ApiClient.PatchAsync<object, AgendamentoDto>($"/api/Agendamentos/{id}/nao-comparecimento", new { });
+        }
     }
 }

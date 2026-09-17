@@ -28,6 +28,7 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
         private DataGridView dgvAgendamentos;
         private ContextMenuStrip cmsAcoes;
         private ToolStripMenuItem tsmiCancelar;
+        private ToolStripMenuItem tsmiNaoCompareceu;
 
         protected override void Dispose(bool disposing)
         {
@@ -64,6 +65,7 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             dgvAgendamentos = new DataGridView();
             cmsAcoes = new ContextMenuStrip();
             tsmiCancelar = new ToolStripMenuItem();
+            tsmiNaoCompareceu = new ToolStripMenuItem();
 
             pnlFiltrosTopo.SuspendLayout();
             pnlDatasPersonalizadas.SuspendLayout();
@@ -184,10 +186,15 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
 
             // cmsAcoes
             cmsAcoes.Items.Add(tsmiCancelar);
+            cmsAcoes.Items.Add(tsmiNaoCompareceu);
 
             // tsmiCancelar
             tsmiCancelar.Text = "❌ Cancelar este Agendamento";
             tsmiCancelar.Click += tsmiCancelar_Click;
+
+            // tsmiNaoCompareceu
+            tsmiNaoCompareceu.Text = "👤 Não compareceu";
+            tsmiNaoCompareceu.Click += tsmiNaoCompareceu_Click;
 
             // UserControl
             Controls.Add(lblTitulo);

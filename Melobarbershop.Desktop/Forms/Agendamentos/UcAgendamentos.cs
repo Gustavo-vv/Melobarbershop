@@ -240,11 +240,10 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             ).ToList();
 
             GarantirColunasGrid();
+            dgvAgendamentos.Rows.Clear();
 
             if (filtrados.Count == 0)
             {
-                dgvAgendamentos.Rows.Clear();
-                dgvAgendamentos.Visible = false;
                 _emptyState.Visible = true;
                 _emptyState.BringToFront();
                 return;
@@ -252,7 +251,7 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
 
             _emptyState.Visible = false;
             dgvAgendamentos.Visible = true;
-            dgvAgendamentos.Rows.Clear();
+            dgvAgendamentos.BringToFront();
             foreach (var a in filtrados)
             {
                 var rowIndex = dgvAgendamentos.Rows.Add(
@@ -489,8 +488,9 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
                 dgvAgendamentos.Rows[e.RowIndex].Selected = true;
 
                 var ag = ObterAgendamentoDaLinha(e.RowIndex);
-                var podeCancelar = ag != null && (ag.Status == StatusAgendamentoDto.Pendente || ag.Status == StatusAgendamentoDto.Confirmado);
-                tsmiCancelar.Enabled = podeCancelar;
+                var podeAcaoSecundaria = ag != null && (ag.Status == StatusAgendamentoDto.Pendente || ag.Status == StatusAgendamentoDto.Confirmado);
+                tsmiCancelar.Enabled = podeAcaoSecundaria;
+                tsmiNaoCompareceu.Enabled = podeAcaoSecundaria;
             }
         }
 
@@ -512,6 +512,27 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             else
             {
                 MessageBox.Show($"Falha ao cancelar: {resp.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void tsmiNaoCompareceu_Click(object? sender, EventArgs e)
+        {
+            var ag = ObterAgendamentoSelecionado();
+            if (ag == null) return;
+
+            var confirm = MessageBox.Show($"Registrar não comparecimento para o agendamento #{ag.Id} de {ag.NomeCliente}?", "Não Compareceu", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (confirm != DialogResult.Yes) return;
+
+            lblStatus.Text = "Registrando não comparecimento...";
+            var resp = await _agendamentoService.RegistrarNaoComparecimentoAsync(ag.Id);
+            if (resp.Sucesso)
+            {
+                MessageBox.Show("Não comparecimento registrado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                await CarregarAgendamentosAsync();
+            }
+            else
+            {
+                MessageBox.Show($"Falha ao registrar não comparecimento: {resp.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
