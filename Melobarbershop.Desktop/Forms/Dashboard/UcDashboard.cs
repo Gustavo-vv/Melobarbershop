@@ -20,36 +20,53 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
 
         private void ConfigurarEstilo()
         {
-            this.BackColor = AppTheme.BackgroundDark;
-            this.ForeColor = AppTheme.TextPrimary;
-
             lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
-            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
             lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
+            lblFilaTitulo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblFilaRestantes.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblSecaoResumo.Font = new Font("Segoe UI", 11.5F, FontStyle.Bold);
+
+            AplicarTema();
+        }
+
+        public void AplicarTema()
+        {
+            this.BackColor = TemaMelobarbershop.BackgroundDark;
+            this.ForeColor = TemaMelobarbershop.TextPrimary;
+
+            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
             lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
+            lblSecaoResumo.ForeColor = TemaMelobarbershop.TextPrimary;
 
             TemaMelobarbershop.AplicarEstiloBotaoPrimario(btnAtualizar);
 
             // Estilos dos Cards Oficiais com Elevação e Borda
+            cardServicos.AplicarTema();
+            cardServicosAtivos.AplicarTema();
+            cardClientes.AplicarTema();
+            cardBarbeiros.AplicarTema();
+            cardFilaAgendamentos.AplicarTema();
+
             EstilizarCard(cardServicos, lblCardServicosValor, lblCardServicosTitulo, lblCardServicosSub, TemaMelobarbershop.BlueAccent);
             EstilizarCard(cardServicosAtivos, lblCardAtivosValor, lblCardAtivosTitulo, lblCardAtivosSub, TemaMelobarbershop.SuccessColor);
             EstilizarCard(cardClientes, lblCardClientesValor, lblCardClientesTitulo, lblCardClientesSub, TemaMelobarbershop.BluePrimary);
             EstilizarCard(cardBarbeiros, lblCardBarbeirosValor, lblCardBarbeirosTitulo, lblCardBarbeirosSub, TemaMelobarbershop.WarningColor);
 
-            // Card da Fila do Agendamento Web
-            TemaMelobarbershop.AplicarBordaCardElevado(cardFilaAgendamentos);
-
-            lblFilaTitulo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblFilaTitulo.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            lblFilaRestantes.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            lblFilaRestantes.ForeColor = Color.FromArgb(248, 113, 113);
-            lblFilaRestantes.BackColor = Color.FromArgb(45, 20, 25);
+            lblFilaRestantes.ForeColor = TemaMelobarbershop.DangerColor;
+            lblFilaRestantes.BackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(254, 226, 226) : Color.FromArgb(45, 20, 25);
             lblFilaRestantes.Padding = new Padding(8, 4, 8, 4);
 
             pnlFilaLista.BackColor = Color.Transparent;
+            lblFilaVazia.ForeColor = TemaMelobarbershop.TextMuted;
 
             TemaMelobarbershop.EstilizarDataGridView(dgvResumo);
+
+            if (_agendamentosHoje.Count > 0)
+            {
+                RenderizarFilaAgendamentos();
+            }
         }
 
         private void EstilizarCard(Melobarbershop.Desktop.Theme.CardPanel card, Label lblValor, Label lblTitulo, Label lblSub, Color corDestaque)
@@ -206,7 +223,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             var pnl = new Panel
             {
                 Height = 72,
-                BackColor = Color.FromArgb(18, 22, 28),
+                BackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(240, 243, 248) : Color.FromArgb(18, 22, 28),
                 Padding = new Padding(12, 8, 12, 8)
             };
 
@@ -222,8 +239,12 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
 
             // Tag de Origem (SITE / BALCÃO)
             var tagOrigem = ag.Origem == OrigemAgendamentoDto.PresencialBalcao ? "BALCÃO" : "SITE";
-            var corTagBg = ag.Origem == OrigemAgendamentoDto.PresencialBalcao ? Color.FromArgb(45, 25, 55) : Color.FromArgb(15, 38, 65);
-            var corTagFg = ag.Origem == OrigemAgendamentoDto.PresencialBalcao ? Color.FromArgb(216, 180, 254) : TemaMelobarbershop.BlueAccent;
+            var corTagBg = ag.Origem == OrigemAgendamentoDto.PresencialBalcao
+                ? (TemaMelobarbershop.ModoClaro ? Color.FromArgb(243, 232, 255) : Color.FromArgb(45, 25, 55))
+                : (TemaMelobarbershop.ModoClaro ? Color.FromArgb(224, 242, 254) : Color.FromArgb(15, 38, 65));
+            var corTagFg = ag.Origem == OrigemAgendamentoDto.PresencialBalcao
+                ? (TemaMelobarbershop.ModoClaro ? Color.FromArgb(126, 34, 206) : Color.FromArgb(216, 180, 254))
+                : TemaMelobarbershop.BlueAccent;
 
             var lblTag = new Label
             {
@@ -242,7 +263,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             {
                 Text = servicosBarbeiro,
                 Font = new Font("Segoe UI", 9F),
-                ForeColor = Color.FromArgb(175, 182, 192),
+                ForeColor = TemaMelobarbershop.TextMuted,
                 AutoSize = true,
                 Location = new Point(12, 30)
             };
@@ -253,7 +274,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             {
                 Text = telefoneTxt,
                 Font = new Font("Segoe UI", 8.5F),
-                ForeColor = Color.FromArgb(135, 142, 150),
+                ForeColor = TemaMelobarbershop.TextMuted,
                 AutoSize = true,
                 Location = new Point(12, 49)
             };

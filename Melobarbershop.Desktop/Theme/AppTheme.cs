@@ -3,37 +3,75 @@ namespace Melobarbershop.Desktop.Theme
     public static class TemaMelobarbershop
     {
         // ================================================================
-        // PALETA OFICIAL EXTRAÍDA DO SITE (style.css, login.css, theme.css)
+        // ESTADO DO TEMA E EVENTO DE ALTERAÇÃO
+        // ================================================================
+        private static bool _modoClaro = Configuration.AppConfig.ModoClaro;
+
+        public static bool ModoClaro
+        {
+            get => _modoClaro;
+            set
+            {
+                if (_modoClaro != value)
+                {
+                    _modoClaro = value;
+                    Configuration.AppConfig.SalvarModoClaro(value);
+                    TemaAlterado?.Invoke();
+                }
+            }
+        }
+
+        public static event Action? TemaAlterado;
+
+        // ================================================================
+        // PALETA OFICIAL (DINÂMICA: MODO ESCURO / MODO CLARO)
         // ================================================================
 
-        // Fundo Principal (--bg: #070809 / #090a0c)
-        public static readonly Color BackgroundDark = Color.FromArgb(7, 8, 9);
+        // Fundo Principal (--bg: #070809 no Dark / #F5F6F7 no Light)
+        public static Color BackgroundDark =>
+            ModoClaro ? Color.FromArgb(245, 246, 247) : Color.FromArgb(7, 8, 9);
 
-        // Superfície dos Cards e Painéis (--surface: #0e1013 / #101215)
-        public static readonly Color SurfaceCard = Color.FromArgb(14, 16, 19);
+        // Superfície dos Cards e Painéis (--surface: #0e1013 no Dark / #FFFFFF no Light)
+        public static Color SurfaceCard =>
+            ModoClaro ? Color.FromArgb(255, 255, 255) : Color.FromArgb(14, 16, 19);
 
-        // Superfície Secundária (Inputs, Sidebar, Topbar: #14171b / #17191d)
-        public static readonly Color SurfaceSecondary = Color.FromArgb(20, 23, 27);
+        // Superfície Secundária (Inputs, Sidebar, Topbar: #14171b no Dark / #EDEEF0 no Light)
+        public static Color SurfaceSecondary =>
+            ModoClaro ? Color.FromArgb(237, 238, 240) : Color.FromArgb(20, 23, 27);
 
         // Cor Primária da Marca (--blue / .btn-auth: #087cff)
-        public static readonly Color BluePrimary = Color.FromArgb(8, 124, 255);
+        public static Color BluePrimary => Color.FromArgb(8, 124, 255);
 
-        // Cor de Destaque / Hover (--blue-2: #35a1ff)
-        public static readonly Color BlueAccent = Color.FromArgb(53, 161, 255);
+        // Cor de Destaque / Hover (--blue-2: #35a1ff / no light escurecido levemente para contraste de texto)
+        public static Color BlueAccent =>
+            ModoClaro ? Color.FromArgb(6, 105, 220) : Color.FromArgb(53, 161, 255);
 
-        // Bordas (--border: #2a2e33 / rgba(53, 161, 255, 0.22))
-        public static readonly Color BorderColor = Color.FromArgb(42, 46, 51);
-        public static readonly Color BorderAccent = Color.FromArgb(60, 95, 140);
+        // Bordas (--border: #2a2e33 no Dark / #D8DBDF no Light)
+        public static Color BorderColor =>
+            ModoClaro ? Color.FromArgb(216, 219, 223) : Color.FromArgb(42, 46, 51);
 
-        // Textos (--text: #f6f7f8 / --muted: #a9afb7)
-        public static readonly Color TextPrimary = Color.FromArgb(246, 247, 248);
-        public static readonly Color TextMuted = Color.FromArgb(169, 175, 183);
-        public static readonly Color TextDisabled = Color.FromArgb(110, 115, 122);
+        public static Color BorderAccent =>
+            ModoClaro ? Color.FromArgb(180, 205, 235) : Color.FromArgb(60, 95, 140);
 
-        // Cores Semânticas (--green: #25d366 / --red: #e53935)
-        public static readonly Color SuccessColor = Color.FromArgb(37, 211, 102);
-        public static readonly Color DangerColor = Color.FromArgb(229, 57, 53);
-        public static readonly Color WarningColor = Color.FromArgb(243, 156, 18);
+        // Textos (--text: #f6f7f8 no Dark / #1A1C1F no Light)
+        public static Color TextPrimary =>
+            ModoClaro ? Color.FromArgb(26, 28, 31) : Color.FromArgb(246, 247, 248);
+
+        public static Color TextMuted =>
+            ModoClaro ? Color.FromArgb(91, 97, 105) : Color.FromArgb(169, 175, 183);
+
+        public static Color TextDisabled =>
+            ModoClaro ? Color.FromArgb(160, 165, 172) : Color.FromArgb(110, 115, 122);
+
+        // Cores Semânticas
+        public static Color SuccessColor =>
+            ModoClaro ? Color.FromArgb(22, 160, 75) : Color.FromArgb(37, 211, 102);
+
+        public static Color DangerColor =>
+            ModoClaro ? Color.FromArgb(220, 38, 38) : Color.FromArgb(229, 57, 53);
+
+        public static Color WarningColor =>
+            ModoClaro ? Color.FromArgb(217, 119, 6) : Color.FromArgb(243, 156, 18);
 
         // ================================================================
         // ESCALA DE ESPAÇAMENTO PADRONIZADA (8px, 16px, 24px, 32px)
@@ -140,9 +178,9 @@ namespace Melobarbershop.Desktop.Theme
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 1;
             btn.FlatAppearance.BorderColor = BorderAccent;
-            btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(24, 34, 48);
-            btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(16, 24, 34);
-            btn.BackColor = Color.FromArgb(14, 18, 24);
+            btn.FlatAppearance.MouseOverBackColor = ModoClaro ? Color.FromArgb(220, 230, 245) : Color.FromArgb(24, 34, 48);
+            btn.FlatAppearance.MouseDownBackColor = ModoClaro ? Color.FromArgb(200, 215, 235) : Color.FromArgb(16, 24, 34);
+            btn.BackColor = ModoClaro ? Color.FromArgb(240, 245, 252) : Color.FromArgb(14, 18, 24);
             btn.ForeColor = BlueAccent;
             btn.Font = BodyBoldFont;
             btn.Cursor = Cursors.Hand;
@@ -155,11 +193,11 @@ namespace Melobarbershop.Desktop.Theme
         {
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 1;
-            btn.FlatAppearance.BorderColor = Color.FromArgb(150, 40, 40);
-            btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(55, 18, 22);
-            btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(40, 12, 16);
-            btn.BackColor = Color.FromArgb(28, 12, 14);
-            btn.ForeColor = Color.FromArgb(248, 113, 113);
+            btn.FlatAppearance.BorderColor = DangerColor;
+            btn.FlatAppearance.MouseOverBackColor = ModoClaro ? Color.FromArgb(254, 226, 226) : Color.FromArgb(55, 18, 22);
+            btn.FlatAppearance.MouseDownBackColor = ModoClaro ? Color.FromArgb(252, 165, 165) : Color.FromArgb(40, 12, 16);
+            btn.BackColor = ModoClaro ? Color.FromArgb(254, 242, 242) : Color.FromArgb(28, 12, 14);
+            btn.ForeColor = DangerColor;
             btn.Font = BodyBoldFont;
             btn.Cursor = Cursors.Hand;
             btn.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
@@ -174,7 +212,7 @@ namespace Melobarbershop.Desktop.Theme
             btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(46, 225, 115);
             btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(28, 175, 84);
             btn.BackColor = SuccessColor;
-            btn.ForeColor = Color.FromArgb(6, 30, 15);
+            btn.ForeColor = Color.White;
             btn.Font = BodyBoldFont;
             btn.Cursor = Cursors.Hand;
             btn.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
@@ -230,9 +268,12 @@ namespace Melobarbershop.Desktop.Theme
             using var penBorder = new Pen(BorderColor, 1);
             e.Graphics.DrawPath(penBorder, path);
 
-            // Realce sutil superior de iluminação
-            using var penHighlight = new Pen(Color.FromArgb(30, 55, 85), 1);
-            e.Graphics.DrawLine(penHighlight, DefaultRadius, 1, panel.Width - DefaultRadius, 1);
+            // Realce sutil superior de iluminação (apenas no dark mode)
+            if (!ModoClaro)
+            {
+                using var penHighlight = new Pen(Color.FromArgb(30, 55, 85), 1);
+                e.Graphics.DrawLine(penHighlight, DefaultRadius, 1, panel.Width - DefaultRadius, 1);
+            }
         }
 
         // ================================================================
@@ -264,7 +305,7 @@ namespace Melobarbershop.Desktop.Theme
             dgv.BackgroundColor = SurfaceCard;
             dgv.BorderStyle = BorderStyle.None;
             dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgv.GridColor = Color.FromArgb(28, 33, 40);
+            dgv.GridColor = BorderColor;
             dgv.EnableHeadersVisualStyles = false;
             dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgv.MultiSelect = false;
@@ -285,16 +326,16 @@ namespace Melobarbershop.Desktop.Theme
             // Linhas
             dgv.DefaultCellStyle.BackColor = SurfaceCard;
             dgv.DefaultCellStyle.ForeColor = TextPrimary;
-            dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 48, 88);
-            dgv.DefaultCellStyle.SelectionForeColor = Color.White;
+            dgv.DefaultCellStyle.SelectionBackColor = ModoClaro ? Color.FromArgb(210, 230, 255) : Color.FromArgb(20, 48, 88);
+            dgv.DefaultCellStyle.SelectionForeColor = ModoClaro ? Color.FromArgb(10, 30, 60) : Color.White;
             dgv.DefaultCellStyle.Font = BodyFont;
             dgv.DefaultCellStyle.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
 
             // Linhas alternadas sutis
-            dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(17, 20, 24);
+            dgv.AlternatingRowsDefaultCellStyle.BackColor = ModoClaro ? Color.FromArgb(248, 249, 250) : Color.FromArgb(17, 20, 24);
             dgv.AlternatingRowsDefaultCellStyle.ForeColor = TextPrimary;
-            dgv.AlternatingRowsDefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 48, 88);
-            dgv.AlternatingRowsDefaultCellStyle.SelectionForeColor = Color.White;
+            dgv.AlternatingRowsDefaultCellStyle.SelectionBackColor = ModoClaro ? Color.FromArgb(210, 230, 255) : Color.FromArgb(20, 48, 88);
+            dgv.AlternatingRowsDefaultCellStyle.SelectionForeColor = ModoClaro ? Color.FromArgb(10, 30, 60) : Color.White;
             dgv.AlternatingRowsDefaultCellStyle.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
         }
     }

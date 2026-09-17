@@ -30,35 +30,41 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
 
         private void ConfigurarEstilo()
         {
+            lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
+            lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
+            lblFiltro.Font = TemaMelobarbershop.BodyBoldFont;
+            lblBusca.Font = TemaMelobarbershop.BodyBoldFont;
+            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
+
+            cmbFiltroRole.Items.Clear();
+            cmbFiltroRole.Items.AddRange(new object[] { "Todos os Usuários", "Barbeiros", "Clientes", "Administradores" });
+            cmbFiltroRole.SelectedIndex = 0;
+
+            txtBusca.PlaceholderText = "Pesquise por nome ou e-mail...";
+
+            AplicarTema();
+        }
+
+        public void AplicarTema()
+        {
             this.BackColor = TemaMelobarbershop.BackgroundDark;
             this.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
             lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
-            lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
             lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
+            lblFiltro.ForeColor = TemaMelobarbershop.TextMuted;
+            lblBusca.ForeColor = TemaMelobarbershop.TextMuted;
 
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAlternarStatus);
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnHistoricoCliente);
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
 
-            lblFiltro.Font = TemaMelobarbershop.BodyBoldFont;
-            lblFiltro.ForeColor = TemaMelobarbershop.TextMuted;
-
             TemaMelobarbershop.EstilizarComboBox(cmbFiltroRole);
-            cmbFiltroRole.Items.Clear();
-            cmbFiltroRole.Items.AddRange(new object[] { "Todos os Usuários", "Barbeiros", "Clientes", "Administradores" });
-            cmbFiltroRole.SelectedIndex = 0;
-
-            lblBusca.Font = TemaMelobarbershop.BodyBoldFont;
-            lblBusca.ForeColor = TemaMelobarbershop.TextMuted;
-
             TemaMelobarbershop.EstilizarTextBox(txtBusca);
-            txtBusca.PlaceholderText = "Pesquise por nome ou e-mail...";
-
-            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
-
             TemaMelobarbershop.EstilizarDataGridView(dgvUsuarios);
+
+            _emptyState.AplicarTema();
+            dgvUsuarios.Invalidate();
         }
 
         public async Task CarregarUsuariosAsync()

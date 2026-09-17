@@ -12,6 +12,13 @@ namespace Melobarbershop.Desktop.Theme
         private readonly Label _lblTitulo;
         private readonly Label _lblDescricao;
 
+        public void AplicarTema()
+        {
+            _lblIcone.ForeColor = TemaMelobarbershop.TextDisabled;
+            _lblTitulo.ForeColor = TemaMelobarbershop.TextPrimary;
+            _lblDescricao.ForeColor = TemaMelobarbershop.TextMuted;
+        }
+
         public EmptyStatePanel()
         {
             BackColor = Color.Transparent;

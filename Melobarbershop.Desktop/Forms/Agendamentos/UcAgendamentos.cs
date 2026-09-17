@@ -29,44 +29,60 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
 
         private void ConfigurarEstilo()
         {
-            this.BackColor = TemaMelobarbershop.BackgroundDark;
-            this.ForeColor = TemaMelobarbershop.TextPrimary;
-
             lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
-            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
             lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
-            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
-
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
-
             lblFiltroPeriodo.Font = TemaMelobarbershop.BodyBoldFont;
-            lblFiltroPeriodo.ForeColor = TemaMelobarbershop.TextMuted;
-
-            TemaMelobarbershop.EstilizarComboBox(cmbFiltroPeriodo);
-            cmbFiltroPeriodo.Items.Clear();
-            cmbFiltroPeriodo.Items.AddRange(new object[] { "Hoje", "Amanhã", "Últimos 7 dias", "Este mês", "Personalizado" });
-            cmbFiltroPeriodo.SelectedIndex = 0;
-
             lblAte.Font = TemaMelobarbershop.BodyFont;
-            lblAte.ForeColor = TemaMelobarbershop.TextMuted;
+            lblBuscaIcon.Font = new Font("Segoe UI", 11F);
+            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
 
             dtpInicio.Format = DateTimePickerFormat.Short;
             dtpFim.Format = DateTimePickerFormat.Short;
             dtpInicio.Value = DateTime.Today;
             dtpFim.Value = DateTime.Today;
 
-            lblBuscaIcon.Font = new Font("Segoe UI", 11F);
+            cmbFiltroPeriodo.Items.Clear();
+            cmbFiltroPeriodo.Items.AddRange(new object[] { "Hoje", "Amanhã", "Últimos 7 dias", "Este mês", "Personalizado" });
+            cmbFiltroPeriodo.SelectedIndex = 0;
+
+            txtBusca.PlaceholderText = "Buscar por cliente, barbeiro ou serviço...";
+
+            CriarChipsStatus();
+            AplicarTema();
+        }
+
+        public void AplicarTema()
+        {
+            this.BackColor = TemaMelobarbershop.BackgroundDark;
+            this.ForeColor = TemaMelobarbershop.TextPrimary;
+
+            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
+
+            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
+
+            lblFiltroPeriodo.ForeColor = TemaMelobarbershop.TextMuted;
+            TemaMelobarbershop.EstilizarComboBox(cmbFiltroPeriodo);
+
+            lblAte.ForeColor = TemaMelobarbershop.TextMuted;
             lblBuscaIcon.ForeColor = TemaMelobarbershop.TextMuted;
 
             TemaMelobarbershop.EstilizarTextBox(txtBusca);
-            txtBusca.PlaceholderText = "Buscar por cliente, barbeiro ou serviço...";
-
-            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
-
             TemaMelobarbershop.EstilizarDataGridView(dgvAgendamentos);
             dgvAgendamentos.RowTemplate.Height = 44;
 
-            CriarChipsStatus();
+            _emptyState.AplicarTema();
+
+            foreach (Control c in flowStatusChips.Controls)
+            {
+                if (c is Button b)
+                {
+                    var statusB = b.Tag as StatusAgendamentoDto?;
+                    AtualizarEstiloChip(b, statusB == _filtroStatusSelecionado);
+                }
+            }
+
+            dgvAgendamentos.Invalidate();
         }
 
         private void CriarChipsStatus()
@@ -371,6 +387,20 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
 
         private static (Color bg, Color fg, string texto) ObterEstiloStatusBadge(StatusAgendamentoDto status)
         {
+            if (TemaMelobarbershop.ModoClaro)
+            {
+                return status switch
+                {
+                    StatusAgendamentoDto.Confirmado => (Color.FromArgb(220, 252, 231), Color.FromArgb(22, 101, 52), "Confirmado"),
+                    StatusAgendamentoDto.Pendente => (Color.FromArgb(254, 243, 199), Color.FromArgb(146, 64, 14), "Pendente"),
+                    StatusAgendamentoDto.EmAtendimento => (Color.FromArgb(224, 242, 254), Color.FromArgb(7, 89, 133), "Em Atendimento"),
+                    StatusAgendamentoDto.Concluido => (Color.FromArgb(207, 250, 254), Color.FromArgb(14, 116, 144), "Concluído"),
+                    StatusAgendamentoDto.Cancelado => (Color.FromArgb(254, 226, 226), Color.FromArgb(185, 28, 28), "Cancelado"),
+                    StatusAgendamentoDto.NaoCompareceu => (Color.FromArgb(243, 244, 246), Color.FromArgb(107, 114, 128), "Faltou"),
+                    _ => (TemaMelobarbershop.SurfaceSecondary, TemaMelobarbershop.TextPrimary, status.ToString())
+                };
+            }
+
             return status switch
             {
                 StatusAgendamentoDto.Confirmado => (Color.FromArgb(20, 50, 30), TemaMelobarbershop.SuccessColor, "Confirmado"),

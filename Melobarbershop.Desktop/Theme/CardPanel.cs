@@ -20,6 +20,13 @@ namespace Melobarbershop.Desktop.Theme
         [DefaultValue(true)]
         public bool ShowTopHighlight { get; set; } = true;
 
+        public void AplicarTema()
+        {
+            BackColor = TemaMelobarbershop.SurfaceCard;
+            BorderLineColor = TemaMelobarbershop.BorderColor;
+            Invalidate();
+        }
+
         public CardPanel()
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint |
@@ -27,7 +34,7 @@ namespace Melobarbershop.Desktop.Theme
                      ControlStyles.OptimizedDoubleBuffer |
                      ControlStyles.ResizeRedraw, true);
 
-            BackColor = TemaMelobarbershop.SurfaceCard;
+            AplicarTema();
             Padding = new Padding(TemaMelobarbershop.SpaceMD);
         }
 
@@ -49,12 +56,12 @@ namespace Melobarbershop.Desktop.Theme
             var rect = new Rectangle(0, 0, Width - 1, Height - 1);
             using var path = TemaMelobarbershop.CriarCaminhoArredondado(rect, BorderRadius);
 
-            // Borda externa de 1px
+            // Borda externa de 1px usando a cor dinâmica do tema
             using var penBorder = new Pen(BorderLineColor, 1);
             e.Graphics.DrawPath(penBorder, path);
 
-            // Realce sutil superior de iluminação (se ativado)
-            if (ShowTopHighlight && Width > BorderRadius * 2)
+            // Realce sutil superior de iluminação (apenas no modo escuro)
+            if (ShowTopHighlight && !TemaMelobarbershop.ModoClaro && Width > BorderRadius * 2)
             {
                 using var penHighlight = new Pen(Color.FromArgb(32, 55, 82), 1);
                 e.Graphics.DrawLine(penHighlight, BorderRadius, 1, Width - BorderRadius, 1);

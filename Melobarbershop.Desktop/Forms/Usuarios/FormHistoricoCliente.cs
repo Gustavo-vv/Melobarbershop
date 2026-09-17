@@ -19,27 +19,41 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             InitializeComponent();
             ConfigurarEstilo();
             ConfigurarEmptyState();
+
+            TemaMelobarbershop.TemaAlterado += AplicarTema;
         }
 
         private void ConfigurarEstilo()
         {
-            this.BackColor = TemaMelobarbershop.BackgroundDark;
-            this.ForeColor = TemaMelobarbershop.TextPrimary;
             this.Text = $"Histórico de {_nomeCliente}";
-
             lblTitulo.Text = $"Histórico de {_nomeCliente}";
             lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
-            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
-
             lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
-            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
-
             lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
+
+            ConfigurarColunas();
+            AplicarTema();
+        }
+
+        public void AplicarTema()
+        {
+            this.BackColor = TemaMelobarbershop.BackgroundDark;
+            this.ForeColor = TemaMelobarbershop.TextPrimary;
+
+            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
 
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnFechar);
             TemaMelobarbershop.EstilizarDataGridView(dgvHistorico);
 
-            ConfigurarColunas();
+            _emptyState.AplicarTema();
+            dgvHistorico.Invalidate();
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            TemaMelobarbershop.TemaAlterado -= AplicarTema;
+            base.OnFormClosed(e);
         }
 
         private void ConfigurarEmptyState()
@@ -199,6 +213,20 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
 
         private static (Color bg, Color fg, string texto) ObterEstiloStatusBadge(StatusAgendamentoDto status)
         {
+            if (TemaMelobarbershop.ModoClaro)
+            {
+                return status switch
+                {
+                    StatusAgendamentoDto.Confirmado => (Color.FromArgb(220, 252, 231), Color.FromArgb(22, 101, 52), "Confirmado"),
+                    StatusAgendamentoDto.Pendente => (Color.FromArgb(254, 243, 199), Color.FromArgb(146, 64, 14), "Pendente"),
+                    StatusAgendamentoDto.EmAtendimento => (Color.FromArgb(224, 242, 254), Color.FromArgb(7, 89, 133), "Em Atendimento"),
+                    StatusAgendamentoDto.Concluido => (Color.FromArgb(207, 250, 254), Color.FromArgb(14, 116, 144), "Concluído"),
+                    StatusAgendamentoDto.Cancelado => (Color.FromArgb(254, 226, 226), Color.FromArgb(185, 28, 28), "Cancelado"),
+                    StatusAgendamentoDto.NaoCompareceu => (Color.FromArgb(243, 244, 246), Color.FromArgb(107, 114, 128), "Faltou"),
+                    _ => (TemaMelobarbershop.SurfaceSecondary, TemaMelobarbershop.TextPrimary, status.ToString())
+                };
+            }
+
             return status switch
             {
                 StatusAgendamentoDto.Confirmado => (Color.FromArgb(20, 50, 30), TemaMelobarbershop.SuccessColor, "Confirmado"),

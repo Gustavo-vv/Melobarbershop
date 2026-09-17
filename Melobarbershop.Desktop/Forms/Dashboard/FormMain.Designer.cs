@@ -12,6 +12,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private Button btnMenuAgendamentos;
         private Button btnMenuServicos;
         private Button btnMenuUsuarios;
+        private Button btnAlternarTema;
         private Button btnMenuSair;
 
         private Panel panelRodape;
@@ -39,6 +40,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             btnMenuAgendamentos = new Button();
             btnMenuServicos = new Button();
             btnMenuUsuarios = new Button();
+            btnAlternarTema = new Button();
             btnMenuSair = new Button();
 
             panelRodape = new Panel();
@@ -62,6 +64,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             panelSidebar.Controls.Add(btnMenuAgendamentos);
             panelSidebar.Controls.Add(btnMenuServicos);
             panelSidebar.Controls.Add(btnMenuUsuarios);
+            panelSidebar.Controls.Add(btnAlternarTema);
             panelSidebar.Controls.Add(btnMenuSair);
 
             // picLogoSidebar
@@ -104,9 +107,15 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             btnMenuUsuarios.Text = "👥  Usuários & Barbeiros";
             btnMenuUsuarios.Click += btnMenuUsuarios_Click;
 
+            // btnAlternarTema
+            btnAlternarTema.Dock = DockStyle.Bottom;
+            btnAlternarTema.Height = 45;
+            btnAlternarTema.Text = "☀️  Modo Claro";
+            btnAlternarTema.Click += btnAlternarTema_Click;
+
             // btnMenuSair
             btnMenuSair.Dock = DockStyle.Bottom;
-            btnMenuSair.Height = 55;
+            btnMenuSair.Height = 50;
             btnMenuSair.Text = "🚪  Sair do Sistema";
             btnMenuSair.Click += btnMenuSair_Click;
 

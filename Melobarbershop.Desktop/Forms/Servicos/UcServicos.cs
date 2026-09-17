@@ -31,13 +31,24 @@ namespace Melobarbershop.Desktop.Forms.Servicos
 
         private void ConfigurarEstilo()
         {
+            lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
+            lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
+            lblBusca.Font = TemaMelobarbershop.BodyBoldFont;
+            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
+
+            txtBusca.PlaceholderText = "Pesquise por nome ou descrição do serviço...";
+
+            AplicarTema();
+        }
+
+        public void AplicarTema()
+        {
             this.BackColor = TemaMelobarbershop.BackgroundDark;
             this.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
             lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
-            lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
             lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
+            lblBusca.ForeColor = TemaMelobarbershop.TextMuted;
 
             TemaMelobarbershop.AplicarEstiloBotaoPrimario(btnNovo);
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnEditar);
@@ -46,13 +57,10 @@ namespace Melobarbershop.Desktop.Forms.Servicos
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
 
             TemaMelobarbershop.EstilizarTextBox(txtBusca);
-            txtBusca.PlaceholderText = "Pesquise por nome ou descrição do serviço...";
-
-            lblBusca.Font = TemaMelobarbershop.BodyBoldFont;
-            lblBusca.ForeColor = TemaMelobarbershop.TextMuted;
-            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
-
             TemaMelobarbershop.EstilizarDataGridView(dgvServicos);
+
+            _emptyState.AplicarTema();
+            dgvServicos.Invalidate();
         }
 
         public async Task CarregarServicosAsync()

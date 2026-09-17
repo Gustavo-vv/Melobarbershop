@@ -24,22 +24,26 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             ConfigurarEstilo();
             InicializarTelas();
             ConfigurarTimer();
+
+            TemaMelobarbershop.TemaAlterado += OnTemaAlterado;
+            AplicarTema();
         }
 
-        private void ConfigurarEstilo()
+        private void OnTemaAlterado()
         {
-            this.BackColor = AppTheme.BackgroundDark;
-            this.ForeColor = AppTheme.TextPrimary;
-            this.Font = AppTheme.NormalFont;
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.Size = new Size(1220, 740);
-            this.MinimumSize = new Size(1050, 650);
-            this.Text = "Melo Barbershop — Painel Administrativo de Gestão";
+            AplicarTema();
+            _ucDashboard?.AplicarTema();
+            _ucAgendamentos?.AplicarTema();
+            _ucServicos?.AplicarTema();
+            _ucUsuarios?.AplicarTema();
+        }
+
+        public void AplicarTema()
+        {
+            this.BackColor = TemaMelobarbershop.BackgroundDark;
+            this.ForeColor = TemaMelobarbershop.TextPrimary;
 
             panelSidebar.BackColor = TemaMelobarbershop.SurfaceSecondary;
-            picLogoSidebar.Image = TemaMelobarbershop.CarregarLogo();
-
-            lblLogo.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblLogo.ForeColor = TemaMelobarbershop.BlueAccent;
             lblLogoSub.ForeColor = TemaMelobarbershop.TextMuted;
 
@@ -49,9 +53,35 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             EstilizarBotaoMenu(btnMenuUsuarios);
             EstilizarBotaoMenu(btnMenuSair);
 
-            panelRodape.BackColor = Color.FromArgb(12, 14, 18);
+            btnAlternarTema.FlatStyle = FlatStyle.Flat;
+            btnAlternarTema.FlatAppearance.BorderSize = 0;
+            btnAlternarTema.BackColor = Color.Transparent;
+            btnAlternarTema.ForeColor = TemaMelobarbershop.TextMuted;
+            btnAlternarTema.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btnAlternarTema.TextAlign = ContentAlignment.MiddleLeft;
+            btnAlternarTema.Padding = new Padding(TemaMelobarbershop.SpaceLG, 0, 0, 0);
+            btnAlternarTema.Cursor = Cursors.Hand;
+            btnAlternarTema.Text = TemaMelobarbershop.ModoClaro ? "🌙  Modo Escuro" : "☀️  Modo Claro";
+
+            panelRodape.BackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(230, 232, 235) : Color.FromArgb(12, 14, 18);
             lblUsuarioLogado.ForeColor = TemaMelobarbershop.BlueAccent;
             lblStatusApi.ForeColor = TemaMelobarbershop.SuccessColor;
+
+            if (_botaoMenuAtual != null)
+            {
+                DestacarBotaoAtivo(_botaoMenuAtual);
+            }
+        }
+
+        private void ConfigurarEstilo()
+        {
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Size = new Size(1220, 740);
+            this.MinimumSize = new Size(1050, 650);
+            this.Text = "Melo Barbershop — Painel Administrativo de Gestão";
+            this.Font = TemaMelobarbershop.BodyFont;
+
+            picLogoSidebar.Image = TemaMelobarbershop.CarregarLogo();
 
             if (ApiClient.UsuarioLogado != null)
             {
@@ -67,8 +97,8 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         {
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
-            btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(20, 28, 38);
-            btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(15, 35, 65);
+            btn.FlatAppearance.MouseOverBackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(220, 230, 245) : Color.FromArgb(20, 28, 38);
+            btn.FlatAppearance.MouseDownBackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(200, 215, 235) : Color.FromArgb(15, 35, 65);
             btn.BackColor = Color.Transparent;
             btn.ForeColor = TemaMelobarbershop.TextMuted;
             btn.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
@@ -99,7 +129,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             {
                 if (b == btnAtivo)
                 {
-                    b.BackColor = Color.FromArgb(16, 32, 54);
+                    b.BackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(220, 235, 255) : Color.FromArgb(16, 32, 54);
                     b.ForeColor = TemaMelobarbershop.BlueAccent;
                 }
                 else
@@ -109,6 +139,11 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
                 }
                 b.Invalidate();
             }
+        }
+
+        private void btnAlternarTema_Click(object? sender, EventArgs e)
+        {
+            TemaMelobarbershop.ModoClaro = !TemaMelobarbershop.ModoClaro;
         }
 
         private void InicializarTelas()
@@ -218,6 +253,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
+            TemaMelobarbershop.TemaAlterado -= OnTemaAlterado;
             _timerAutoRefresh?.Stop();
             _timerAutoRefresh?.Dispose();
             base.OnFormClosed(e);
