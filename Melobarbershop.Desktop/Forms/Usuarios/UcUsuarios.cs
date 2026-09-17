@@ -39,6 +39,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
 
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAlternarStatus);
+            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnHistoricoCliente);
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
 
             lblFiltro.Font = TemaMelobarbershop.BodyBoldFont;
@@ -129,6 +130,25 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
                 Cadastro = u.DataCadastro.ToString("dd/MM/yyyy"),
                 Status = u.Ativo ? "Ativo" : "Inativo"
             }).ToList();
+
+            GarantirColunaHistorico();
+        }
+
+        private void GarantirColunaHistorico()
+        {
+            if (dgvUsuarios.Columns["AcaoHistorico"] == null)
+            {
+                var btnCol = new DataGridViewButtonColumn
+                {
+                    Name = "AcaoHistorico",
+                    HeaderText = "Histórico",
+                    Text = "Ver histórico",
+                    UseColumnTextForButtonValue = true,
+                    Width = 115,
+                    FlatStyle = FlatStyle.Flat
+                };
+                dgvUsuarios.Columns.Add(btnCol);
+            }
         }
 
         private UsuarioDto? ObterUsuarioSelecionado()
@@ -181,6 +201,40 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             {
                 MessageBox.Show($"Falha: {resp.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnHistoricoCliente_Click(object? sender, EventArgs e)
+        {
+            var usuario = ObterUsuarioSelecionado();
+            if (usuario == null)
+            {
+                MessageBox.Show("Selecione um usuário na lista para ver o histórico.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            AbrirHistoricoCliente(usuario.Id, usuario.Nome);
+        }
+
+        private void dgvUsuarios_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+            if (dgvUsuarios.Columns[e.ColumnIndex].Name == "AcaoHistorico")
+            {
+                var idObj = dgvUsuarios.Rows[e.RowIndex].Cells["Id"]?.Value;
+                var nomeObj = dgvUsuarios.Rows[e.RowIndex].Cells["Nome"]?.Value;
+
+                if (idObj is string id && nomeObj is string nome)
+                {
+                    AbrirHistoricoCliente(id, nome);
+                }
+            }
+        }
+
+        private void AbrirHistoricoCliente(string clienteId, string nomeCliente)
+        {
+            using var form = new FormHistoricoCliente(clienteId, nomeCliente);
+            form.ShowDialog(this);
         }
 
         private async void btnAtualizar_Click(object sender, EventArgs e)
