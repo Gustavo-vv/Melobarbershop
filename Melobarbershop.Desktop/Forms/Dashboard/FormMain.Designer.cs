@@ -8,12 +8,12 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private PictureBox picLogoSidebar;
         private Label lblLogo;
         private Label lblLogoSub;
-        private Button btnMenuDashboard;
-        private Button btnMenuAgendamentos;
-        private Button btnMenuServicos;
-        private Button btnMenuUsuarios;
-        private Button btnAlternarTema;
-        private Button btnMenuSair;
+        private Guna.UI2.WinForms.Guna2Button btnMenuDashboard;
+        private Guna.UI2.WinForms.Guna2Button btnMenuAgendamentos;
+        private Guna.UI2.WinForms.Guna2Button btnMenuServicos;
+        private Guna.UI2.WinForms.Guna2Button btnMenuUsuarios;
+        private Guna.UI2.WinForms.Guna2Button btnAlternarTema;
+        private Guna.UI2.WinForms.Guna2Button btnMenuSair;
 
         private Panel panelRodape;
         private Label lblUsuarioLogado;
@@ -36,12 +36,12 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             picLogoSidebar = new PictureBox();
             lblLogo = new Label();
             lblLogoSub = new Label();
-            btnMenuDashboard = new Button();
-            btnMenuAgendamentos = new Button();
-            btnMenuServicos = new Button();
-            btnMenuUsuarios = new Button();
-            btnAlternarTema = new Button();
-            btnMenuSair = new Button();
+            btnMenuDashboard = new Guna.UI2.WinForms.Guna2Button();
+            btnMenuAgendamentos = new Guna.UI2.WinForms.Guna2Button();
+            btnMenuServicos = new Guna.UI2.WinForms.Guna2Button();
+            btnMenuUsuarios = new Guna.UI2.WinForms.Guna2Button();
+            btnAlternarTema = new Guna.UI2.WinForms.Guna2Button();
+            btnMenuSair = new Guna.UI2.WinForms.Guna2Button();
 
             panelRodape = new Panel();
             lblUsuarioLogado = new Label();

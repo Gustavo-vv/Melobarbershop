@@ -338,6 +338,124 @@ namespace Melobarbershop.Desktop.Theme
             dgv.AlternatingRowsDefaultCellStyle.SelectionForeColor = ModoClaro ? Color.FromArgb(10, 30, 60) : Color.White;
             dgv.AlternatingRowsDefaultCellStyle.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
         }
+
+        // ================================================================
+        // HELPERS GUNA.UI2 COM A PALETA DO TEMA
+        // ================================================================
+
+        public static void EstilizarGunaPanelCard(Guna.UI2.WinForms.Guna2Panel pnl, int radius = 8)
+        {
+            pnl.BorderRadius = radius;
+            pnl.FillColor = SurfaceCard;
+            pnl.BorderColor = BorderColor;
+            pnl.BorderThickness = 1;
+            pnl.ShadowDecoration.Enabled = true;
+            pnl.ShadowDecoration.BorderRadius = radius;
+            pnl.ShadowDecoration.Color = ModoClaro ? Color.FromArgb(200, 205, 215) : Color.FromArgb(5, 5, 5);
+            pnl.ShadowDecoration.Depth = 10;
+        }
+
+        public static void EstilizarGunaButtonPrimario(Guna.UI2.WinForms.Guna2Button btn, int radius = 6)
+        {
+            btn.BorderRadius = radius;
+            btn.FillColor = BluePrimary;
+            btn.ForeColor = Color.White;
+            btn.Font = BodyBoldFont;
+            btn.Cursor = Cursors.Hand;
+            btn.HoverState.FillColor = BlueAccent;
+            btn.BorderThickness = 0;
+            btn.Animated = true;
+        }
+
+        public static void EstilizarGunaButtonSecundario(Guna.UI2.WinForms.Guna2Button btn, int radius = 6)
+        {
+            btn.BorderRadius = radius;
+            btn.FillColor = ModoClaro ? Color.FromArgb(240, 245, 252) : Color.FromArgb(14, 18, 24);
+            btn.BorderColor = BorderAccent;
+            btn.BorderThickness = 1;
+            btn.ForeColor = BlueAccent;
+            btn.Font = BodyBoldFont;
+            btn.Cursor = Cursors.Hand;
+            btn.HoverState.FillColor = ModoClaro ? Color.FromArgb(220, 230, 245) : Color.FromArgb(24, 34, 48);
+            btn.HoverState.BorderColor = BlueAccent;
+            btn.Animated = true;
+        }
+
+        public static void EstilizarGunaTextBox(Guna.UI2.WinForms.Guna2TextBox txt, int radius = 6)
+        {
+            txt.BorderRadius = radius;
+            txt.FillColor = SurfaceSecondary;
+            txt.BorderColor = BorderColor;
+            txt.ForeColor = TextPrimary;
+            txt.PlaceholderForeColor = TextMuted;
+            txt.Font = BodyFont;
+            txt.FocusedState.BorderColor = BlueAccent;
+            txt.HoverState.BorderColor = BorderAccent;
+            txt.Animated = true;
+        }
+
+        public static void EstilizarGunaComboBox(Guna.UI2.WinForms.Guna2ComboBox cmb, int radius = 6)
+        {
+            cmb.BorderRadius = radius;
+            cmb.FillColor = SurfaceSecondary;
+            cmb.BorderColor = BorderColor;
+            cmb.ForeColor = TextPrimary;
+            cmb.Font = BodyFont;
+            cmb.FocusedState.BorderColor = BlueAccent;
+            cmb.HoverState.BorderColor = BorderAccent;
+            cmb.Animated = true;
+        }
+
+        public static void EstilizarGunaDateTimePicker(Guna.UI2.WinForms.Guna2DateTimePicker dtp, int radius = 6)
+        {
+            dtp.BorderRadius = radius;
+            dtp.FillColor = SurfaceSecondary;
+            dtp.BorderColor = BorderColor;
+            dtp.BorderThickness = 1;
+            dtp.ForeColor = TextPrimary;
+            dtp.Font = BodyFont;
+            dtp.HoverState.BorderColor = BlueAccent;
+            dtp.Animated = true;
+        }
+
+        public static void EstilizarGunaDataGridView(Guna.UI2.WinForms.Guna2DataGridView dgv)
+        {
+            dgv.BackgroundColor = SurfaceCard;
+            dgv.BorderStyle = BorderStyle.None;
+            dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dgv.GridColor = BorderColor;
+            dgv.EnableHeadersVisualStyles = false;
+            dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgv.MultiSelect = false;
+            dgv.RowHeadersVisible = false;
+            dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgv.RowTemplate.Height = 42;
+            dgv.AllowUserToResizeRows = false;
+
+            // Cabeçalho
+            dgv.ColumnHeadersDefaultCellStyle.BackColor = SurfaceSecondary;
+            dgv.ColumnHeadersDefaultCellStyle.ForeColor = BlueAccent;
+            dgv.ColumnHeadersDefaultCellStyle.Font = CardTitleFont;
+            dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dgv.ColumnHeadersDefaultCellStyle.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
+            dgv.ColumnHeadersHeight = 44;
+            dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+
+            // Linhas
+            dgv.DefaultCellStyle.BackColor = SurfaceCard;
+            dgv.DefaultCellStyle.ForeColor = TextPrimary;
+            dgv.DefaultCellStyle.SelectionBackColor = ModoClaro ? Color.FromArgb(210, 230, 255) : Color.FromArgb(20, 48, 88);
+            dgv.DefaultCellStyle.SelectionForeColor = ModoClaro ? Color.FromArgb(10, 30, 60) : Color.White;
+            dgv.DefaultCellStyle.Font = BodyFont;
+            dgv.DefaultCellStyle.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
+
+            // Linhas alternadas
+            dgv.AlternatingRowsDefaultCellStyle.BackColor = ModoClaro ? Color.FromArgb(248, 249, 250) : Color.FromArgb(17, 20, 24);
+            dgv.AlternatingRowsDefaultCellStyle.ForeColor = TextPrimary;
+            dgv.AlternatingRowsDefaultCellStyle.SelectionBackColor = ModoClaro ? Color.FromArgb(210, 230, 255) : Color.FromArgb(20, 48, 88);
+            dgv.AlternatingRowsDefaultCellStyle.SelectionForeColor = ModoClaro ? Color.FromArgb(10, 30, 60) : Color.White;
+            dgv.AlternatingRowsDefaultCellStyle.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
+        }
     }
 
     // Alias de compatibilidade retroativa para evitar qualquer breaking change

@@ -53,14 +53,15 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             EstilizarBotaoMenu(btnMenuUsuarios);
             EstilizarBotaoMenu(btnMenuSair);
 
-            btnAlternarTema.FlatStyle = FlatStyle.Flat;
-            btnAlternarTema.FlatAppearance.BorderSize = 0;
-            btnAlternarTema.BackColor = Color.Transparent;
+            btnAlternarTema.FillColor = Color.Transparent;
             btnAlternarTema.ForeColor = TemaMelobarbershop.TextMuted;
             btnAlternarTema.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            btnAlternarTema.TextAlign = ContentAlignment.MiddleLeft;
+            btnAlternarTema.TextAlign = HorizontalAlignment.Left;
             btnAlternarTema.Padding = new Padding(TemaMelobarbershop.SpaceLG, 0, 0, 0);
             btnAlternarTema.Cursor = Cursors.Hand;
+            btnAlternarTema.BorderRadius = 8;
+            btnAlternarTema.Animated = true;
+            btnAlternarTema.HoverState.FillColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(220, 230, 245) : Color.FromArgb(20, 28, 38);
             btnAlternarTema.Text = TemaMelobarbershop.ModoClaro ? "🌙  Modo Escuro" : "☀️  Modo Claro";
 
             panelRodape.BackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(230, 232, 235) : Color.FromArgb(12, 14, 18);
@@ -91,27 +92,27 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             lblStatusApi.Text = $"🟢 API Conectada em: {AppConfig.ApiBaseUrl}";
         }
 
-        private Button? _botaoMenuAtual;
+        private Guna.UI2.WinForms.Guna2Button? _botaoMenuAtual;
 
-        private void EstilizarBotaoMenu(Button btn)
+        private void EstilizarBotaoMenu(Guna.UI2.WinForms.Guna2Button btn)
         {
-            btn.FlatStyle = FlatStyle.Flat;
-            btn.FlatAppearance.BorderSize = 0;
-            btn.FlatAppearance.MouseOverBackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(220, 230, 245) : Color.FromArgb(20, 28, 38);
-            btn.FlatAppearance.MouseDownBackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(200, 215, 235) : Color.FromArgb(15, 35, 65);
-            btn.BackColor = Color.Transparent;
+            btn.BorderRadius = 8;
+            btn.Animated = true;
+            btn.FillColor = Color.Transparent;
             btn.ForeColor = TemaMelobarbershop.TextMuted;
-            btn.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
-            btn.TextAlign = ContentAlignment.MiddleLeft;
+            btn.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btn.TextAlign = HorizontalAlignment.Left;
             btn.Padding = new Padding(TemaMelobarbershop.SpaceLG, 0, 0, 0);
             btn.Cursor = Cursors.Hand;
+            btn.HoverState.FillColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(220, 230, 245) : Color.FromArgb(20, 28, 38);
+            btn.HoverState.ForeColor = TemaMelobarbershop.BlueAccent;
             btn.Paint -= BotaoMenu_Paint;
             btn.Paint += BotaoMenu_Paint;
         }
 
         private void BotaoMenu_Paint(object? sender, PaintEventArgs e)
         {
-            if (sender is not Button btn) return;
+            if (sender is not Guna.UI2.WinForms.Guna2Button btn) return;
 
             // Se o botão for o ativo no momento, desenha barra de destaque de 4px à esquerda
             if (btn == _botaoMenuAtual)
@@ -121,7 +122,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             }
         }
 
-        private void DestacarBotaoAtivo(Button btnAtivo)
+        private void DestacarBotaoAtivo(Guna.UI2.WinForms.Guna2Button btnAtivo)
         {
             _botaoMenuAtual = btnAtivo;
             var botoes = new[] { btnMenuDashboard, btnMenuAgendamentos, btnMenuServicos, btnMenuUsuarios };
@@ -129,12 +130,12 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             {
                 if (b == btnAtivo)
                 {
-                    b.BackColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(220, 235, 255) : Color.FromArgb(16, 32, 54);
+                    b.FillColor = TemaMelobarbershop.ModoClaro ? Color.FromArgb(220, 235, 255) : Color.FromArgb(16, 32, 54);
                     b.ForeColor = TemaMelobarbershop.BlueAccent;
                 }
                 else
                 {
-                    b.BackColor = Color.Transparent;
+                    b.FillColor = Color.Transparent;
                     b.ForeColor = TemaMelobarbershop.TextMuted;
                 }
                 b.Invalidate();
@@ -161,7 +162,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             ExibirTela(_ucDashboard, btnMenuDashboard);
         }
 
-        private async void ExibirTela(UserControl tela, Button btnMenu)
+        private async void ExibirTela(UserControl tela, Guna.UI2.WinForms.Guna2Button btnMenu)
         {
             if (_ucDashboard != null) _ucDashboard.Visible = false;
             if (_ucAgendamentos != null) _ucAgendamentos.Visible = false;

@@ -33,7 +33,6 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
             lblFiltroPeriodo.Font = TemaMelobarbershop.BodyBoldFont;
             lblAte.Font = TemaMelobarbershop.BodyFont;
-            lblBuscaIcon.Font = new Font("Segoe UI", 11F);
             lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
 
             dtpInicio.Format = DateTimePickerFormat.Short;
@@ -59,23 +58,24 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
             lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
 
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAtualizar);
 
             lblFiltroPeriodo.ForeColor = TemaMelobarbershop.TextMuted;
-            TemaMelobarbershop.EstilizarComboBox(cmbFiltroPeriodo);
+            TemaMelobarbershop.EstilizarGunaComboBox(cmbFiltroPeriodo);
 
             lblAte.ForeColor = TemaMelobarbershop.TextMuted;
-            lblBuscaIcon.ForeColor = TemaMelobarbershop.TextMuted;
 
-            TemaMelobarbershop.EstilizarTextBox(txtBusca);
-            TemaMelobarbershop.EstilizarDataGridView(dgvAgendamentos);
+            TemaMelobarbershop.EstilizarGunaDateTimePicker(dtpInicio);
+            TemaMelobarbershop.EstilizarGunaDateTimePicker(dtpFim);
+            TemaMelobarbershop.EstilizarGunaTextBox(txtBusca);
+            TemaMelobarbershop.EstilizarGunaDataGridView(dgvAgendamentos);
             dgvAgendamentos.RowTemplate.Height = 44;
 
             _emptyState.AplicarTema();
 
             foreach (Control c in flowStatusChips.Controls)
             {
-                if (c is Button b)
+                if (c is Guna.UI2.WinForms.Guna2Button b)
                 {
                     var statusB = b.Tag as StatusAgendamentoDto?;
                     AtualizarEstiloChip(b, statusB == _filtroStatusSelecionado);
@@ -103,19 +103,19 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
 
             foreach (var opcao in statusOpcoes)
             {
-                var btnChip = new Button
+                var btnChip = new Guna.UI2.WinForms.Guna2Button
                 {
                     Text = opcao.Titulo,
                     Tag = opcao.Status,
-                    Height = 28,
+                    Height = 30,
                     AutoSize = true,
                     Cursor = Cursors.Hand,
-                    FlatStyle = FlatStyle.Flat,
+                    BorderRadius = 8,
+                    BorderThickness = 1,
                     Font = TemaMelobarbershop.SmallBoldFont,
-                    Margin = new Padding(0, 3, TemaMelobarbershop.SpaceSM, 3),
-                    Padding = new Padding(TemaMelobarbershop.SpaceSM, 2, TemaMelobarbershop.SpaceSM, 2)
+                    Margin = new Padding(0, 2, TemaMelobarbershop.SpaceSM, 2),
+                    Animated = true
                 };
-                btnChip.FlatAppearance.BorderSize = 1;
 
                 AtualizarEstiloChip(btnChip, opcao.Status == _filtroStatusSelecionado);
 
@@ -124,7 +124,7 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
                     _filtroStatusSelecionado = opcao.Status;
                     foreach (Control c in flowStatusChips.Controls)
                     {
-                        if (c is Button b)
+                        if (c is Guna.UI2.WinForms.Guna2Button b)
                         {
                             var statusB = b.Tag as StatusAgendamentoDto?;
                             AtualizarEstiloChip(b, statusB == _filtroStatusSelecionado);
@@ -139,28 +139,30 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             flowStatusChips.ResumeLayout(true);
         }
 
-        private void AtualizarEstiloChip(Button btnChip, bool ativo)
+        private void AtualizarEstiloChip(Guna.UI2.WinForms.Guna2Button btnChip, bool ativo)
         {
             if (ativo)
             {
-                btnChip.BackColor = TemaMelobarbershop.BluePrimary;
+                btnChip.FillColor = TemaMelobarbershop.BluePrimary;
                 btnChip.ForeColor = Color.White;
-                btnChip.FlatAppearance.BorderColor = TemaMelobarbershop.BlueAccent;
+                btnChip.BorderColor = TemaMelobarbershop.BlueAccent;
+                btnChip.HoverState.FillColor = TemaMelobarbershop.BlueAccent;
             }
             else
             {
-                btnChip.BackColor = TemaMelobarbershop.SurfaceSecondary;
+                btnChip.FillColor = TemaMelobarbershop.SurfaceSecondary;
                 btnChip.ForeColor = TemaMelobarbershop.TextMuted;
-                btnChip.FlatAppearance.BorderColor = TemaMelobarbershop.BorderColor;
+                btnChip.BorderColor = TemaMelobarbershop.BorderColor;
+                btnChip.HoverState.FillColor = TemaMelobarbershop.BorderColor;
+                btnChip.HoverState.ForeColor = TemaMelobarbershop.TextPrimary;
             }
-            TemaMelobarbershop.ArredondarRegiaoControle(btnChip, 6);
         }
 
         private void AtualizarContadoresChips()
         {
             foreach (Control c in flowStatusChips.Controls)
             {
-                if (c is Button b)
+                if (c is Guna.UI2.WinForms.Guna2Button b)
                 {
                     var status = b.Tag as StatusAgendamentoDto?;
                     int total = status == null

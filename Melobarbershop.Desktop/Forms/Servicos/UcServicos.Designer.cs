@@ -8,17 +8,17 @@ namespace Melobarbershop.Desktop.Forms.Servicos
         private Label lblSubtitulo;
 
         private Panel panelBarraAcoes;
-        private Button btnNovo;
-        private Button btnEditar;
-        private Button btnAlternarStatus;
-        private Button btnExcluir;
-        private Button btnAtualizar;
+        private Guna.UI2.WinForms.Guna2Button btnNovo;
+        private Guna.UI2.WinForms.Guna2Button btnEditar;
+        private Guna.UI2.WinForms.Guna2Button btnAlternarStatus;
+        private Guna.UI2.WinForms.Guna2Button btnExcluir;
+        private Guna.UI2.WinForms.Guna2Button btnAtualizar;
 
         private Label lblBusca;
-        private TextBox txtBusca;
+        private Guna.UI2.WinForms.Guna2TextBox txtBusca;
         private Label lblStatus;
 
-        private DataGridView dgvServicos;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvServicos;
 
         protected override void Dispose(bool disposing)
         {
@@ -35,17 +35,17 @@ namespace Melobarbershop.Desktop.Forms.Servicos
             lblSubtitulo = new Label();
 
             panelBarraAcoes = new Panel();
-            btnNovo = new Button();
-            btnEditar = new Button();
-            btnAlternarStatus = new Button();
-            btnExcluir = new Button();
-            btnAtualizar = new Button();
+            btnNovo = new Guna.UI2.WinForms.Guna2Button();
+            btnEditar = new Guna.UI2.WinForms.Guna2Button();
+            btnAlternarStatus = new Guna.UI2.WinForms.Guna2Button();
+            btnExcluir = new Guna.UI2.WinForms.Guna2Button();
+            btnAtualizar = new Guna.UI2.WinForms.Guna2Button();
 
             lblBusca = new Label();
-            txtBusca = new TextBox();
+            txtBusca = new Guna.UI2.WinForms.Guna2TextBox();
             lblStatus = new Label();
 
-            dgvServicos = new DataGridView();
+            dgvServicos = new Guna.UI2.WinForms.Guna2DataGridView();
 
             panelBarraAcoes.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvServicos).BeginInit();
@@ -111,9 +111,6 @@ namespace Melobarbershop.Desktop.Forms.Servicos
             // txtBusca
             txtBusca.Location = new Point(135, 145);
             txtBusca.Size = new Size(300, 28);
-            txtBusca.BackColor = Color.FromArgb(40, 42, 52);
-            txtBusca.ForeColor = Color.White;
-            txtBusca.BorderStyle = BorderStyle.FixedSingle;
             txtBusca.TextChanged += txtBusca_TextChanged;
 
             // lblStatus

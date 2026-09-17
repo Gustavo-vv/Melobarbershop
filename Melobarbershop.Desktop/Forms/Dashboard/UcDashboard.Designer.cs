@@ -6,7 +6,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
 
         private Label lblTitulo;
         private Label lblSubtitulo;
-        private Button btnAtualizar;
+        private Guna.UI2.WinForms.Guna2Button btnAtualizar;
         private Label lblStatus;
 
         private Melobarbershop.Desktop.Theme.CardPanel cardServicos;
@@ -36,7 +36,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private Label lblFilaVazia;
 
         private Label lblSecaoResumo;
-        private DataGridView dgvResumo;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvResumo;
 
         protected override void Dispose(bool disposing)
         {
@@ -51,7 +51,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         {
             lblTitulo = new Label();
             lblSubtitulo = new Label();
-            btnAtualizar = new Button();
+            btnAtualizar = new Guna.UI2.WinForms.Guna2Button();
             lblStatus = new Label();
 
             cardServicos = new Melobarbershop.Desktop.Theme.CardPanel();
@@ -81,7 +81,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             lblFilaVazia = new Label();
 
             lblSecaoResumo = new Label();
-            dgvResumo = new DataGridView();
+            dgvResumo = new Guna.UI2.WinForms.Guna2DataGridView();
 
             cardServicos.SuspendLayout();
             cardServicosAtivos.SuspendLayout();

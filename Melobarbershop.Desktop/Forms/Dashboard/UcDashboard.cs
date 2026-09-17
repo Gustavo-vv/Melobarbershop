@@ -38,7 +38,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
             lblSecaoResumo.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            TemaMelobarbershop.AplicarEstiloBotaoPrimario(btnAtualizar);
+            TemaMelobarbershop.EstilizarGunaButtonPrimario(btnAtualizar);
 
             // Estilos dos Cards Oficiais com Elevação e Borda
             cardServicos.AplicarTema();
@@ -64,7 +64,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             pnlFilaLista.BackColor = Color.Transparent;
             lblFilaVazia.ForeColor = TemaMelobarbershop.TextMuted;
 
-            TemaMelobarbershop.EstilizarDataGridView(dgvResumo);
+            TemaMelobarbershop.EstilizarGunaDataGridView(dgvResumo);
 
             if (_agendamentosHoje.Count > 0)
             {

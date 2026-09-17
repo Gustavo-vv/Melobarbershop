@@ -58,9 +58,10 @@ namespace Melobarbershop.Desktop.Forms.Login
             lblSenha.ForeColor = TemaMelobarbershop.TextMuted;
             lblApiUrl.ForeColor = TemaMelobarbershop.TextMuted;
 
-            TemaMelobarbershop.EstilizarTextBox(txtEmail);
-            TemaMelobarbershop.EstilizarTextBox(txtSenha);
-            TemaMelobarbershop.AplicarEstiloBotaoPrimario(btnEntrar);
+            TemaMelobarbershop.EstilizarGunaPanelCard(panelCard);
+            TemaMelobarbershop.EstilizarGunaTextBox(txtEmail);
+            TemaMelobarbershop.EstilizarGunaTextBox(txtSenha);
+            TemaMelobarbershop.EstilizarGunaButtonPrimario(btnEntrar);
             lblStatus.ForeColor = TemaMelobarbershop.DangerColor;
         }
 

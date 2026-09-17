@@ -8,18 +8,18 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
         private Label lblSubtitulo;
 
         private Panel panelBarraAcoes;
-        private Button btnAlternarStatus;
-        private Button btnHistoricoCliente;
-        private Button btnAtualizar;
+        private Guna.UI2.WinForms.Guna2Button btnAlternarStatus;
+        private Guna.UI2.WinForms.Guna2Button btnHistoricoCliente;
+        private Guna.UI2.WinForms.Guna2Button btnAtualizar;
 
         private Label lblFiltro;
-        private ComboBox cmbFiltroRole;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbFiltroRole;
 
         private Label lblBusca;
-        private TextBox txtBusca;
+        private Guna.UI2.WinForms.Guna2TextBox txtBusca;
         private Label lblStatus;
 
-        private DataGridView dgvUsuarios;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvUsuarios;
 
         protected override void Dispose(bool disposing)
         {
@@ -36,18 +36,18 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             lblSubtitulo = new Label();
 
             panelBarraAcoes = new Panel();
-            btnAlternarStatus = new Button();
-            btnHistoricoCliente = new Button();
-            btnAtualizar = new Button();
+            btnAlternarStatus = new Guna.UI2.WinForms.Guna2Button();
+            btnHistoricoCliente = new Guna.UI2.WinForms.Guna2Button();
+            btnAtualizar = new Guna.UI2.WinForms.Guna2Button();
 
             lblFiltro = new Label();
-            cmbFiltroRole = new ComboBox();
+            cmbFiltroRole = new Guna.UI2.WinForms.Guna2ComboBox();
 
             lblBusca = new Label();
-            txtBusca = new TextBox();
+            txtBusca = new Guna.UI2.WinForms.Guna2TextBox();
             lblStatus = new Label();
 
-            dgvUsuarios = new DataGridView();
+            dgvUsuarios = new Guna.UI2.WinForms.Guna2DataGridView();
 
             panelBarraAcoes.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsuarios).BeginInit();
@@ -113,9 +113,6 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             // txtBusca
             txtBusca.Location = new Point(155, 145);
             txtBusca.Size = new Size(280, 28);
-            txtBusca.BackColor = Color.FromArgb(40, 42, 52);
-            txtBusca.ForeColor = Color.White;
-            txtBusca.BorderStyle = BorderStyle.FixedSingle;
             txtBusca.TextChanged += txtBusca_TextChanged;
 
             // lblStatus

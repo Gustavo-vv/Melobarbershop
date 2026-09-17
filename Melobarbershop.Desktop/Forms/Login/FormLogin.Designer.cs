@@ -3,15 +3,15 @@ namespace Melobarbershop.Desktop.Forms.Login
     partial class FormLogin
     {
         private System.ComponentModel.IContainer components = null;
-        private Melobarbershop.Desktop.Theme.CardPanel panelCard;
+        private Guna.UI2.WinForms.Guna2Panel panelCard;
         private PictureBox picLogo;
         private Label lblTitulo;
         private Label lblSubtitulo;
         private Label lblEmail;
-        private TextBox txtEmail;
+        private Guna.UI2.WinForms.Guna2TextBox txtEmail;
         private Label lblSenha;
-        private TextBox txtSenha;
-        private Button btnEntrar;
+        private Guna.UI2.WinForms.Guna2TextBox txtSenha;
+        private Guna.UI2.WinForms.Guna2Button btnEntrar;
         private Label lblStatus;
         private Label lblApiUrl;
 
@@ -26,15 +26,15 @@ namespace Melobarbershop.Desktop.Forms.Login
 
         private void InitializeComponent()
         {
-            panelCard = new Melobarbershop.Desktop.Theme.CardPanel();
+            panelCard = new Guna.UI2.WinForms.Guna2Panel();
             picLogo = new PictureBox();
             lblTitulo = new Label();
             lblSubtitulo = new Label();
             lblEmail = new Label();
-            txtEmail = new TextBox();
+            txtEmail = new Guna.UI2.WinForms.Guna2TextBox();
             lblSenha = new Label();
-            txtSenha = new TextBox();
-            btnEntrar = new Button();
+            txtSenha = new Guna.UI2.WinForms.Guna2TextBox();
+            btnEntrar = new Guna.UI2.WinForms.Guna2Button();
             lblStatus = new Label();
             lblApiUrl = new Label();
 

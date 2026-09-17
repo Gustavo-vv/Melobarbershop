@@ -50,14 +50,16 @@ namespace Melobarbershop.Desktop.Forms.Servicos
             lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
             lblBusca.ForeColor = TemaMelobarbershop.TextMuted;
 
-            TemaMelobarbershop.AplicarEstiloBotaoPrimario(btnNovo);
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnEditar);
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAlternarStatus);
-            TemaMelobarbershop.AplicarEstiloBotaoPerigo(btnExcluir);
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
+            TemaMelobarbershop.EstilizarGunaButtonPrimario(btnNovo);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnEditar);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAlternarStatus);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnExcluir);
+            btnExcluir.FillColor = TemaMelobarbershop.DangerColor;
+            btnExcluir.HoverState.FillColor = Color.FromArgb(220, 38, 38);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAtualizar);
 
-            TemaMelobarbershop.EstilizarTextBox(txtBusca);
-            TemaMelobarbershop.EstilizarDataGridView(dgvServicos);
+            TemaMelobarbershop.EstilizarGunaTextBox(txtBusca);
+            TemaMelobarbershop.EstilizarGunaDataGridView(dgvServicos);
 
             _emptyState.AplicarTema();
             dgvServicos.Invalidate();

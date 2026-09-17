@@ -55,13 +55,13 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             lblFiltro.ForeColor = TemaMelobarbershop.TextMuted;
             lblBusca.ForeColor = TemaMelobarbershop.TextMuted;
 
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAlternarStatus);
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnHistoricoCliente);
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAlternarStatus);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnHistoricoCliente);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAtualizar);
 
-            TemaMelobarbershop.EstilizarComboBox(cmbFiltroRole);
-            TemaMelobarbershop.EstilizarTextBox(txtBusca);
-            TemaMelobarbershop.EstilizarDataGridView(dgvUsuarios);
+            TemaMelobarbershop.EstilizarGunaComboBox(cmbFiltroRole);
+            TemaMelobarbershop.EstilizarGunaTextBox(txtBusca);
+            TemaMelobarbershop.EstilizarGunaDataGridView(dgvUsuarios);
 
             _emptyState.AplicarTema();
             dgvUsuarios.Invalidate();
