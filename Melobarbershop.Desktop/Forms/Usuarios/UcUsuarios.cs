@@ -8,11 +8,24 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
     {
         private readonly UsuarioApiService _usuarioService = new();
         private List<UsuarioDto> _listaUsuarios = new();
+        private readonly EmptyStatePanel _emptyState = new();
 
         public UcUsuarios()
         {
             InitializeComponent();
             ConfigurarEstilo();
+            ConfigurarEmptyState();
+        }
+
+        private void ConfigurarEmptyState()
+        {
+            _emptyState.Configurar("\uE716", "Nenhum usuário encontrado", "Não há usuários cadastrados correspondentes a este filtro.");
+            _emptyState.Visible = false;
+            _emptyState.Location = dgvUsuarios.Location;
+            _emptyState.Size = dgvUsuarios.Size;
+            _emptyState.Anchor = dgvUsuarios.Anchor;
+            Controls.Add(_emptyState);
+            _emptyState.BringToFront();
         }
 
         private void ConfigurarEstilo()
@@ -28,12 +41,22 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAlternarStatus);
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
 
+            lblFiltro.Font = TemaMelobarbershop.BodyBoldFont;
+            lblFiltro.ForeColor = TemaMelobarbershop.TextMuted;
+
             TemaMelobarbershop.EstilizarComboBox(cmbFiltroRole);
             cmbFiltroRole.Items.Clear();
             cmbFiltroRole.Items.AddRange(new object[] { "Todos os Usuários", "Barbeiros", "Clientes", "Administradores" });
             cmbFiltroRole.SelectedIndex = 0;
 
+            lblBusca.Font = TemaMelobarbershop.BodyBoldFont;
+            lblBusca.ForeColor = TemaMelobarbershop.TextMuted;
+
             TemaMelobarbershop.EstilizarTextBox(txtBusca);
+            txtBusca.PlaceholderText = "Pesquise por nome ou e-mail...";
+
+            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
+
             TemaMelobarbershop.EstilizarDataGridView(dgvUsuarios);
         }
 
@@ -86,6 +109,15 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
 
                 return matchTexto && matchRole;
             }).ToList();
+
+            if (filtrados.Count == 0)
+            {
+                dgvUsuarios.DataSource = null;
+                _emptyState.Visible = true;
+                return;
+            }
+
+            _emptyState.Visible = false;
 
             dgvUsuarios.DataSource = filtrados.Select(u => new
             {

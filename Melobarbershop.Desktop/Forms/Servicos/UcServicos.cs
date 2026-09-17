@@ -9,11 +9,24 @@ namespace Melobarbershop.Desktop.Forms.Servicos
     {
         private readonly ServicoApiService _servicoService = new();
         private List<ServicoDto> _listaServicos = new();
+        private readonly EmptyStatePanel _emptyState = new();
 
         public UcServicos()
         {
             InitializeComponent();
             ConfigurarEstilo();
+            ConfigurarEmptyState();
+        }
+
+        private void ConfigurarEmptyState()
+        {
+            _emptyState.Configurar("\uE805", "Nenhum serviço encontrado", "Não encontramos serviços correspondentes à pesquisa.");
+            _emptyState.Visible = false;
+            _emptyState.Location = dgvServicos.Location;
+            _emptyState.Size = dgvServicos.Size;
+            _emptyState.Anchor = dgvServicos.Anchor;
+            Controls.Add(_emptyState);
+            _emptyState.BringToFront();
         }
 
         private void ConfigurarEstilo()
@@ -33,6 +46,12 @@ namespace Melobarbershop.Desktop.Forms.Servicos
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
 
             TemaMelobarbershop.EstilizarTextBox(txtBusca);
+            txtBusca.PlaceholderText = "Pesquise por nome ou descrição do serviço...";
+
+            lblBusca.Font = TemaMelobarbershop.BodyBoldFont;
+            lblBusca.ForeColor = TemaMelobarbershop.TextMuted;
+            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
+
             TemaMelobarbershop.EstilizarDataGridView(dgvServicos);
         }
 
@@ -72,6 +91,15 @@ namespace Melobarbershop.Desktop.Forms.Servicos
                 s.Nome.ToLowerInvariant().Contains(termo) ||
                 (s.Descricao != null && s.Descricao.ToLowerInvariant().Contains(termo))
             ).ToList();
+
+            if (filtrados.Count == 0)
+            {
+                dgvServicos.DataSource = null;
+                _emptyState.Visible = true;
+                return;
+            }
+
+            _emptyState.Visible = false;
 
             dgvServicos.DataSource = filtrados.Select(s => new
             {

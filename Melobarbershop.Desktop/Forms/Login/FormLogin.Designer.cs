@@ -3,7 +3,7 @@ namespace Melobarbershop.Desktop.Forms.Login
     partial class FormLogin
     {
         private System.ComponentModel.IContainer components = null;
-        private Panel panelCard;
+        private Melobarbershop.Desktop.Theme.CardPanel panelCard;
         private PictureBox picLogo;
         private Label lblTitulo;
         private Label lblSubtitulo;
@@ -26,7 +26,7 @@ namespace Melobarbershop.Desktop.Forms.Login
 
         private void InitializeComponent()
         {
-            panelCard = new Panel();
+            panelCard = new Melobarbershop.Desktop.Theme.CardPanel();
             picLogo = new PictureBox();
             lblTitulo = new Label();
             lblSubtitulo = new Label();
@@ -43,8 +43,8 @@ namespace Melobarbershop.Desktop.Forms.Login
             SuspendLayout();
 
             // panelCard
-            panelCard.Location = new Point(35, 25);
-            panelCard.Size = new Size(375, 480);
+            panelCard.Location = new Point(35, 20);
+            panelCard.Size = new Size(375, 475);
             panelCard.Controls.Add(picLogo);
             panelCard.Controls.Add(lblTitulo);
             panelCard.Controls.Add(lblSubtitulo);

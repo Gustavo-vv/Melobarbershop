@@ -36,15 +36,31 @@ namespace Melobarbershop.Desktop.Theme
         public static readonly Color WarningColor = Color.FromArgb(243, 156, 18);
 
         // ================================================================
+        // ESCALA DE ESPAÇAMENTO PADRONIZADA (8px, 16px, 24px, 32px)
+        // ================================================================
+        public const int SpaceXS = 4;
+        public const int SpaceSM = 8;
+        public const int SpaceMD = 16;
+        public const int SpaceLG = 24;
+        public const int SpaceXL = 32;
+
+        public const int DefaultRadius = 8;
+        public const int ButtonHeight = 36;
+        public const int InputHeight = 32;
+
+        // ================================================================
         // TIPOGRAFIA (Segoe UI com pesos análogos a Oswald e Open Sans)
         // ================================================================
         public static readonly Font BrandTitleFont = new Font("Segoe UI", 16F, FontStyle.Bold);
         public static readonly Font SectionHeadingFont = new Font("Segoe UI", 13F, FontStyle.Bold);
-        public static readonly Font CardTitleFont = new Font("Segoe UI", 10F, FontStyle.Bold);
+        public static readonly Font CardTitleFont = new Font("Segoe UI", 10.5F, FontStyle.Bold);
         public static readonly Font BodyFont = new Font("Segoe UI", 9.5F, FontStyle.Regular);
         public static readonly Font BodyBoldFont = new Font("Segoe UI", 9.5F, FontStyle.Bold);
         public static readonly Font SmallFont = new Font("Segoe UI", 8.5F, FontStyle.Regular);
-        public static readonly Font MetricValueFont = new Font("Segoe UI", 26F, FontStyle.Bold);
+        public static readonly Font SmallBoldFont = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+        public static readonly Font MetricValueFont = new Font("Segoe UI", 24F, FontStyle.Bold);
+        public static readonly Font IconFontLarge = new Font("Segoe MDL2 Assets", 32F, FontStyle.Regular);
+        public static readonly Font IconFontMedium = new Font("Segoe MDL2 Assets", 14F, FontStyle.Regular);
 
         // ================================================================
         // LOGO E RECURSOS VISUAIS
@@ -67,50 +83,138 @@ namespace Melobarbershop.Desktop.Theme
         }
 
         // ================================================================
-        // ESTILOS DE COMPONENTES
+        // HELPERS DE DESENHO E FORMAS ARREDONDADAS
+        // ================================================================
+        public static System.Drawing.Drawing2D.GraphicsPath CriarCaminhoArredondado(Rectangle bounds, int radius)
+        {
+            var path = new System.Drawing.Drawing2D.GraphicsPath();
+            if (radius <= 0)
+            {
+                path.AddRectangle(bounds);
+                return path;
+            }
+
+            int diameter = radius * 2;
+            var arc = new Rectangle(bounds.Location, new Size(diameter, diameter));
+
+            // Canto Superior Esquerdo
+            path.AddArc(arc, 180, 90);
+
+            // Canto Superior Direito
+            arc.X = bounds.Right - diameter;
+            path.AddArc(arc, 270, 90);
+
+            // Canto Inferior Direito
+            arc.Y = bounds.Bottom - diameter;
+            path.AddArc(arc, 0, 90);
+
+            // Canto Inferior Esquerdo
+            arc.X = bounds.Left;
+            path.AddArc(arc, 90, 90);
+
+            path.CloseFigure();
+            return path;
+        }
+
+        // ================================================================
+        // ESTILOS DE BOTÕES PADRONIZADOS (PRIMÁRIO, SECUNDÁRIO, PERIGO)
         // ================================================================
 
         public static void AplicarEstiloBotaoPrimario(Button btn)
         {
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
+            btn.FlatAppearance.MouseOverBackColor = BlueAccent;
+            btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(4, 98, 204);
             btn.BackColor = BluePrimary;
             btn.ForeColor = Color.White;
-            btn.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            btn.Font = BodyBoldFont;
             btn.Cursor = Cursors.Hand;
-            btn.Padding = new Padding(6, 2, 6, 2);
+            btn.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
+            btn.Height = Math.Max(btn.Height, ButtonHeight);
+            ArredondarRegiaoControle(btn, DefaultRadius);
         }
 
         public static void AplicarEstiloBotaoSecundario(Button btn)
         {
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 1;
-            btn.FlatAppearance.BorderColor = Color.FromArgb(45, 75, 115);
-            btn.BackColor = Color.FromArgb(16, 22, 30);
+            btn.FlatAppearance.BorderColor = BorderAccent;
+            btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(24, 34, 48);
+            btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(16, 24, 34);
+            btn.BackColor = Color.FromArgb(14, 18, 24);
             btn.ForeColor = BlueAccent;
-            btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btn.Font = BodyBoldFont;
             btn.Cursor = Cursors.Hand;
-            btn.Padding = new Padding(6, 2, 6, 2);
+            btn.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
+            btn.Height = Math.Max(btn.Height, ButtonHeight);
+            ArredondarRegiaoControle(btn, DefaultRadius);
         }
 
         public static void AplicarEstiloBotaoPerigo(Button btn)
         {
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 1;
-            btn.FlatAppearance.BorderColor = Color.FromArgb(180, 40, 40);
-            btn.BackColor = Color.FromArgb(35, 14, 16);
+            btn.FlatAppearance.BorderColor = Color.FromArgb(150, 40, 40);
+            btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(55, 18, 22);
+            btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(40, 12, 16);
+            btn.BackColor = Color.FromArgb(28, 12, 14);
             btn.ForeColor = Color.FromArgb(248, 113, 113);
-            btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btn.Font = BodyBoldFont;
             btn.Cursor = Cursors.Hand;
-            btn.Padding = new Padding(6, 2, 6, 2);
+            btn.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
+            btn.Height = Math.Max(btn.Height, ButtonHeight);
+            ArredondarRegiaoControle(btn, DefaultRadius);
         }
 
-        public static void AplicarBordaCardElevado(Panel card)
+        public static void AplicarEstiloBotaoSucesso(Button btn)
+        {
+            btn.FlatStyle = FlatStyle.Flat;
+            btn.FlatAppearance.BorderSize = 0;
+            btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(46, 225, 115);
+            btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(28, 175, 84);
+            btn.BackColor = SuccessColor;
+            btn.ForeColor = Color.FromArgb(6, 30, 15);
+            btn.Font = BodyBoldFont;
+            btn.Cursor = Cursors.Hand;
+            btn.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
+            btn.Height = Math.Max(btn.Height, ButtonHeight);
+            ArredondarRegiaoControle(btn, DefaultRadius);
+        }
+
+        public static void ArredondarRegiaoControle(Control ctrl, int radius = DefaultRadius)
+        {
+            ctrl.Resize -= Ctrl_ResizeArredondar;
+            ctrl.Resize += Ctrl_ResizeArredondar;
+            AtualizarRegiaoArredondada(ctrl, radius);
+        }
+
+        private static void Ctrl_ResizeArredondar(object? sender, EventArgs e)
+        {
+            if (sender is Control ctrl && ctrl.Width > 0 && ctrl.Height > 0)
+            {
+                AtualizarRegiaoArredondada(ctrl, DefaultRadius);
+            }
+        }
+
+        private static void AtualizarRegiaoArredondada(Control ctrl, int radius)
+        {
+            if (ctrl.Width <= 0 || ctrl.Height <= 0) return;
+            using var path = CriarCaminhoArredondado(new Rectangle(0, 0, ctrl.Width, ctrl.Height), radius);
+            ctrl.Region = new Region(path);
+        }
+
+        // ================================================================
+        // ESTILOS DE PAINÉIS E CARDS ELEVADOS
+        // ================================================================
+
+        public static void AplicarBordaCardElevado(Panel card, int radius = DefaultRadius)
         {
             card.BackColor = SurfaceCard;
             card.BorderStyle = BorderStyle.None;
             card.Paint -= Card_Paint;
             card.Paint += Card_Paint;
+            ArredondarRegiaoControle(card, radius);
         }
 
         private static void Card_Paint(object? sender, PaintEventArgs e)
@@ -120,13 +224,20 @@ namespace Melobarbershop.Desktop.Theme
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
             var rect = new Rectangle(0, 0, panel.Width - 1, panel.Height - 1);
-            using var penBorder = new Pen(Color.FromArgb(35, 40, 48), 1);
-            e.Graphics.DrawRectangle(penBorder, rect);
+            using var path = CriarCaminhoArredondado(rect, DefaultRadius);
+            
+            // Borda sutil de 1px
+            using var penBorder = new Pen(BorderColor, 1);
+            e.Graphics.DrawPath(penBorder, path);
 
-            // Realce superior sutil de iluminação
-            using var penHighlight = new Pen(Color.FromArgb(25, 55, 95), 1);
-            e.Graphics.DrawLine(penHighlight, 1, 1, panel.Width - 2, 1);
+            // Realce sutil superior de iluminação
+            using var penHighlight = new Pen(Color.FromArgb(30, 55, 85), 1);
+            e.Graphics.DrawLine(penHighlight, DefaultRadius, 1, panel.Width - DefaultRadius, 1);
         }
+
+        // ================================================================
+        // ESTILOS DE INPUTS E COMBOBOX
+        // ================================================================
 
         public static void EstilizarTextBox(TextBox txt)
         {
@@ -144,41 +255,47 @@ namespace Melobarbershop.Desktop.Theme
             cmb.Font = BodyFont;
         }
 
+        // ================================================================
+        // ESTILO DO DATAGRIDVIEW
+        // ================================================================
+
         public static void EstilizarDataGridView(DataGridView dgv)
         {
             dgv.BackgroundColor = SurfaceCard;
             dgv.BorderStyle = BorderStyle.None;
             dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgv.GridColor = Color.FromArgb(25, 30, 36);
+            dgv.GridColor = Color.FromArgb(28, 33, 40);
             dgv.EnableHeadersVisualStyles = false;
             dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgv.MultiSelect = false;
             dgv.RowHeadersVisible = false;
             dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgv.RowTemplate.Height = 40;
+            dgv.RowTemplate.Height = 42;
+            dgv.AllowUserToResizeRows = false;
 
             // Cabeçalho Oficial
-            dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(12, 15, 19);
+            dgv.ColumnHeadersDefaultCellStyle.BackColor = SurfaceSecondary;
             dgv.ColumnHeadersDefaultCellStyle.ForeColor = BlueAccent;
             dgv.ColumnHeadersDefaultCellStyle.Font = CardTitleFont;
             dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dgv.ColumnHeadersDefaultCellStyle.Padding = new Padding(12, 0, 12, 0);
+            dgv.ColumnHeadersDefaultCellStyle.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
             dgv.ColumnHeadersHeight = 44;
             dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
 
             // Linhas
             dgv.DefaultCellStyle.BackColor = SurfaceCard;
             dgv.DefaultCellStyle.ForeColor = TextPrimary;
-            dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 50, 95);
+            dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 48, 88);
             dgv.DefaultCellStyle.SelectionForeColor = Color.White;
             dgv.DefaultCellStyle.Font = BodyFont;
-            dgv.DefaultCellStyle.Padding = new Padding(12, 0, 12, 0);
+            dgv.DefaultCellStyle.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
 
-            // Zebra Striping Neutro elegante
-            dgv.AlternatingRowsDefaultCellStyle.BackColor = SurfaceSecondary;
+            // Linhas alternadas sutis
+            dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(17, 20, 24);
             dgv.AlternatingRowsDefaultCellStyle.ForeColor = TextPrimary;
-            dgv.AlternatingRowsDefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 50, 95);
+            dgv.AlternatingRowsDefaultCellStyle.SelectionBackColor = Color.FromArgb(20, 48, 88);
             dgv.AlternatingRowsDefaultCellStyle.SelectionForeColor = Color.White;
+            dgv.AlternatingRowsDefaultCellStyle.Padding = new Padding(SpaceMD, 0, SpaceMD, 0);
         }
     }
 

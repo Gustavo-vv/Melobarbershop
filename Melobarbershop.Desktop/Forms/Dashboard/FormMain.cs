@@ -61,6 +61,8 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             lblStatusApi.Text = $"🟢 API Conectada em: {AppConfig.ApiBaseUrl}";
         }
 
+        private Button? _botaoMenuAtual;
+
         private void EstilizarBotaoMenu(Button btn)
         {
             btn.FlatStyle = FlatStyle.Flat;
@@ -69,14 +71,29 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(15, 35, 65);
             btn.BackColor = Color.Transparent;
             btn.ForeColor = TemaMelobarbershop.TextMuted;
-            btn.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btn.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
             btn.TextAlign = ContentAlignment.MiddleLeft;
-            btn.Padding = new Padding(20, 0, 0, 0);
+            btn.Padding = new Padding(TemaMelobarbershop.SpaceLG, 0, 0, 0);
             btn.Cursor = Cursors.Hand;
+            btn.Paint -= BotaoMenu_Paint;
+            btn.Paint += BotaoMenu_Paint;
+        }
+
+        private void BotaoMenu_Paint(object? sender, PaintEventArgs e)
+        {
+            if (sender is not Button btn) return;
+
+            // Se o botão for o ativo no momento, desenha barra de destaque de 4px à esquerda
+            if (btn == _botaoMenuAtual)
+            {
+                using var brush = new SolidBrush(TemaMelobarbershop.BluePrimary);
+                e.Graphics.FillRectangle(brush, 0, 0, 4, btn.Height);
+            }
         }
 
         private void DestacarBotaoAtivo(Button btnAtivo)
         {
+            _botaoMenuAtual = btnAtivo;
             var botoes = new[] { btnMenuDashboard, btnMenuAgendamentos, btnMenuServicos, btnMenuUsuarios };
             foreach (var b in botoes)
             {
@@ -90,6 +107,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
                     b.BackColor = Color.Transparent;
                     b.ForeColor = TemaMelobarbershop.TextMuted;
                 }
+                b.Invalidate();
             }
         }
 

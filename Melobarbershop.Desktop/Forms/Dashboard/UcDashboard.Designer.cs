@@ -9,27 +9,27 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private Button btnAtualizar;
         private Label lblStatus;
 
-        private Panel cardServicos;
+        private Melobarbershop.Desktop.Theme.CardPanel cardServicos;
         private Label lblCardServicosValor;
         private Label lblCardServicosTitulo;
         private Label lblCardServicosSub;
 
-        private Panel cardServicosAtivos;
+        private Melobarbershop.Desktop.Theme.CardPanel cardServicosAtivos;
         private Label lblCardAtivosValor;
         private Label lblCardAtivosTitulo;
         private Label lblCardAtivosSub;
 
-        private Panel cardClientes;
+        private Melobarbershop.Desktop.Theme.CardPanel cardClientes;
         private Label lblCardClientesValor;
         private Label lblCardClientesTitulo;
         private Label lblCardClientesSub;
 
-        private Panel cardBarbeiros;
+        private Melobarbershop.Desktop.Theme.CardPanel cardBarbeiros;
         private Label lblCardBarbeirosValor;
         private Label lblCardBarbeirosTitulo;
         private Label lblCardBarbeirosSub;
 
-        private Panel cardFilaAgendamentos;
+        private Melobarbershop.Desktop.Theme.CardPanel cardFilaAgendamentos;
         private Label lblFilaTitulo;
         private Label lblFilaRestantes;
         private Panel pnlFilaLista;
@@ -54,27 +54,27 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             btnAtualizar = new Button();
             lblStatus = new Label();
 
-            cardServicos = new Panel();
+            cardServicos = new Melobarbershop.Desktop.Theme.CardPanel();
             lblCardServicosValor = new Label();
             lblCardServicosTitulo = new Label();
             lblCardServicosSub = new Label();
 
-            cardServicosAtivos = new Panel();
+            cardServicosAtivos = new Melobarbershop.Desktop.Theme.CardPanel();
             lblCardAtivosValor = new Label();
             lblCardAtivosTitulo = new Label();
             lblCardAtivosSub = new Label();
 
-            cardClientes = new Panel();
+            cardClientes = new Melobarbershop.Desktop.Theme.CardPanel();
             lblCardClientesValor = new Label();
             lblCardClientesTitulo = new Label();
             lblCardClientesSub = new Label();
 
-            cardBarbeiros = new Panel();
+            cardBarbeiros = new Melobarbershop.Desktop.Theme.CardPanel();
             lblCardBarbeirosValor = new Label();
             lblCardBarbeirosTitulo = new Label();
             lblCardBarbeirosSub = new Label();
 
-            cardFilaAgendamentos = new Panel();
+            cardFilaAgendamentos = new Melobarbershop.Desktop.Theme.CardPanel();
             lblFilaTitulo = new Label();
             lblFilaRestantes = new Label();
             pnlFilaLista = new Panel();

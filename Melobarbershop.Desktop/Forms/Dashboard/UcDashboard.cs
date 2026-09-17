@@ -52,20 +52,18 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             TemaMelobarbershop.EstilizarDataGridView(dgvResumo);
         }
 
-        private void EstilizarCard(Panel card, Label lblValor, Label lblTitulo, Label lblSub, Color corDestaque)
+        private void EstilizarCard(Melobarbershop.Desktop.Theme.CardPanel card, Label lblValor, Label lblTitulo, Label lblSub, Color corDestaque)
         {
-            TemaMelobarbershop.AplicarBordaCardElevado(card);
-
-            lblValor.Font = AppTheme.MetricFont;
+            lblValor.Font = TemaMelobarbershop.MetricValueFont;
             lblValor.ForeColor = corDestaque;
             lblValor.TextAlign = ContentAlignment.MiddleLeft;
 
-            lblTitulo.Font = AppTheme.HeaderFont;
-            lblTitulo.ForeColor = AppTheme.TextPrimary;
+            lblTitulo.Font = TemaMelobarbershop.CardTitleFont;
+            lblTitulo.ForeColor = TemaMelobarbershop.TextPrimary;
             lblTitulo.TextAlign = ContentAlignment.MiddleLeft;
 
-            lblSub.Font = AppTheme.SmallFont;
-            lblSub.ForeColor = AppTheme.TextMuted;
+            lblSub.Font = TemaMelobarbershop.SmallFont;
+            lblSub.ForeColor = TemaMelobarbershop.TextMuted;
             lblSub.TextAlign = ContentAlignment.MiddleLeft;
         }
 
@@ -278,85 +276,147 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             pnl.Controls.Add(lblTelefone);
             pnl.Controls.Add(lblHorario);
 
-            // Ação à direita: Check-in se aguardando / confirmado, ou label de status
-            if (ag.Status == StatusAgendamentoDto.Pendente || ag.Status == StatusAgendamentoDto.Confirmado)
+            // ── Botões de ação por status (fluxo: Pendente → Confirmar → Iniciar → Concluir) ──
+            if (ag.Status == StatusAgendamentoDto.Pendente)
             {
-                var btnCheckin = new Button
+                // Pendente: precisa ser confirmado primeiro
+                var btnConfirmar = CriarBotaoAcao("✔ Confirmar", TemaMelobarbershop.SuccessColor, pnl);
+                btnConfirmar.Click += async (s, e) =>
                 {
-                    Text = "Check-in",
-                    Size = new Size(85, 28),
-                    Anchor = AnchorStyles.Top | AnchorStyles.Right,
-                    Location = new Point(pnl.ClientSize.Width - 98, 36),
-                    Cursor = Cursors.Hand,
-                    FlatStyle = FlatStyle.Flat
-                };
-                btnCheckin.FlatAppearance.BorderSize = 0;
-                btnCheckin.BackColor = TemaMelobarbershop.BluePrimary;
-                btnCheckin.ForeColor = Color.White;
-                btnCheckin.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
-
-                btnCheckin.Click += async (s, e) =>
-                {
-                    btnCheckin.Enabled = false;
-                    btnCheckin.Text = "...";
+                    btnConfirmar.Enabled = false;
+                    btnConfirmar.Text = "...";
                     try
                     {
-                        var resp = await _agendamentoService.IniciarAtendimentoAsync(ag.Id);
-                        if (resp.Sucesso)
-                        {
-                            await CarregarDadosAsync();
-                        }
+                        var resp = await _agendamentoService.ConfirmarAsync(ag.Id);
+                        if (resp.Sucesso) await CarregarDadosAsync();
                         else
                         {
-                            MessageBox.Show($"Falha no check-in: {resp.Mensagem}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            btnCheckin.Enabled = true;
-                            btnCheckin.Text = "Check-in";
+                            MessageBox.Show($"Falha ao confirmar: {resp.Mensagem}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            btnConfirmar.Enabled = true;
+                            btnConfirmar.Text = "✔ Confirmar";
                         }
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Erro ao realizar check-in: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        btnCheckin.Enabled = true;
-                        btnCheckin.Text = "Check-in";
+                        MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        btnConfirmar.Enabled = true;
+                        btnConfirmar.Text = "✔ Confirmar";
                     }
                 };
-
-                pnl.Controls.Add(btnCheckin);
+                pnl.Controls.Add(btnConfirmar);
+            }
+            else if (ag.Status == StatusAgendamentoDto.Confirmado)
+            {
+                // Confirmado: pode iniciar o atendimento (Check-in)
+                var btnIniciar = CriarBotaoAcao("▶ Iniciar", TemaMelobarbershop.BluePrimary, pnl);
+                btnIniciar.Click += async (s, e) =>
+                {
+                    btnIniciar.Enabled = false;
+                    btnIniciar.Text = "...";
+                    try
+                    {
+                        var resp = await _agendamentoService.IniciarAtendimentoAsync(ag.Id);
+                        if (resp.Sucesso) await CarregarDadosAsync();
+                        else
+                        {
+                            MessageBox.Show($"Falha ao iniciar: {resp.Mensagem}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            btnIniciar.Enabled = true;
+                            btnIniciar.Text = "▶ Iniciar";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        btnIniciar.Enabled = true;
+                        btnIniciar.Text = "▶ Iniciar";
+                    }
+                };
+                pnl.Controls.Add(btnIniciar);
+            }
+            else if (ag.Status == StatusAgendamentoDto.EmAtendimento)
+            {
+                // Em Atendimento: pode concluir
+                var btnConcluir = CriarBotaoAcao("🏁 Concluir", Color.FromArgb(243, 156, 18), pnl);
+                btnConcluir.Click += async (s, e) =>
+                {
+                    btnConcluir.Enabled = false;
+                    btnConcluir.Text = "...";
+                    try
+                    {
+                        var resp = await _agendamentoService.ConcluirAsync(ag.Id);
+                        if (resp.Sucesso) await CarregarDadosAsync();
+                        else
+                        {
+                            MessageBox.Show($"Falha ao concluir: {resp.Mensagem}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            btnConcluir.Enabled = true;
+                            btnConcluir.Text = "🏁 Concluir";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Erro: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        btnConcluir.Enabled = true;
+                        btnConcluir.Text = "🏁 Concluir";
+                    }
+                };
+                pnl.Controls.Add(btnConcluir);
             }
             else
             {
+                // Concluído / Cancelado / Faltou — apenas label de status
                 var statusTxt = ag.Status switch
                 {
-                    StatusAgendamentoDto.EmAtendimento => "Em Atendimento",
-                    StatusAgendamentoDto.Concluido => "Concluído",
-                    StatusAgendamentoDto.Cancelado => "Cancelado",
-                    StatusAgendamentoDto.NaoCompareceu => "Faltou",
+                    StatusAgendamentoDto.Concluido => "✅ Concluído",
+                    StatusAgendamentoDto.Cancelado => "❌ Cancelado",
+                    StatusAgendamentoDto.NaoCompareceu => "⚠ Faltou",
                     _ => ag.Status.ToString()
                 };
-
                 var corStatus = ag.Status switch
                 {
-                    StatusAgendamentoDto.EmAtendimento => Color.FromArgb(243, 156, 18),
                     StatusAgendamentoDto.Concluido => Color.FromArgb(70, 190, 240),
                     StatusAgendamentoDto.Cancelado => TemaMelobarbershop.DangerColor,
                     _ => Color.FromArgb(150, 155, 165)
                 };
-
                 var lblStatusLinha = new Label
                 {
                     Text = statusTxt,
                     Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
                     ForeColor = corStatus,
                     TextAlign = ContentAlignment.MiddleRight,
-                    Size = new Size(110, 22),
+                    Size = new Size(115, 22),
                     Anchor = AnchorStyles.Top | AnchorStyles.Right,
-                    Location = new Point(pnl.ClientSize.Width - 120, 39)
+                    Location = new Point(pnl.ClientSize.Width - 124, 39)
                 };
-
                 pnl.Controls.Add(lblStatusLinha);
             }
 
+            TemaMelobarbershop.ArredondarRegiaoControle(pnl, 6);
             return pnl;
+        }
+
+        /// <summary>Cria um botão de ação padronizado ancorado à direita do card pai.</summary>
+        private static Button CriarBotaoAcao(string texto, Color cor, Panel pai)
+        {
+            var btn = new Button
+            {
+                Text = texto,
+                Size = new Size(95, 28),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right,
+                Cursor = Cursors.Hand,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = cor,
+                ForeColor = Color.White,
+                Font = TemaMelobarbershop.SmallBoldFont
+            };
+            btn.FlatAppearance.BorderSize = 0;
+            TemaMelobarbershop.ArredondarRegiaoControle(btn, 4);
+
+            // Posição calculada após o pai ser dimensionado — usa evento de layout
+            pai.Layout += (s, e) =>
+            {
+                btn.Location = new Point(pai.ClientSize.Width - 104, 36);
+            };
+            return btn;
         }
 
         private async void btnAtualizar_Click(object sender, EventArgs e)
