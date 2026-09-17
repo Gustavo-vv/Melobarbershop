@@ -197,4 +197,3 @@ Funcionalidades já modeladas no domínio, previstas para as próximas etapas:
 
 ## Autor
 
-Desenvolvido por [Gustavo](https://github.com/Gustavo-vv) como projeto de curso técnico.
