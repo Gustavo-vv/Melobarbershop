@@ -8,17 +8,18 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
         private Label lblSubtitulo;
 
         private Panel panelBarraAcoes;
-        private Button btnAlternarStatus;
-        private Button btnAtualizar;
+        private Guna.UI2.WinForms.Guna2Button btnAlternarStatus;
+        private Guna.UI2.WinForms.Guna2Button btnHistoricoCliente;
+        private Guna.UI2.WinForms.Guna2Button btnAtualizar;
 
         private Label lblFiltro;
-        private ComboBox cmbFiltroRole;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbFiltroRole;
 
         private Label lblBusca;
-        private TextBox txtBusca;
+        private Guna.UI2.WinForms.Guna2TextBox txtBusca;
         private Label lblStatus;
 
-        private DataGridView dgvUsuarios;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvUsuarios;
 
         protected override void Dispose(bool disposing)
         {
@@ -35,17 +36,18 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             lblSubtitulo = new Label();
 
             panelBarraAcoes = new Panel();
-            btnAlternarStatus = new Button();
-            btnAtualizar = new Button();
+            btnAlternarStatus = new Guna.UI2.WinForms.Guna2Button();
+            btnHistoricoCliente = new Guna.UI2.WinForms.Guna2Button();
+            btnAtualizar = new Guna.UI2.WinForms.Guna2Button();
 
             lblFiltro = new Label();
-            cmbFiltroRole = new ComboBox();
+            cmbFiltroRole = new Guna.UI2.WinForms.Guna2ComboBox();
 
             lblBusca = new Label();
-            txtBusca = new TextBox();
+            txtBusca = new Guna.UI2.WinForms.Guna2TextBox();
             lblStatus = new Label();
 
-            dgvUsuarios = new DataGridView();
+            dgvUsuarios = new Guna.UI2.WinForms.Guna2DataGridView();
 
             panelBarraAcoes.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsuarios).BeginInit();
@@ -66,6 +68,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             panelBarraAcoes.Size = new Size(935, 45);
             panelBarraAcoes.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panelBarraAcoes.Controls.Add(btnAlternarStatus);
+            panelBarraAcoes.Controls.Add(btnHistoricoCliente);
             panelBarraAcoes.Controls.Add(lblFiltro);
             panelBarraAcoes.Controls.Add(cmbFiltroRole);
             panelBarraAcoes.Controls.Add(btnAtualizar);
@@ -76,15 +79,21 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             btnAlternarStatus.Text = "⚡ Ativar/Desativar Usuário";
             btnAlternarStatus.Click += btnAlternarStatus_Click;
 
+            // btnHistoricoCliente
+            btnHistoricoCliente.Location = new Point(190, 3);
+            btnHistoricoCliente.Size = new Size(150, 36);
+            btnHistoricoCliente.Text = "📋 Ver Histórico";
+            btnHistoricoCliente.Click += btnHistoricoCliente_Click;
+
             // lblFiltro
-            lblFiltro.Location = new Point(200, 10);
+            lblFiltro.Location = new Point(355, 10);
             lblFiltro.Size = new Size(90, 22);
             lblFiltro.Text = "Filtrar perfil:";
             lblFiltro.ForeColor = Color.FromArgb(160, 163, 175);
 
             // cmbFiltroRole
-            cmbFiltroRole.Location = new Point(295, 7);
-            cmbFiltroRole.Size = new Size(180, 28);
+            cmbFiltroRole.Location = new Point(450, 7);
+            cmbFiltroRole.Size = new Size(170, 28);
             cmbFiltroRole.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbFiltroRole.SelectedIndexChanged += cmbFiltroRole_SelectedIndexChanged;
 
@@ -104,9 +113,6 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             // txtBusca
             txtBusca.Location = new Point(155, 145);
             txtBusca.Size = new Size(280, 28);
-            txtBusca.BackColor = Color.FromArgb(40, 42, 52);
-            txtBusca.ForeColor = Color.White;
-            txtBusca.BorderStyle = BorderStyle.FixedSingle;
             txtBusca.TextChanged += txtBusca_TextChanged;
 
             // lblStatus
@@ -122,6 +128,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             dgvUsuarios.ReadOnly = true;
             dgvUsuarios.AllowUserToAddRows = false;
             dgvUsuarios.AllowUserToDeleteRows = false;
+            dgvUsuarios.CellContentClick += dgvUsuarios_CellContentClick;
 
             // UserControl
             Controls.Add(lblTitulo);

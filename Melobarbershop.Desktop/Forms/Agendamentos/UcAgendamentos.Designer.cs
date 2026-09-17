@@ -6,26 +6,27 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
 
         private Label lblTitulo;
         private Label lblSubtitulo;
+        private Guna.UI2.WinForms.Guna2Button btnAtualizar;
 
-        private Panel panelBarraAcoes;
+        private Panel pnlFiltrosTopo;
         private Label lblFiltroPeriodo;
-        private ComboBox cmbFiltroPeriodo;
+        private Guna.UI2.WinForms.Guna2ComboBox cmbFiltroPeriodo;
         private Panel pnlDatasPersonalizadas;
         private Label lblAte;
-        private DateTimePicker dtpInicio;
-        private DateTimePicker dtpFim;
-        private Button btnBuscar;
-        private Button btnAtualizar;
+        private Guna.UI2.WinForms.Guna2DateTimePicker dtpInicio;
+        private Guna.UI2.WinForms.Guna2DateTimePicker dtpFim;
 
-        private Button btnConfirmar;
-        private Button btnConcluir;
-        private Button btnCancelar;
-
-        private Label lblBusca;
-        private TextBox txtBusca;
+        private Guna.UI2.WinForms.Guna2TextBox txtBusca;
         private Label lblStatus;
 
-        private DataGridView dgvAgendamentos;
+        private Panel pnlStatusChips;
+        private FlowLayoutPanel flowStatusChips;
+
+        private Panel pnlGridContainer;
+        private Guna.UI2.WinForms.Guna2DataGridView dgvAgendamentos;
+        private ContextMenuStrip cmsAcoes;
+        private ToolStripMenuItem tsmiCancelar;
+        private ToolStripMenuItem tsmiNaoCompareceu;
 
         protected override void Dispose(bool disposing)
         {
@@ -40,164 +41,163 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
         {
             lblTitulo = new Label();
             lblSubtitulo = new Label();
+            btnAtualizar = new Guna.UI2.WinForms.Guna2Button();
 
-            panelBarraAcoes = new Panel();
+            pnlFiltrosTopo = new Panel();
             lblFiltroPeriodo = new Label();
-            cmbFiltroPeriodo = new ComboBox();
+            cmbFiltroPeriodo = new Guna.UI2.WinForms.Guna2ComboBox();
             pnlDatasPersonalizadas = new Panel();
-            dtpInicio = new DateTimePicker();
+            dtpInicio = new Guna.UI2.WinForms.Guna2DateTimePicker();
             lblAte = new Label();
-            dtpFim = new DateTimePicker();
-            btnBuscar = new Button();
-            btnAtualizar = new Button();
+            dtpFim = new Guna.UI2.WinForms.Guna2DateTimePicker();
 
-            btnConfirmar = new Button();
-            btnConcluir = new Button();
-            btnCancelar = new Button();
-
-            lblBusca = new Label();
-            txtBusca = new TextBox();
+            txtBusca = new Guna.UI2.WinForms.Guna2TextBox();
             lblStatus = new Label();
 
-            dgvAgendamentos = new DataGridView();
+            pnlStatusChips = new Panel();
+            flowStatusChips = new FlowLayoutPanel();
 
-            panelBarraAcoes.SuspendLayout();
+            pnlGridContainer = new Panel();
+            dgvAgendamentos = new Guna.UI2.WinForms.Guna2DataGridView();
+            cmsAcoes = new ContextMenuStrip();
+            tsmiCancelar = new ToolStripMenuItem();
+            tsmiNaoCompareceu = new ToolStripMenuItem();
+
+            pnlFiltrosTopo.SuspendLayout();
             pnlDatasPersonalizadas.SuspendLayout();
+            pnlStatusChips.SuspendLayout();
+            pnlGridContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvAgendamentos).BeginInit();
+            cmsAcoes.SuspendLayout();
             SuspendLayout();
 
             // lblTitulo
-            lblTitulo.Location = new Point(25, 20);
-            lblTitulo.Size = new Size(400, 32);
+            lblTitulo.Location = new Point(24, 18);
+            lblTitulo.Size = new Size(420, 30);
             lblTitulo.Text = "Gestão de Agendamentos";
 
             // lblSubtitulo
-            lblSubtitulo.Location = new Point(25, 52);
-            lblSubtitulo.Size = new Size(500, 24);
+            lblSubtitulo.Location = new Point(24, 48);
+            lblSubtitulo.Size = new Size(520, 22);
             lblSubtitulo.Text = "Acompanhamento da agenda da barbearia, status e atendimento dos clientes";
 
-            // panelBarraAcoes
-            panelBarraAcoes.Location = new Point(25, 90);
-            panelBarraAcoes.Size = new Size(935, 45);
-            panelBarraAcoes.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            // btnAtualizar
+            btnAtualizar.Location = new Point(810, 18);
+            btnAtualizar.Size = new Size(145, 36);
+            btnAtualizar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnAtualizar.Text = "🔄 Recarregar";
+            btnAtualizar.Click += btnAtualizar_Click;
+
+            // pnlFiltrosTopo
+            pnlFiltrosTopo.Location = new Point(24, 78);
+            pnlFiltrosTopo.Size = new Size(932, 42);
+            pnlFiltrosTopo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            pnlFiltrosTopo.Controls.Add(lblFiltroPeriodo);
+            pnlFiltrosTopo.Controls.Add(cmbFiltroPeriodo);
+            pnlFiltrosTopo.Controls.Add(pnlDatasPersonalizadas);
+            pnlFiltrosTopo.Controls.Add(txtBusca);
+            pnlFiltrosTopo.Controls.Add(lblStatus);
 
             // lblFiltroPeriodo
-            lblFiltroPeriodo.Location = new Point(0, 10);
-            lblFiltroPeriodo.Size = new Size(60, 22);
+            lblFiltroPeriodo.Location = new Point(0, 8);
+            lblFiltroPeriodo.Size = new Size(65, 26);
             lblFiltroPeriodo.Text = "Período:";
-            lblFiltroPeriodo.ForeColor = Color.FromArgb(160, 163, 175);
 
             // cmbFiltroPeriodo
-            cmbFiltroPeriodo.Location = new Point(65, 7);
-            cmbFiltroPeriodo.Size = new Size(130, 28);
-            cmbFiltroPeriodo.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbFiltroPeriodo.Location = new Point(70, 3);
+            cmbFiltroPeriodo.Size = new Size(160, 36);
             cmbFiltroPeriodo.SelectedIndexChanged += cmbFiltroPeriodo_SelectedIndexChanged;
 
             // pnlDatasPersonalizadas
-            pnlDatasPersonalizadas.Location = new Point(200, 2);
-            pnlDatasPersonalizadas.Size = new Size(240, 40);
+            pnlDatasPersonalizadas.Location = new Point(235, 0);
+            pnlDatasPersonalizadas.Size = new Size(270, 42);
             pnlDatasPersonalizadas.Visible = false;
             pnlDatasPersonalizadas.Controls.Add(dtpInicio);
             pnlDatasPersonalizadas.Controls.Add(lblAte);
             pnlDatasPersonalizadas.Controls.Add(dtpFim);
 
-            dtpInicio.Location = new Point(0, 5);
-            dtpInicio.Size = new Size(105, 28);
+            dtpInicio.Location = new Point(0, 3);
+            dtpInicio.Size = new Size(115, 36);
+            dtpInicio.ValueChanged += dtpPersonalizado_ValueChanged;
 
-            lblAte.Location = new Point(108, 8);
-            lblAte.Size = new Size(24, 20);
+            lblAte.Location = new Point(120, 8);
+            lblAte.Size = new Size(20, 26);
             lblAte.Text = "a";
             lblAte.TextAlign = ContentAlignment.MiddleCenter;
-            lblAte.ForeColor = Color.FromArgb(160, 163, 175);
 
-            dtpFim.Location = new Point(135, 5);
-            dtpFim.Size = new Size(105, 28);
-
-            // btnBuscar
-            btnBuscar.Location = new Point(445, 4);
-            btnBuscar.Size = new Size(90, 36);
-            btnBuscar.Text = "🔍 Filtrar";
-            btnBuscar.Click += btnBuscar_Click;
-
-            // btnConfirmar
-            btnConfirmar.Location = new Point(545, 4);
-            btnConfirmar.Size = new Size(110, 36);
-            btnConfirmar.Text = "✔️ Confirmar";
-            btnConfirmar.Click += btnConfirmar_Click;
-
-            // btnConcluir
-            btnConcluir.Location = new Point(660, 4);
-            btnConcluir.Size = new Size(100, 36);
-            btnConcluir.Text = "🏁 Concluir";
-            btnConcluir.Click += btnConcluir_Click;
-
-            // btnCancelar
-            btnCancelar.Location = new Point(765, 4);
-            btnCancelar.Size = new Size(95, 36);
-            btnCancelar.Text = "❌ Cancelar";
-            btnCancelar.Click += btnCancelar_Click;
-
-            // btnAtualizar
-            btnAtualizar.Location = new Point(865, 4);
-            btnAtualizar.Size = new Size(70, 36);
-            btnAtualizar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnAtualizar.Text = "🔄";
-            btnAtualizar.Click += btnAtualizar_Click;
-
-            panelBarraAcoes.Controls.Add(lblFiltroPeriodo);
-            panelBarraAcoes.Controls.Add(cmbFiltroPeriodo);
-            panelBarraAcoes.Controls.Add(pnlDatasPersonalizadas);
-            panelBarraAcoes.Controls.Add(btnBuscar);
-            panelBarraAcoes.Controls.Add(btnConfirmar);
-            panelBarraAcoes.Controls.Add(btnConcluir);
-            panelBarraAcoes.Controls.Add(btnCancelar);
-            panelBarraAcoes.Controls.Add(btnAtualizar);
-
-            // lblBusca
-            lblBusca.Location = new Point(25, 148);
-            lblBusca.Size = new Size(110, 22);
-            lblBusca.Text = "Buscar agenda:";
-            lblBusca.ForeColor = Color.FromArgb(160, 163, 175);
+            dtpFim.Location = new Point(145, 3);
+            dtpFim.Size = new Size(115, 36);
+            dtpFim.ValueChanged += dtpPersonalizado_ValueChanged;
 
             // txtBusca
-            txtBusca.Location = new Point(140, 145);
-            txtBusca.Size = new Size(290, 28);
-            txtBusca.BackColor = Color.FromArgb(40, 42, 52);
-            txtBusca.ForeColor = Color.White;
-            txtBusca.BorderStyle = BorderStyle.FixedSingle;
+            txtBusca.Location = new Point(515, 3);
+            txtBusca.Size = new Size(260, 36);
+            txtBusca.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            txtBusca.PlaceholderText = "🔍 Buscar cliente/barbeiro...";
             txtBusca.TextChanged += txtBusca_TextChanged;
 
             // lblStatus
-            lblStatus.Location = new Point(440, 148);
-            lblStatus.Size = new Size(520, 22);
+            lblStatus.Location = new Point(780, 8);
+            lblStatus.Size = new Size(150, 26);
             lblStatus.TextAlign = ContentAlignment.MiddleRight;
             lblStatus.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 
+            // pnlStatusChips
+            pnlStatusChips.Location = new Point(24, 126);
+            pnlStatusChips.Size = new Size(932, 40);
+            pnlStatusChips.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            pnlStatusChips.Controls.Add(flowStatusChips);
+
+            // flowStatusChips
+            flowStatusChips.Dock = DockStyle.Fill;
+            flowStatusChips.WrapContents = false;
+            flowStatusChips.AutoScroll = true;
+
+            // pnlGridContainer
+            pnlGridContainer.Location = new Point(24, 172);
+            pnlGridContainer.Size = new Size(932, 438);
+            pnlGridContainer.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlGridContainer.Controls.Add(dgvAgendamentos);
+
             // dgvAgendamentos
-            dgvAgendamentos.Location = new Point(25, 185);
-            dgvAgendamentos.Size = new Size(935, 425);
-            dgvAgendamentos.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dgvAgendamentos.Dock = DockStyle.Fill;
             dgvAgendamentos.ReadOnly = true;
             dgvAgendamentos.AllowUserToAddRows = false;
             dgvAgendamentos.AllowUserToDeleteRows = false;
-            dgvAgendamentos.DataBindingComplete += dgvAgendamentos_DataBindingComplete;
+            dgvAgendamentos.ContextMenuStrip = cmsAcoes;
+            dgvAgendamentos.CellContentClick += dgvAgendamentos_CellContentClick;
+            dgvAgendamentos.CellPainting += dgvAgendamentos_CellPainting;
+            dgvAgendamentos.CellMouseDown += dgvAgendamentos_CellMouseDown;
+
+            // cmsAcoes
+            cmsAcoes.Items.Add(tsmiCancelar);
+            cmsAcoes.Items.Add(tsmiNaoCompareceu);
+
+            // tsmiCancelar
+            tsmiCancelar.Text = "❌ Cancelar este Agendamento";
+            tsmiCancelar.Click += tsmiCancelar_Click;
+
+            // tsmiNaoCompareceu
+            tsmiNaoCompareceu.Text = "👤 Não compareceu";
+            tsmiNaoCompareceu.Click += tsmiNaoCompareceu_Click;
 
             // UserControl
             Controls.Add(lblTitulo);
             Controls.Add(lblSubtitulo);
-            Controls.Add(panelBarraAcoes);
-            Controls.Add(lblBusca);
-            Controls.Add(txtBusca);
-            Controls.Add(lblStatus);
-            Controls.Add(dgvAgendamentos);
+            Controls.Add(btnAtualizar);
+            Controls.Add(pnlFiltrosTopo);
+            Controls.Add(pnlStatusChips);
+            Controls.Add(pnlGridContainer);
 
             Size = new Size(980, 630);
 
-            panelBarraAcoes.ResumeLayout(false);
+            pnlFiltrosTopo.ResumeLayout(false);
             pnlDatasPersonalizadas.ResumeLayout(false);
+            pnlStatusChips.ResumeLayout(false);
+            pnlGridContainer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvAgendamentos).EndInit();
+            cmsAcoes.ResumeLayout(false);
             ResumeLayout(false);
-            PerformLayout();
         }
     }
 }

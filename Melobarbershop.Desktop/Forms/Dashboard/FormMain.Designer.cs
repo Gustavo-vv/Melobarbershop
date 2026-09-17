@@ -8,11 +8,12 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private PictureBox picLogoSidebar;
         private Label lblLogo;
         private Label lblLogoSub;
-        private Button btnMenuDashboard;
-        private Button btnMenuAgendamentos;
-        private Button btnMenuServicos;
-        private Button btnMenuUsuarios;
-        private Button btnMenuSair;
+        private Guna.UI2.WinForms.Guna2Button btnMenuDashboard;
+        private Guna.UI2.WinForms.Guna2Button btnMenuAgendamentos;
+        private Guna.UI2.WinForms.Guna2Button btnMenuServicos;
+        private Guna.UI2.WinForms.Guna2Button btnMenuUsuarios;
+        private Guna.UI2.WinForms.Guna2Button btnAlternarTema;
+        private Guna.UI2.WinForms.Guna2Button btnMenuSair;
 
         private Panel panelRodape;
         private Label lblUsuarioLogado;
@@ -35,11 +36,12 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             picLogoSidebar = new PictureBox();
             lblLogo = new Label();
             lblLogoSub = new Label();
-            btnMenuDashboard = new Button();
-            btnMenuAgendamentos = new Button();
-            btnMenuServicos = new Button();
-            btnMenuUsuarios = new Button();
-            btnMenuSair = new Button();
+            btnMenuDashboard = new Guna.UI2.WinForms.Guna2Button();
+            btnMenuAgendamentos = new Guna.UI2.WinForms.Guna2Button();
+            btnMenuServicos = new Guna.UI2.WinForms.Guna2Button();
+            btnMenuUsuarios = new Guna.UI2.WinForms.Guna2Button();
+            btnAlternarTema = new Guna.UI2.WinForms.Guna2Button();
+            btnMenuSair = new Guna.UI2.WinForms.Guna2Button();
 
             panelRodape = new Panel();
             lblUsuarioLogado = new Label();
@@ -62,6 +64,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             panelSidebar.Controls.Add(btnMenuAgendamentos);
             panelSidebar.Controls.Add(btnMenuServicos);
             panelSidebar.Controls.Add(btnMenuUsuarios);
+            panelSidebar.Controls.Add(btnAlternarTema);
             panelSidebar.Controls.Add(btnMenuSair);
 
             // picLogoSidebar
@@ -104,9 +107,15 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             btnMenuUsuarios.Text = "👥  Usuários & Barbeiros";
             btnMenuUsuarios.Click += btnMenuUsuarios_Click;
 
+            // btnAlternarTema
+            btnAlternarTema.Dock = DockStyle.Bottom;
+            btnAlternarTema.Height = 45;
+            btnAlternarTema.Text = "☀️  Modo Claro";
+            btnAlternarTema.Click += btnAlternarTema_Click;
+
             // btnMenuSair
             btnMenuSair.Dock = DockStyle.Bottom;
-            btnMenuSair.Height = 55;
+            btnMenuSair.Height = 50;
             btnMenuSair.Text = "🚪  Sair do Sistema";
             btnMenuSair.Click += btnMenuSair_Click;
 

@@ -9,31 +9,60 @@ namespace Melobarbershop.Desktop.Forms.Servicos
     {
         private readonly ServicoApiService _servicoService = new();
         private List<ServicoDto> _listaServicos = new();
+        private readonly EmptyStatePanel _emptyState = new();
 
         public UcServicos()
         {
             InitializeComponent();
             ConfigurarEstilo();
+            ConfigurarEmptyState();
+        }
+
+        private void ConfigurarEmptyState()
+        {
+            _emptyState.Configurar("\uE805", "Nenhum serviço encontrado", "Não encontramos serviços correspondentes à pesquisa.");
+            _emptyState.Visible = false;
+            _emptyState.Location = dgvServicos.Location;
+            _emptyState.Size = dgvServicos.Size;
+            _emptyState.Anchor = dgvServicos.Anchor;
+            Controls.Add(_emptyState);
+            _emptyState.BringToFront();
         }
 
         private void ConfigurarEstilo()
         {
+            lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
+            lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
+            lblBusca.Font = TemaMelobarbershop.BodyBoldFont;
+            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
+
+            txtBusca.PlaceholderText = "Pesquise por nome ou descrição do serviço...";
+
+            AplicarTema();
+        }
+
+        public void AplicarTema()
+        {
             this.BackColor = TemaMelobarbershop.BackgroundDark;
             this.ForeColor = TemaMelobarbershop.TextPrimary;
 
-            lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
             lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
-            lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
             lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
+            lblBusca.ForeColor = TemaMelobarbershop.TextMuted;
 
-            TemaMelobarbershop.AplicarEstiloBotaoPrimario(btnNovo);
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnEditar);
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAlternarStatus);
-            TemaMelobarbershop.AplicarEstiloBotaoPerigo(btnExcluir);
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
+            TemaMelobarbershop.EstilizarGunaButtonPrimario(btnNovo);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnEditar);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAlternarStatus);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnExcluir);
+            btnExcluir.FillColor = TemaMelobarbershop.DangerColor;
+            btnExcluir.HoverState.FillColor = Color.FromArgb(220, 38, 38);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAtualizar);
 
-            TemaMelobarbershop.EstilizarTextBox(txtBusca);
-            TemaMelobarbershop.EstilizarDataGridView(dgvServicos);
+            TemaMelobarbershop.EstilizarGunaTextBox(txtBusca);
+            TemaMelobarbershop.EstilizarGunaDataGridView(dgvServicos);
+
+            _emptyState.AplicarTema();
+            dgvServicos.Invalidate();
         }
 
         public async Task CarregarServicosAsync()
@@ -72,6 +101,15 @@ namespace Melobarbershop.Desktop.Forms.Servicos
                 s.Nome.ToLowerInvariant().Contains(termo) ||
                 (s.Descricao != null && s.Descricao.ToLowerInvariant().Contains(termo))
             ).ToList();
+
+            if (filtrados.Count == 0)
+            {
+                dgvServicos.DataSource = null;
+                _emptyState.Visible = true;
+                return;
+            }
+
+            _emptyState.Visible = false;
 
             dgvServicos.DataSource = filtrados.Select(s => new
             {

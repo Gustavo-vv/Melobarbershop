@@ -14,50 +14,61 @@ namespace Melobarbershop.Desktop.Forms.Login
         {
             InitializeComponent();
             ConfigurarEstilo();
+
+            TemaMelobarbershop.TemaAlterado += AplicarTema;
         }
 
         private void ConfigurarEstilo()
         {
-            this.BackColor = AppTheme.BackgroundDark;
-            this.ForeColor = AppTheme.TextPrimary;
-            this.Font = AppTheme.NormalFont;
+            this.Font = TemaMelobarbershop.BodyFont;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Text = "Melo Barbershop — Acesso Administrativo";
-            this.Size = new Size(465, 540);
+            this.Size = new Size(465, 545);
 
-            panelCard.BackColor = AppTheme.CardBackground;
             picLogo.Image = TemaMelobarbershop.CarregarLogo();
 
             lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
-            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
             lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
-            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
-
-            lblEmail.ForeColor = AppTheme.TextSecondary;
-            lblSenha.ForeColor = AppTheme.TextSecondary;
-
-            txtEmail.BackColor = AppTheme.InputBackground;
-            txtEmail.ForeColor = AppTheme.TextPrimary;
-            txtEmail.BorderStyle = BorderStyle.FixedSingle;
-
-            txtSenha.BackColor = AppTheme.InputBackground;
-            txtSenha.ForeColor = AppTheme.TextPrimary;
-            txtSenha.BorderStyle = BorderStyle.FixedSingle;
+            lblEmail.Font = TemaMelobarbershop.BodyBoldFont;
+            lblSenha.Font = TemaMelobarbershop.BodyBoldFont;
             txtSenha.UseSystemPasswordChar = true;
-
-            AppTheme.AplicarEstiloBotaoPrimario(btnEntrar);
-            lblStatus.ForeColor = AppTheme.DangerColor;
+            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
             lblStatus.Text = string.Empty;
 
             lblApiUrl.Text = $"Conectando em: {AppConfig.ApiBaseUrl}";
-            lblApiUrl.ForeColor = AppTheme.TextMuted;
-            lblApiUrl.Font = AppTheme.SmallFont;
+            lblApiUrl.Font = TemaMelobarbershop.SmallFont;
 
             // Pré-preenchimento das credenciais de seed admin para conveniência
             txtEmail.Text = "admin@melobarbershop.com";
             txtSenha.Text = "Admin@123";
+
+            AplicarTema();
+        }
+
+        public void AplicarTema()
+        {
+            this.BackColor = TemaMelobarbershop.BackgroundDark;
+            this.ForeColor = TemaMelobarbershop.TextPrimary;
+
+            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
+            lblEmail.ForeColor = TemaMelobarbershop.TextMuted;
+            lblSenha.ForeColor = TemaMelobarbershop.TextMuted;
+            lblApiUrl.ForeColor = TemaMelobarbershop.TextMuted;
+
+            TemaMelobarbershop.EstilizarGunaPanelCard(panelCard);
+            TemaMelobarbershop.EstilizarGunaTextBox(txtEmail);
+            TemaMelobarbershop.EstilizarGunaTextBox(txtSenha);
+            TemaMelobarbershop.EstilizarGunaButtonPrimario(btnEntrar);
+            lblStatus.ForeColor = TemaMelobarbershop.DangerColor;
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            TemaMelobarbershop.TemaAlterado -= AplicarTema;
+            base.OnFormClosed(e);
         }
 
         private async void btnEntrar_Click(object sender, EventArgs e)

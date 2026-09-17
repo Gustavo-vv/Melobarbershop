@@ -8,33 +8,63 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
     {
         private readonly UsuarioApiService _usuarioService = new();
         private List<UsuarioDto> _listaUsuarios = new();
+        private readonly EmptyStatePanel _emptyState = new();
 
         public UcUsuarios()
         {
             InitializeComponent();
             ConfigurarEstilo();
+            ConfigurarEmptyState();
+        }
+
+        private void ConfigurarEmptyState()
+        {
+            _emptyState.Configurar("\uE716", "Nenhum usuário encontrado", "Não há usuários cadastrados correspondentes a este filtro.");
+            _emptyState.Visible = false;
+            _emptyState.Location = dgvUsuarios.Location;
+            _emptyState.Size = dgvUsuarios.Size;
+            _emptyState.Anchor = dgvUsuarios.Anchor;
+            Controls.Add(_emptyState);
+            _emptyState.BringToFront();
         }
 
         private void ConfigurarEstilo()
         {
-            this.BackColor = TemaMelobarbershop.BackgroundDark;
-            this.ForeColor = TemaMelobarbershop.TextPrimary;
-
             lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
-            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
             lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
-            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
+            lblFiltro.Font = TemaMelobarbershop.BodyBoldFont;
+            lblBusca.Font = TemaMelobarbershop.BodyBoldFont;
+            lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
 
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAlternarStatus);
-            TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnAtualizar);
-
-            TemaMelobarbershop.EstilizarComboBox(cmbFiltroRole);
             cmbFiltroRole.Items.Clear();
             cmbFiltroRole.Items.AddRange(new object[] { "Todos os Usuários", "Barbeiros", "Clientes", "Administradores" });
             cmbFiltroRole.SelectedIndex = 0;
 
-            TemaMelobarbershop.EstilizarTextBox(txtBusca);
-            TemaMelobarbershop.EstilizarDataGridView(dgvUsuarios);
+            txtBusca.PlaceholderText = "Pesquise por nome ou e-mail...";
+
+            AplicarTema();
+        }
+
+        public void AplicarTema()
+        {
+            this.BackColor = TemaMelobarbershop.BackgroundDark;
+            this.ForeColor = TemaMelobarbershop.TextPrimary;
+
+            lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
+            lblFiltro.ForeColor = TemaMelobarbershop.TextMuted;
+            lblBusca.ForeColor = TemaMelobarbershop.TextMuted;
+
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAlternarStatus);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnHistoricoCliente);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAtualizar);
+
+            TemaMelobarbershop.EstilizarGunaComboBox(cmbFiltroRole);
+            TemaMelobarbershop.EstilizarGunaTextBox(txtBusca);
+            TemaMelobarbershop.EstilizarGunaDataGridView(dgvUsuarios);
+
+            _emptyState.AplicarTema();
+            dgvUsuarios.Invalidate();
         }
 
         public async Task CarregarUsuariosAsync()
@@ -87,6 +117,15 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
                 return matchTexto && matchRole;
             }).ToList();
 
+            if (filtrados.Count == 0)
+            {
+                dgvUsuarios.DataSource = null;
+                _emptyState.Visible = true;
+                return;
+            }
+
+            _emptyState.Visible = false;
+
             dgvUsuarios.DataSource = filtrados.Select(u => new
             {
                 Id = u.Id,
@@ -97,6 +136,25 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
                 Cadastro = u.DataCadastro.ToString("dd/MM/yyyy"),
                 Status = u.Ativo ? "Ativo" : "Inativo"
             }).ToList();
+
+            GarantirColunaHistorico();
+        }
+
+        private void GarantirColunaHistorico()
+        {
+            if (dgvUsuarios.Columns["AcaoHistorico"] == null)
+            {
+                var btnCol = new DataGridViewButtonColumn
+                {
+                    Name = "AcaoHistorico",
+                    HeaderText = "Histórico",
+                    Text = "Ver histórico",
+                    UseColumnTextForButtonValue = true,
+                    Width = 115,
+                    FlatStyle = FlatStyle.Flat
+                };
+                dgvUsuarios.Columns.Add(btnCol);
+            }
         }
 
         private UsuarioDto? ObterUsuarioSelecionado()
@@ -149,6 +207,40 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             {
                 MessageBox.Show($"Falha: {resp.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void btnHistoricoCliente_Click(object? sender, EventArgs e)
+        {
+            var usuario = ObterUsuarioSelecionado();
+            if (usuario == null)
+            {
+                MessageBox.Show("Selecione um usuário na lista para ver o histórico.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            AbrirHistoricoCliente(usuario.Id, usuario.Nome);
+        }
+
+        private void dgvUsuarios_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+            if (dgvUsuarios.Columns[e.ColumnIndex].Name == "AcaoHistorico")
+            {
+                var idObj = dgvUsuarios.Rows[e.RowIndex].Cells["Id"]?.Value;
+                var nomeObj = dgvUsuarios.Rows[e.RowIndex].Cells["Nome"]?.Value;
+
+                if (idObj is string id && nomeObj is string nome)
+                {
+                    AbrirHistoricoCliente(id, nome);
+                }
+            }
+        }
+
+        private void AbrirHistoricoCliente(string clienteId, string nomeCliente)
+        {
+            using var form = new FormHistoricoCliente(clienteId, nomeCliente);
+            form.ShowDialog(this);
         }
 
         private async void btnAtualizar_Click(object sender, EventArgs e)
