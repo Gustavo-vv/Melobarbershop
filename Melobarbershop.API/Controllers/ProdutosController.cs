@@ -29,6 +29,13 @@ namespace Melobarbershop.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("estoque-baixo")]
+        public async Task<IActionResult> ObterComEstoqueAbaixoDoMinimo()
+        {
+            var response = await _produtoService.ListarComEstoqueAbaixoDoMinimoAsync();
+            return Ok(response);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterPorId(int id)
         {
@@ -44,15 +51,69 @@ namespace Melobarbershop.API.Controllers
             if (!response.Sucesso) return NotFound(response);
             return Ok(response);
         }
+
+        [HttpGet("{produtoId}/estoque-disponivel")]
+        public async Task<IActionResult> PossuiEstoque(int produtoId, [FromQuery] int quantidade)
+        {
+            var response = await _produtoService.PossuiEstoqueAsync(produtoId, quantidade);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpGet("{produtoId}/movimentacoes")]
+        public async Task<IActionResult> ObterMovimentacoesPorProduto(int produtoId, [FromQuery] DateTime? inicio = null, [FromQuery] DateTime? fim = null)
+        {
+            var response = await _produtoService.ListarMovimentacoesPorProdutoAsync(produtoId, inicio, fim);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Criar([FromBody] CriarProdutoDto dto)
+        {
+            var response = await _produtoService.CriarAsync(dto);
+            if (!response.Sucesso) return BadRequest(response);
+            return StatusCode(201, response);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Atualizar(int id, [FromBody] AtualizarProdutoDto dto)
+        {
+            var response = await _produtoService.AtualizarAsync(id, dto);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpPost("movimentar-estoque")]
+        public async Task<IActionResult> MovimentarEstoque([FromBody] MovimentarEstoqueDto dto)
+        {
+            var response = await _produtoService.MovimentarEstoqueAsync(dto);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpPatch("{id}/desativar")]
+        public async Task<IActionResult> Desativar(int id)
+        {
+            var response = await _produtoService.DesativarAsync(id);
+            if (!response.Sucesso) return NotFound(response);
+            return Ok(response);
+        }
+
+        [HttpPatch("{id}/ativar")]
+        public async Task<IActionResult> Ativar(int id)
+        {
+            var response = await _produtoService.AtivarAsync(id);
+            if (!response.Sucesso) return NotFound(response);
+            return Ok(response);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> RemoverPermanentemente(int id)
+        {
+            var response = await _produtoService.RemoverPermanentementeAsync(id);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
     }
 }
-
-//Task<ApiResposta<IEnumerable<ProdutoDto>>> ListarComEstoqueAbaixoDoMinimoAsync();
-//Task<ApiResposta<ProdutoDto>> CriarAsync(CriarProdutoDto dto);
-//Task<ApiResposta<ProdutoDto>> AtualizarAsync(int id, AtualizarProdutoDto dto);
-//Task<ApiResposta<ProdutoDto>> MovimentarEstoqueAsync(MovimentarEstoqueDto dto);
-//Task<ApiResposta<IEnumerable<MovimentacaoEstoqueDto>>> ListarMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null);
-//Task<ApiResposta<bool>> PossuiEstoqueAsync(int produtoId, int quantidade);
-//Task<ApiResposta<ProdutoDto>> DesativarAsync(int id);
-//Task<ApiResposta<ProdutoDto>> AtivarAsync(int id);
-//Task<ApiResposta<ProdutoDto>> RemoverPermanentementeAsync(int id);
