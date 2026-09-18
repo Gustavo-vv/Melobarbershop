@@ -65,6 +65,32 @@ namespace Melobarbershop.Desktop.Forms.Servicos
             dgvServicos.Invalidate();
         }
 
+        /// <summary>
+        /// Centraliza horizontalmente o bloco de botões de ação (Novo, Editar,
+        /// Ativar/Desativar, Excluir) dentro do panelBarraAcoes.
+        /// O btnAtualizar fica ancorado à direita e não entra neste cálculo.
+        /// É chamado uma vez no InitializeComponent e novamente a cada Resize do painel.
+        /// </summary>
+        private void CentralizarBotoesBarra()
+        {
+            const int gap = 10;
+            const int top = 3;
+
+            // Botões que formam o bloco central (na ordem de exibição)
+            var botoes = new[] { btnNovo, btnEditar, btnAlternarStatus, btnExcluir };
+
+            // Botões alinhados à esquerda
+            int xInicial = 0;
+
+            // Posiciona cada botão em sequência a partir do X central
+            int x = xInicial;
+            foreach (var btn in botoes)
+            {
+                btn.Location = new Point(x, top);
+                x += btn.Width + gap;
+            }
+        }
+
         public async Task CarregarServicosAsync()
         {
             try

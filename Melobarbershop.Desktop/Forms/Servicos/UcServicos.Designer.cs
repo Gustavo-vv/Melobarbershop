@@ -72,35 +72,35 @@ namespace Melobarbershop.Desktop.Forms.Servicos
             panelBarraAcoes.Controls.Add(btnAtualizar);
 
             // btnNovo
-            btnNovo.Location = new Point(0, 3);
             btnNovo.Size = new Size(130, 36);
-            btnNovo.Text = "➕ Novo Serviço";
+            btnNovo.Text = "+ Novo Serviço";
             btnNovo.Click += btnNovo_Click;
 
             // btnEditar
-            btnEditar.Location = new Point(140, 3);
-            btnEditar.Size = new Size(110, 36);
-            btnEditar.Text = "✏️ Editar";
+            btnEditar.Size = new Size(100, 36);
+            btnEditar.Text = "Editar";
             btnEditar.Click += btnEditar_Click;
 
             // btnAlternarStatus
-            btnAlternarStatus.Location = new Point(260, 3);
-            btnAlternarStatus.Size = new Size(160, 36);
-            btnAlternarStatus.Text = "⚡ Ativar/Desativar";
+            btnAlternarStatus.Size = new Size(150, 36);
+            btnAlternarStatus.Text = "Ativar / Desativar";
             btnAlternarStatus.Click += btnAlternarStatus_Click;
 
             // btnExcluir
-            btnExcluir.Location = new Point(430, 3);
-            btnExcluir.Size = new Size(140, 36);
-            btnExcluir.Text = "🗑️ Excluir";
+            btnExcluir.Size = new Size(100, 36);
+            btnExcluir.Text = "Excluir";
             btnExcluir.Click += btnExcluir_Click;
 
-            // btnAtualizar
+            // btnAtualizar — fixo à direita, não entra no cálculo de centralização
             btnAtualizar.Location = new Point(815, 3);
             btnAtualizar.Size = new Size(120, 36);
             btnAtualizar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnAtualizar.Text = "🔄 Recarregar";
+            btnAtualizar.Text = "Recarregar";
             btnAtualizar.Click += btnAtualizar_Click;
+
+            // Centralização dinâmica do bloco de botões de ação
+            CentralizarBotoesBarra();
+            panelBarraAcoes.Resize += (s, e) => CentralizarBotoesBarra();
 
             // lblBusca
             lblBusca.Location = new Point(25, 148);
