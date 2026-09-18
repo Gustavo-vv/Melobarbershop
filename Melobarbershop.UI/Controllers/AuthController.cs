@@ -162,6 +162,12 @@ namespace Melobarbershop.UI.Controllers
         }
 
         [HttpGet]
+        public IActionResult Termos() => View();
+
+        [HttpGet]
+        public IActionResult Privacidade() => View();
+
+        [HttpGet]
         public IActionResult Cadastro()
         {
             var viewModel = new CadastroViewModel();

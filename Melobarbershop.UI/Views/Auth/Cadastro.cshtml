@@ -111,7 +111,7 @@
 
                 <label class="register-terms">
                     <input type="checkbox" id="termos" name="termos" required>
-                    <span>Eu aceito os <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a></span>
+                    <span>Eu aceito os <a asp-controller="Auth" asp-action="Termos" target="_blank" rel="noopener">Termos de Uso</a> e a <a asp-controller="Auth" asp-action="Privacidade" target="_blank" rel="noopener">Política de Privacidade</a></span>
                 </label>
 
                 <button type="submit" class="register-submit">
