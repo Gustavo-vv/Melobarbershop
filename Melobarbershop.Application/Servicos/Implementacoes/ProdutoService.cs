@@ -1,3 +1,14 @@
+// ============================================================================
+// Arquivo: ProdutoService.cs
+// Camada: Melobarbershop.Application (Serviços - Implementações)
+// Objetivo: Implementar a lógica de negócio para o catálogo de produtos e
+//           controle de estoque da barbearia (entradas, saídas, histórico de movimentações).
+// Papel na Arquitetura:
+//   - Faz a intermediação entre as interfaces/APIs e o repositório IProdutoRepository.
+//   - Valida unicidade de código de barras na criação e atualização.
+//   - Gerencia regras de movimentação de estoque (validação de saldo mínimo, histórico via MovimentacaoEstoque).
+// ============================================================================
+
 using AutoMapper;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
@@ -7,17 +18,26 @@ using Melobarbershop.Domain.Interfaces.Repositories;
 
 namespace Melobarbershop.Application.Servicos.Implementacoes;
 
+/// <summary>
+/// Implementação do serviço de gerenciamento de produtos e controle de estoque.
+/// </summary>
 public class ProdutoService : IProdutoService
 {
     private readonly IProdutoRepository _produtoRepository;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Construtor com injeção do repositório de produtos e do AutoMapper.
+    /// </summary>
     public ProdutoService(IProdutoRepository produtoRepository, IMapper mapper)
     {
         _produtoRepository = produtoRepository;
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém os dados de um produto pelo seu identificador primário.
+    /// </summary>
     public async Task<ApiResposta<ProdutoDto>> ObterPorIdAsync(int id)
     {
         try
@@ -35,6 +55,9 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Busca um produto pelo código de barras cadastrado.
+    /// </summary>
     public async Task<ApiResposta<ProdutoDto>> ObterPorCodigoBarrasAsync(string codigoBarras)
     {
         try
@@ -52,6 +75,9 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Retorna todos os produtos ativos disponíveis para venda ou uso na barbearia.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<ProdutoDto>>> ListarAtivosAsync()
     {
         try
@@ -66,6 +92,9 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Retorna todos os produtos cadastrados no sistema, incluindo os inativos.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<ProdutoDto>>> ListarTodosAsync()
     {
         try
@@ -80,6 +109,9 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Obtém a listagem de produtos cujo estoque atual atingiu ou ficou abaixo do estoque mínimo configurado.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<ProdutoDto>>> ListarComEstoqueAbaixoDoMinimoAsync()
     {
         try
@@ -94,10 +126,14 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Cadastra um novo produto, validando se o código de barras já existe e registrando movimentação inicial se houver estoque inicial informado.
+    /// </summary>
     public async Task<ApiResposta<ProdutoDto>> CriarAsync(CriarProdutoDto dto)
     {
         try
         {
+            // Valida unicidade de código de barras
             var existente = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras);
             if (existente != null)
                 return ApiResposta<ProdutoDto>.Falha($"Já existe um produto cadastrado com o código de barras '{dto.CodigoBarras}'.");
@@ -105,6 +141,7 @@ public class ProdutoService : IProdutoService
             var produto = _mapper.Map<Produto>(dto);
             await _produtoRepository.AdicionarAsync(produto);
 
+            // Se informado estoque inicial na criação, registra como movimentação de Entrada
             if (dto.EstoqueInicial > 0)
             {
                 var movimentacaoInicial = new MovimentacaoEstoque
@@ -127,6 +164,9 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Atualiza os dados de um produto existente, validando conflito de código de barras com outros cadastros.
+    /// </summary>
     public async Task<ApiResposta<ProdutoDto>> AtualizarAsync(int id, AtualizarProdutoDto dto)
     {
         try
@@ -135,6 +175,7 @@ public class ProdutoService : IProdutoService
             if (produto == null)
                 return ApiResposta<ProdutoDto>.Falha($"Produto com ID {id} não encontrado.");
 
+            // Se o código de barras foi alterado, checa se outro registro já o utiliza
             if (!string.Equals(produto.CodigoBarras, dto.CodigoBarras, StringComparison.OrdinalIgnoreCase))
             {
                 var outroComMesmoCodigo = await _produtoRepository.ObterPorCodigoBarrasAsync(dto.CodigoBarras);
@@ -154,6 +195,9 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Executa uma movimentação de estoque (entrada, saída por venda, uso interno ou perda), atualizando o saldo e gravando o log de movimentação.
+    /// </summary>
     public async Task<ApiResposta<ProdutoDto>> MovimentarEstoqueAsync(MovimentarEstoqueDto dto)
     {
         if (dto.Quantidade <= 0)
@@ -165,6 +209,7 @@ public class ProdutoService : IProdutoService
             if (produto == null)
                 return ApiResposta<ProdutoDto>.Falha($"Produto com ID {dto.ProdutoId} não encontrado.");
 
+            // Processa as regras de cada tipo de movimentação
             switch (dto.Tipo)
             {
                 case TipoMovimentacaoEstoque.Entrada:
@@ -174,6 +219,7 @@ public class ProdutoService : IProdutoService
                 case TipoMovimentacaoEstoque.SaidaVenda:
                 case TipoMovimentacaoEstoque.UsoInternoBancada:
                 case TipoMovimentacaoEstoque.AjustePerda:
+                    // Impede que o estoque fique negativo em operações de saída
                     if (produto.EstoqueAtual < dto.Quantidade)
                         return ApiResposta<ProdutoDto>.Falha($"Estoque insuficiente. Estoque atual: {produto.EstoqueAtual}, solicitado: {dto.Quantidade}.");
                     produto.EstoqueAtual -= dto.Quantidade;
@@ -183,6 +229,7 @@ public class ProdutoService : IProdutoService
                     return ApiResposta<ProdutoDto>.Falha($"Tipo de movimentação '{dto.Tipo}' não suportado.");
             }
 
+            // Registra auditoria histórica da movimentação
             var movimentacao = new MovimentacaoEstoque
             {
                 ProdutoId = produto.Id,
@@ -204,6 +251,9 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Lista o histórico de movimentações de estoque de um produto em um intervalo de datas.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<MovimentacaoEstoqueDto>>> ListarMovimentacoesPorProdutoAsync(int produtoId, DateTime? inicio = null, DateTime? fim = null)
     {
         try
@@ -218,6 +268,9 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Checa se há saldo de estoque disponível para uma determinada quantidade solicitada.
+    /// </summary>
     public async Task<ApiResposta<bool>> PossuiEstoqueAsync(int produtoId, int quantidade)
     {
         try
@@ -234,6 +287,9 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Desativa um produto (exclusão lógica), impedindo novas vendas sem comprometer integridade histórica.
+    /// </summary>
     public async Task<ApiResposta<ProdutoDto>> DesativarAsync(int id)
     {
         try
@@ -254,6 +310,9 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Reativa um produto previamente inativo para que volte a ser listado nas operações.
+    /// </summary>
     public async Task<ApiResposta<ProdutoDto>> AtivarAsync(int id)
     {
         try
@@ -274,6 +333,10 @@ public class ProdutoService : IProdutoService
         }
     }
 
+    /// <summary>
+    /// Remove um produto permanentemente do banco de dados (exclusão física).
+    /// Caso possua histórico associado a vendas ou movimentações, a exclusão física será recusada por integridade referencial.
+    /// </summary>
     public async Task<ApiResposta<ProdutoDto>> RemoverPermanentementeAsync(int id)
     {
         try

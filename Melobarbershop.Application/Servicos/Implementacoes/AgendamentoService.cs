@@ -1,3 +1,15 @@
+// ============================================================================
+// Arquivo: AgendamentoService.cs
+// Camada: Melobarbershop.Application (Serviços - Implementações)
+// Objetivo: Implementar a lógica de negócio de agendamentos, verificação de
+//           disponibilidade de horários, ciclo de vida do atendimento e bloqueios de agenda.
+// Papel na Arquitetura:
+//   - Orquestra repositórios de agendamentos, serviços e usuários/barbeiros.
+//   - Trata regras de fuso horário fixado para o horário de Brasília (UTC-3).
+//   - Gerencia cálculo de duração estimada com base na soma dos serviços escolhidos.
+//   - Garante prevenção de conflitos de horário e respeito aos bloqueios de expediente.
+// ============================================================================
+
 using AutoMapper;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
@@ -7,6 +19,9 @@ using Melobarbershop.Domain.Interfaces.Repositories;
 
 namespace Melobarbershop.Application.Servicos.Implementacoes;
 
+/// <summary>
+/// Implementação do serviço de agendamentos da barbearia.
+/// </summary>
 public class AgendamentoService : IAgendamentoService
 {
     private readonly IAgendamentoRepository _agendamentoRepository;
@@ -16,17 +31,22 @@ public class AgendamentoService : IAgendamentoService
 
     // Fuso horário fixo da barbearia (Brasil/Brasília = UTC-3).
     // Usar TimeZoneInfo explícito garante que o servidor sempre opere
-    // em horário local brasileiro, independentemente do fuso configurado no SO.
+    // em horário local brasileiro, independentemente do fuso configurado no SO host.
     private static readonly TimeZoneInfo _fusoHorarioBrasilia =
         TimeZoneInfo.FindSystemTimeZoneById(
             OperatingSystem.IsWindows()
                 ? "E. South America Standard Time"   // ID no Windows
                 : "America/Sao_Paulo");               // ID no Linux/Docker
 
-    /// <summary>Retorna o DateTime atual no fuso horário de São Paulo.</summary>
+    /// <summary>
+    /// Retorna a data e hora atual convertida no fuso horário oficial de Brasília.
+    /// </summary>
     private static DateTime AgoraBrt() =>
         TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _fusoHorarioBrasilia);
 
+    /// <summary>
+    /// Construtor com injeção dos repositórios necessários e do AutoMapper.
+    /// </summary>
     public AgendamentoService(
         IAgendamentoRepository agendamentoRepository,
         IServicoRepository servicoRepository,
@@ -39,6 +59,9 @@ public class AgendamentoService : IAgendamentoService
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém os detalhes completos de um agendamento (incluindo barbeiro, cliente e itens).
+    /// </summary>
     public async Task<ApiResposta<AgendamentoDto>> ObterPorIdAsync(int id)
     {
         try
@@ -57,6 +80,9 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Lista agendamentos ocorridos ou previstos dentro de um período, com filtro opcional por barbeiro.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<AgendamentoDto>>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim, string? barbeiroId = null)
     {
         try
@@ -77,6 +103,9 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Lista todos os agendamentos vinculados a um cliente específico (histórico do cliente).
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<AgendamentoDto>>> ListarPorClienteAsync(string clienteId)
     {
         try
@@ -91,30 +120,38 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Cria um novo agendamento validando existência e ativação de cliente/barbeiro, serviços solicitados,
+    /// ausência de bloqueios na agenda e disponibilidade de horário sem sobreposição.
+    /// </summary>
     public async Task<ApiResposta<AgendamentoDto>> CriarAsync(CriarAgendamentoDto dto)
     {
         try
         {
+            // Valida presença de serviços
             if (dto.ServicoIds == null || !dto.ServicoIds.Any())
                 return ApiResposta<AgendamentoDto>.Falha("Pelo menos um servico deve ser selecionado para o agendamento.");
 
             // Compara contra hora local BRT para evitar falsa rejeição quando o
-            // servidor está em UTC e o slot foi gerado em hora local.
+            // servidor está em UTC e o slot foi gerado em hora local. Tolera margem de 5 min.
             if (dto.DataHoraInicio < AgoraBrt().AddMinutes(-5))
                 return ApiResposta<AgendamentoDto>.Falha("A data e hora do agendamento nao pode ser no passado.");
 
+            // Valida se cliente existe e está ativo
             var cliente = await _usuarioRepository.ObterPorIdAsync(dto.ClienteId);
             if (cliente == null)
                 return ApiResposta<AgendamentoDto>.Falha($"Cliente com ID '{dto.ClienteId}' nao encontrado.");
             if (!cliente.Ativo)
                 return ApiResposta<AgendamentoDto>.Falha("O cliente informado esta desativado no sistema.");
 
+            // Valida se barbeiro existe e está ativo
             var barbeiro = await _usuarioRepository.ObterPorIdAsync(dto.BarbeiroId);
             if (barbeiro == null)
                 return ApiResposta<AgendamentoDto>.Falha($"Barbeiro com ID '{dto.BarbeiroId}' nao encontrado.");
             if (!barbeiro.Ativo)
                 return ApiResposta<AgendamentoDto>.Falha("O barbeiro informado esta desativado no sistema.");
 
+            // Carrega e valida serviços ativos
             var servicos = (await _servicoRepository.ObterPorIdsAsync(dto.ServicoIds))
                 .Where(s => s.Ativo)
                 .ToList();
@@ -122,13 +159,16 @@ public class AgendamentoService : IAgendamentoService
             if (servicos.Count != dto.ServicoIds.Distinct().Count())
                 return ApiResposta<AgendamentoDto>.Falha("Um ou mais servicos selecionados nao foram encontrados ou estao inativos.");
 
+            // Calcula término baseado na soma das durações dos serviços
             var duracaoTotalMinutos = servicos.Sum(s => s.DuracaoMinutos);
             var dataHoraFim = dto.DataHoraInicio.AddMinutes(duracaoTotalMinutos);
 
+            // Verifica se o barbeiro possui folga/bloqueio no período
             var possuiBloqueio = await _usuarioRepository.ExisteBloqueioNoPeriodoAsync(dto.BarbeiroId, dto.DataHoraInicio, dataHoraFim);
             if (possuiBloqueio)
                 return ApiResposta<AgendamentoDto>.Falha("O barbeiro selecionado possui um bloqueio de agenda no horario solicitado.");
 
+            // Verifica colisão com outros agendamentos existentes
             var possuiConflito = await _agendamentoRepository.ExisteConflitoDeHorarioAsync(dto.BarbeiroId, dto.DataHoraInicio, dataHoraFim, null);
             if (possuiConflito)
                 return ApiResposta<AgendamentoDto>.Falha("Ja existe outro agendamento para este barbeiro no horario solicitado.");
@@ -158,6 +198,10 @@ public class AgendamentoService : IAgendamentoService
             return ApiResposta<AgendamentoDto>.Falha($"Erro ao criar agendamento: {ex.Message}");
         }
     }
+
+    /// <summary>
+    /// Confirma um agendamento que se encontra no status Pendente.
+    /// </summary>
     public async Task<ApiResposta<AgendamentoDto>> ConfirmarAsync(int agendamentoId)
     {
         try
@@ -180,6 +224,9 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Altera o status do agendamento para EmAtendimento (início da execução dos serviços na cadeira).
+    /// </summary>
     public async Task<ApiResposta<AgendamentoDto>> IniciarAtendimentoAsync(int agendamentoId)
     {
         try
@@ -202,6 +249,9 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Conclui o atendimento do agendamento (liberação para pagamento/checkout).
+    /// </summary>
     public async Task<ApiResposta<AgendamentoDto>> ConcluirAsync(int agendamentoId)
     {
         try
@@ -224,6 +274,9 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Cancela um agendamento pendente ou confirmado, registrando opcionalmente o motivo do cancelamento.
+    /// </summary>
     public async Task<ApiResposta<AgendamentoDto>> CancelarAsync(int agendamentoId, string? motivo = null)
     {
         try
@@ -252,6 +305,9 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Registra que o cliente não compareceu ao horário agendado (No-Show).
+    /// </summary>
     public async Task<ApiResposta<AgendamentoDto>> RegistrarNaoComparecimentoAsync(int agendamentoId)
     {
         try
@@ -274,6 +330,9 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Reagenda um atendimento existente para um novo horário ou para outro barbeiro, validando conflitos.
+    /// </summary>
     public async Task<ApiResposta<AgendamentoDto>> ReagendarAsync(int agendamentoId, ReagendarAgendamentoDto dto)
     {
         try
@@ -303,6 +362,7 @@ public class AgendamentoService : IAgendamentoService
             if (possuiBloqueio)
                 return ApiResposta<AgendamentoDto>.Falha("O barbeiro possui um bloqueio de agenda no novo horario selecionado.");
 
+            // Ignora o ID do próprio agendamento atual para permitir reagendar mantendo o mesmo horário
             var possuiConflito = await _agendamentoRepository.ExisteConflitoDeHorarioAsync(barbeiroId, dto.NovoDataHoraInicio, novoDataHoraFim, agendamento.Id);
             if (possuiConflito)
                 return ApiResposta<AgendamentoDto>.Falha("Ja existe outro agendamento para este barbeiro no novo horario selecionado.");
@@ -321,12 +381,16 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Gera teoreticamente os slots de horários com base no expediente da barbearia (08:00 às 19:00).
+    /// </summary>
     private static List<DateTime> GerarSlotsTeoricos(DateTime data, int duracaoTotalMinutos)
     {
         var inicioExpediente = data.Date.AddHours(8);
         var fimExpediente = data.Date.AddHours(19);
         var slots = new List<DateTime>();
 
+        // Intervalo de grade padrão de 45 minutos entre horários de início
         for (var horario = inicioExpediente; horario.AddMinutes(duracaoTotalMinutos) <= fimExpediente; horario = horario.AddMinutes(45))
         {
             slots.Add(horario);
@@ -335,6 +399,9 @@ public class AgendamentoService : IAgendamentoService
         return slots;
     }
 
+    /// <summary>
+    /// Lista apenas os horários livres (sem agendamentos conflitantes ou bloqueios) para o barbeiro e data informados.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<DateTime>>> ListarHorariosDisponiveisAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds)
     {
         try
@@ -389,6 +456,9 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Retorna todos os slots da grade do dia indicando a flag Disponivel (true/false) para exibição em calendários de agendamento.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<HorarioSlotDto>>> ListarTodosHorariosDoDiaAsync(string barbeiroId, DateTime data, IEnumerable<int> servicoIds)
     {
         try

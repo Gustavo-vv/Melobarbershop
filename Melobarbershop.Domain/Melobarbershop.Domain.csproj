@@ -1,12 +1,32 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<!--
+  CAMADA: Domain (Núcleo do Domínio)
+  PROJETO: Melobarbershop.Domain.csproj
+  PAPEL ARQUITETURAL:
+  - Esta é a camada central e mais interna da Clean Architecture / DDD (Domain-Driven Design).
+  - Ela contém as regras de negócio puras, entidades corporativas, enums e interfaces de repositórios.
+  - Regra de dependência: O Domain NUNCA deve depender de camadas externas (Application, Infrastructure, API, UI, Desktop).
+    Ele é agnóstico a bancos de dados específicos, frameworks web ou bibliotecas de interface visual.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- Define a plataforma de execução para o .NET 9.0 LTS/STS moderno -->
     <TargetFramework>net9.0</TargetFramework>
+    <!-- Habilita usings implícitos padrão do C# para namespaces fundamentais do sistema -->
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Habilita o recurso de anotações de nulabilidade (Nullable Reference Types) do C# 8+,
+         forçando o compilador a emitir avisos caso referências possam ser nulas sem tratamento explícito -->
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <!--
+      PACOTE: Microsoft.AspNetCore.Identity.EntityFrameworkCore
+      MOTIVO TÉCNICO:
+      - Necessário no Domain porque a classe de entidade ApplicationUser herda diretamente de IdentityUser.
+      - Ponto de atenção arquitetural: Embora em DDD puro as entidades evitem herdar de frameworks,
+        o ASP.NET Core Identity é adotado como padrão no ecossistema .NET para gestão de usuários, senhas e claims.
+    -->
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
   </ItemGroup>
 

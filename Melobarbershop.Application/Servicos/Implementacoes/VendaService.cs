@@ -1,11 +1,27 @@
+// ============================================================================
+// Arquivo: VendaService.cs
+// Camada: Melobarbershop.Application (Serviços - Implementações)
+// Objetivo: Implementar a lógica de negócio do fluxo de PDV / Caixa (abertura de comanda,
+//           adição de serviços e produtos, aplicação de descontos, baixa de estoque e fechamento).
+// Papel na Arquitetura:
+//   - Integra Venda com Agendamento, Produto, Servico e Pagamento.
+//   - Gerencia comissão e atribuição por barbeiro em cada item da venda.
+//   - Garante que itens com produtos abatam o estoque com rastreio de auditoria (TipoMovimentacaoEstoque.SaidaVenda).
+//   - Valida liquidação integral da comanda antes de concluir o fechamento.
+// ============================================================================
+
 using AutoMapper;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
+using Melobarbershop.Domain.Enums;
 using Melobarbershop.Domain.Interfaces.Repositories;
 
 namespace Melobarbershop.Application.Servicos.Implementacoes;
 
+/// <summary>
+/// Implementação do serviço de gestão de vendas e operações de caixa / comanda (PDV).
+/// </summary>
 public class VendaService : IVendaService
 {
     private readonly IVendaRepository _vendaRepository;
@@ -14,6 +30,9 @@ public class VendaService : IVendaService
     private readonly IServicoRepository _servicoRepository;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Construtor com injeção de repositórios de vendas, agendamentos, produtos, serviços e do AutoMapper.
+    /// </summary>
     public VendaService(
         IVendaRepository vendaRepository,
         IAgendamentoRepository agendamentoRepository,
@@ -28,6 +47,9 @@ public class VendaService : IVendaService
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém os dados completos de uma venda (itens, serviços, produtos, pagamentos e agendamento vinculado).
+    /// </summary>
     public async Task<ApiResposta<VendaDto>> ObterPorIdAsync(int id)
     {
         try
@@ -45,12 +67,14 @@ public class VendaService : IVendaService
         }
     }
 
+    /// <summary>
+    /// Lista as vendas realizadas em um intervalo de datas.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<VendaDto>>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim)
     {
         try
         {
-            IEnumerable<Venda> vendas;
-            vendas = await _vendaRepository.ObterPorPeriodoAsync(inicio, fim);
+            var vendas = await _vendaRepository.ObterPorPeriodoAsync(inicio, fim);
             var dtos = _mapper.Map<IEnumerable<VendaDto>>(vendas);
             return ApiResposta<IEnumerable<VendaDto>>.Ok(dtos);
         }
@@ -60,12 +84,14 @@ public class VendaService : IVendaService
         }
     }
 
+    /// <summary>
+    /// Lista todas as vendas e comandas vinculadas a um cliente específico.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<VendaDto>>> ListarPorClienteAsync(string clienteId)
     {
         try
         {
             var vendas = await _vendaRepository.ObterPorClienteAsync(clienteId);
-
             var dtos = _mapper.Map<IEnumerable<VendaDto>>(vendas);
             return ApiResposta<IEnumerable<VendaDto>>.Ok(dtos);
         }
@@ -75,6 +101,9 @@ public class VendaService : IVendaService
         }
     }
 
+    /// <summary>
+    /// Inicia uma nova comanda de venda no caixa. Caso originada de um agendamento, importa automaticamente seus serviços e barbeiro.
+    /// </summary>
     public async Task<ApiResposta<VendaDto>> IniciarVendaAsync(IniciarVendaDto dto)
     {
         try
@@ -86,6 +115,7 @@ public class VendaService : IVendaService
                 AgendamentoId = dto.AgendamentoId
             };
 
+            // Se associada a agendamento prévio, importa serviços contratados
             if (dto.AgendamentoId.HasValue)
             {
                 var agendamento = await _agendamentoRepository.ObterPorIdCompletoAsync(dto.AgendamentoId.Value);
@@ -119,6 +149,9 @@ public class VendaService : IVendaService
         }
     }
 
+    /// <summary>
+    /// Adiciona um serviço avulso à comanda, vinculando o barbeiro executor e permitindo preço customizado.
+    /// </summary>
     public async Task<ApiResposta<VendaDto>> AdicionarItemServicoAsync(int vendaId, AdicionarItemServicoDto dto)
     {
         try
@@ -158,6 +191,9 @@ public class VendaService : IVendaService
         }
     }
 
+    /// <summary>
+    /// Adiciona produto(s) à comanda, validando se há estoque disponível no momento da inclusão.
+    /// </summary>
     public async Task<ApiResposta<VendaDto>> AdicionarItemProdutoAsync(int vendaId, AdicionarItemProdutoDto dto)
     {
         if (dto.Quantidade <= 0)
@@ -176,6 +212,7 @@ public class VendaService : IVendaService
             if (!produto.Ativo)
                 return ApiResposta<VendaDto>.Falha("Não é possível adicionar um produto inativo à venda.");
 
+            // Verifica soma das quantidades já na comanda + nova quantidade
             var quantidadeJaNaComanda = venda.Itens
                 .Where(i => i.ProdutoId == dto.ProdutoId)
                 .Sum(i => i.Quantidade);
@@ -185,6 +222,7 @@ public class VendaService : IVendaService
 
             var preco = dto.PrecoCustomizado ?? produto.PrecoVenda;
 
+            // Se o mesmo produto já estava na comanda com o mesmo barbeiro e preço, incrementa quantidade
             var itemExistente = venda.Itens.FirstOrDefault(i => i.ProdutoId == dto.ProdutoId && i.BarbeiroId == dto.BarbeiroId && i.PrecoUnitario == preco);
             if (itemExistente != null)
                 itemExistente.Quantidade += dto.Quantidade;
@@ -211,6 +249,9 @@ public class VendaService : IVendaService
         }
     }
 
+    /// <summary>
+    /// Remove um item (serviço ou produto) da comanda e recalcula os subtotais e totais finais.
+    /// </summary>
     public async Task<ApiResposta<VendaDto>> RemoverItemAsync(int vendaId, int vendaItemId)
     {
         try
@@ -237,6 +278,9 @@ public class VendaService : IVendaService
         }
     }
 
+    /// <summary>
+    /// Aplica um valor fixo de desconto na comanda e atualiza o total final.
+    /// </summary>
     public async Task<ApiResposta<VendaDto>> AplicarDescontoAsync(int vendaId, decimal valorDesconto)
     {
         if (valorDesconto < 0)
@@ -262,6 +306,10 @@ public class VendaService : IVendaService
         }
     }
 
+    /// <summary>
+    /// Finaliza e liquida a venda, validando cobertura total dos pagamentos, dando baixa no estoque de produtos
+    /// e atualizando o status do agendamento vinculado para Concluído.
+    /// </summary>
     public async Task<ApiResposta<VendaDto>> FinalizarVendaAsync(int vendaId)
     {
         try
@@ -273,10 +321,12 @@ public class VendaService : IVendaService
             if (!venda.Itens.Any())
                 return ApiResposta<VendaDto>.Falha("Não é possível finalizar uma venda sem itens.");
 
+            // Valida se o total pago atinge o total a pagar da comanda
             var totalPago = venda.Pagamentos.Sum(p => p.Valor);
             if (totalPago < venda.ValorFinal)
                 return ApiResposta<VendaDto>.Falha($"A venda não está totalmente paga. Valor final: R$ {venda.ValorFinal:F2}, Total pago: R$ {totalPago:F2}. Saldo restante: R$ {(venda.ValorFinal - totalPago):F2}.");
 
+            // Realiza a baixa do estoque e registra a movimentação de auditoria para cada produto vendido
             foreach (var item in venda.Itens.Where(i => i.ProdutoId.HasValue).ToList())
             {
                 var produto = await _produtoRepository.ObterPorIdAsync(item.ProdutoId!.Value);
@@ -287,7 +337,7 @@ public class VendaService : IVendaService
                     {
                         ProdutoId = produto.Id,
                         Quantidade = item.Quantidade,
-                        Tipo = Domain.Enums.TipoMovimentacaoEstoque.SaidaVenda,
+                        Tipo = TipoMovimentacaoEstoque.SaidaVenda,
                         Observacao = $"Saída por venda Nº {venda.Id}",
                         DataHora = DateTime.UtcNow
                     };
@@ -296,8 +346,9 @@ public class VendaService : IVendaService
                 }
             }
 
+            // Se originada de agendamento, marca o atendimento como Concluído
             if (venda.AgendamentoId.HasValue)
-                await _agendamentoRepository.AtualizarStatusAsync(venda.AgendamentoId.Value, Domain.Enums.StatusAgendamento.Concluido);
+                await _agendamentoRepository.AtualizarStatusAsync(venda.AgendamentoId.Value, StatusAgendamento.Concluido);
 
             await _vendaRepository.AtualizarAsync(venda);
 
@@ -311,6 +362,9 @@ public class VendaService : IVendaService
         }
     }
 
+    /// <summary>
+    /// Cancela uma venda/comanda aberta caso ainda não possua pagamentos computados.
+    /// </summary>
     public async Task<ApiResposta<VendaDto>> CancelarVendaAsync(int vendaId, string motivo)
     {
         try
@@ -319,6 +373,7 @@ public class VendaService : IVendaService
             if (venda == null)
                 return ApiResposta<VendaDto>.Falha($"Venda com ID {vendaId} não encontrada.");
 
+            // Impede cancelamento de venda que já tem pagamentos confirmados
             if (venda.Pagamentos.Any())
                 return ApiResposta<VendaDto>.Falha("Não é possível cancelar uma venda que já possui pagamentos registrados. Estorne os pagamentos antes de cancelar.");
 
@@ -339,6 +394,9 @@ public class VendaService : IVendaService
         }
     }
 
+    /// <summary>
+    /// Recalcula o subtotal somando os itens e aplica o desconto fixando o total final nunca abaixo de zero.
+    /// </summary>
     private static void RecalcularTotais(Venda venda)
     {
         venda.ValorSubtotal = venda.Itens.Sum(i => i.Quantidade * i.PrecoUnitario);

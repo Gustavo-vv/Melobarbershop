@@ -1,3 +1,14 @@
+// ============================================================================
+// Arquivo: UsuarioService.cs
+// Camada: Melobarbershop.Application (Serviços - Implementações)
+// Objetivo: Implementar as regras de negócio de usuários (clientes, barbeiros, recepcionistas, admins),
+//           integração com ASP.NET Core Identity e controle de bloqueios de agenda de profissionais.
+// Papel na Arquitetura:
+//   - Faz ponte com IUsuarioRepository e UserManager<ApplicationUser>.
+//   - Valida duplicidade de e-mail e telefone de WhatsApp.
+//   - Gerencia bloqueios de expediente (folgas, pausas, férias) de barbeiros.
+// ============================================================================
+
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Melobarbershop.Application.DTOs;
@@ -7,12 +18,18 @@ using Melobarbershop.Application.Servicos.Services;
 
 namespace Melobarbershop.Application.Servicos.Implementacoes;
 
+/// <summary>
+/// Implementação do serviço de gestão de usuários e bloqueios de agenda.
+/// </summary>
 public class UsuarioService : IUsuarioService
 {
     private readonly IUsuarioRepository _usuarioRepo;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Construtor com injeção do repositório de usuários, UserManager do Identity e AutoMapper.
+    /// </summary>
     public UsuarioService(
         IUsuarioRepository usuarioRepo,
         UserManager<ApplicationUser> userManager,
@@ -23,6 +40,9 @@ public class UsuarioService : IUsuarioService
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém um usuário pelo ID único, carregando também os seus perfis/roles do Identity.
+    /// </summary>
     public async Task<UsuarioDto?> ObterPorIdAsync(string id)
     {
         try
@@ -39,6 +59,9 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Localiza um usuário pelo número de telefone cadastrado.
+    /// </summary>
     public async Task<UsuarioDto?> ObterPorTelefoneAsync(string telefone)
     {
         try
@@ -55,6 +78,9 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Localiza um usuário pelo e-mail cadastrado.
+    /// </summary>
     public async Task<UsuarioDto?> ObterPorEmailAsync(string email)
     {
         try
@@ -71,6 +97,9 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Lista os usuários que pertencem a um perfil/role específico (ex: Barbeiro, Cliente, Admin).
+    /// </summary>
     public async Task<IEnumerable<UsuarioDto>> ListarPorRoleAsync(string roleName, bool apenasAtivos = true)
     {
         try
@@ -94,10 +123,14 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Cria um novo usuário cadastrando suas credenciais no ASP.NET Core Identity com a role padrão Cliente.
+    /// </summary>
     public async Task<UsuarioDto> CriarAsync(CriarUsuarioDto dto)
     {
         try
         {
+            // Valida unicidade de e-mail e telefone
             if (await _usuarioRepo.ExisteEmailAsync(dto.Email))
                 throw new InvalidOperationException($"Ja existe um usuario com o e-mail '{dto.Email}'.");
 
@@ -121,7 +154,7 @@ public class UsuarioService : IUsuarioService
             if (!result.Succeeded)
                 throw new InvalidOperationException($"Erro ao criar usuario: {string.Join(", ", result.Errors.Select(e => e.Description))}");
 
-            const string roleCliente = "Cliente"; // sempre Cliente, endpoint de registro é público
+            const string roleCliente = "Cliente"; // sempre Cliente para autoregistro
             await _userManager.AddToRoleAsync(usuario, roleCliente);
 
             var resultDto = _mapper.Map<UsuarioDto>(usuario);
@@ -135,6 +168,9 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Atualiza os dados cadastrais de um usuário, validando conflito de telefone com outros registros.
+    /// </summary>
     public async Task<UsuarioDto> AtualizarAsync(string id, AtualizarUsuarioDto dto)
     {
         try
@@ -168,6 +204,9 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Desativa o usuário (exclusão lógica), impedindo login e novos agendamentos.
+    /// </summary>
     public async Task DesativarAsync(string id)
     {
         try
@@ -186,6 +225,9 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Reativa o cadastro de um usuário previamente desativado.
+    /// </summary>
     public async Task AtivarAsync(string id)
     {
         try
@@ -204,6 +246,9 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Cadastra um bloqueio na agenda de um barbeiro (ex.: intervalo de almoço, folga ou médico).
+    /// </summary>
     public async Task<BloqueioAgendaDto> AdicionarBloqueioAgendaAsync(CriarBloqueioAgendaDto dto)
     {
         try
@@ -239,6 +284,9 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Remove um bloqueio de agenda liberando os horários para agendamento.
+    /// </summary>
     public async Task RemoverBloqueioAgendaAsync(int bloqueioId)
     {
         try
@@ -256,6 +304,9 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Lista os bloqueios de agenda registrados para um barbeiro em um período específico.
+    /// </summary>
     public async Task<IEnumerable<BloqueioAgendaDto>> ListarBloqueiosBarbeiroAsync(string barbeiroId, DateTime inicio, DateTime fim)
     {
         try
@@ -282,6 +333,9 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    /// <summary>
+    /// Checa se o barbeiro está livre (sem bloqueios de agenda) em um determinado intervalo.
+    /// </summary>
     public async Task<bool> VerificarDisponibilidadeBarbeiroAsync(string barbeiroId, DateTime inicio, DateTime fim)
     {
         try

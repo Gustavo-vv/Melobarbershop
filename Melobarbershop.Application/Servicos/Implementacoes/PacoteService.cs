@@ -1,3 +1,13 @@
+// ============================================================================
+// Arquivo: PacoteService.cs
+// Camada: Melobarbershop.Application (Serviços - Implementações)
+// Objetivo: Implementar a lógica de negócio para criação, edição e ativação
+//           de pacotes promocionais de serviços (combos).
+// Papel na Arquitetura:
+//   - Gerencia o relacionamento N:N entre Pacote e Servico através da entidade de junção PacoteItem.
+//   - Garante que todos os serviços referenciados no DTO existam no banco antes de persistir o pacote.
+// ============================================================================
+
 using AutoMapper;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
@@ -6,12 +16,18 @@ using Melobarbershop.Domain.Interfaces.Repositories;
 
 namespace Melobarbershop.Application.Servicos.Implementacoes;
 
+/// <summary>
+/// Implementação do serviço de gestão de pacotes de serviços da barbearia.
+/// </summary>
 public class PacoteService : IPacoteService
 {
     private readonly IPacoteRepository _pacoteRepository;
     private readonly IServicoRepository _servicoRepository;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Construtor com injeção dos repositórios de pacotes, serviços e do AutoMapper.
+    /// </summary>
     public PacoteService(
         IPacoteRepository pacoteRepository,
         IServicoRepository servicoRepository,
@@ -22,6 +38,9 @@ public class PacoteService : IPacoteService
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Obtém um pacote específico com a coleção de serviços incluídos.
+    /// </summary>
     public async Task<ApiResposta<PacoteDto>> ObterPorIdAsync(int id)
     {
         try
@@ -40,6 +59,9 @@ public class PacoteService : IPacoteService
         }
     }
 
+    /// <summary>
+    /// Retorna todos os pacotes ativos para comercialização na recepção ou no aplicativo.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<PacoteDto>>> ListarAtivosAsync()
     {
         try
@@ -56,6 +78,9 @@ public class PacoteService : IPacoteService
         }
     }
 
+    /// <summary>
+    /// Retorna todos os pacotes existentes no banco, incluindo os inativos.
+    /// </summary>
     public async Task<ApiResposta<IEnumerable<PacoteDto>>> ListarTodosAsync()
     {
         try
@@ -72,12 +97,16 @@ public class PacoteService : IPacoteService
         }
     }
 
+    /// <summary>
+    /// Cria um novo pacote promocional validando se cada serviço indicado existe previamente.
+    /// </summary>
     public async Task<ApiResposta<PacoteDto>> CriarAsync(CriarPacoteDto criarDto)
     {
         try
         {
             var servicos = new List<Servico>();
 
+            // Validação de integridade: checa se cada ID de serviço é válido
             foreach (var sid in criarDto.ServicoIds)
             {
                 var s = await _servicoRepository.ObterPorIdAsync(sid);
@@ -89,6 +118,7 @@ public class PacoteService : IPacoteService
                 servicos.Add(s);
             }
 
+            // Monta a entidade Pacote com os itens de junção PacoteItem
             var pacote = new Pacote
             {
                 Nome = criarDto.Nome,
@@ -104,6 +134,7 @@ public class PacoteService : IPacoteService
 
             await _pacoteRepository.AdicionarAsync(pacote);
 
+            // Recarrega o pacote com os itens e dados dos serviços para devolver DTO completo
             var salvo = await _pacoteRepository
                 .ObterPorIdComItensAsync(pacote.Id);
 
@@ -116,6 +147,9 @@ public class PacoteService : IPacoteService
         }
     }
 
+    /// <summary>
+    /// Atualiza os dados do pacote e redefine a lista de serviços vinculados.
+    /// </summary>
     public async Task<ApiResposta<PacoteDto>> AtualizarAsync(
         int id,
         AtualizarPacoteDto atualizarDto)
@@ -146,6 +180,7 @@ public class PacoteService : IPacoteService
             pacote.PrecoTotal = atualizarDto.PrecoTotal;
             pacote.Ativo = atualizarDto.Ativo;
 
+            // Substitui a lista de itens da entidade pelo novo conjunto informado
             pacote.Itens = servicos
                 .Select(s => new PacoteItem
                 {
@@ -169,6 +204,9 @@ public class PacoteService : IPacoteService
         }
     }
 
+    /// <summary>
+    /// Desativa um pacote promocional impedindo novas compras sem perder o histórico do cadastro.
+    /// </summary>
     public async Task<ApiResposta<PacoteDto>> DesativarAsync(int id)
     {
         try
@@ -196,6 +234,9 @@ public class PacoteService : IPacoteService
         }
     }
 
+    /// <summary>
+    /// Reativa um pacote previamente inativo.
+    /// </summary>
     public async Task<ApiResposta<PacoteDto>> AtivarAsync(int id)
     {
         try

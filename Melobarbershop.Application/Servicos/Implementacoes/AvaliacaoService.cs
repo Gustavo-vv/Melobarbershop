@@ -1,3 +1,14 @@
+// ============================================================================
+// Arquivo: AvaliacaoService.cs
+// Camada: Melobarbershop.Application (Serviços - Implementações)
+// Objetivo: Implementar a lógica de negócio para registro, controle e consultas
+//           estatísticas das avaliações de clientes aos barbeiros.
+// Papel na Arquitetura:
+//   - Garante as regras de integridade: nota entre 1 e 5 estrelas e apenas uma avaliação por agendamento.
+//   - Consolida dados do agendamento para associar automaticamente o BarbeiroId correto.
+//   - Utiliza tratamento explícito de exceções de domínio (KeyNotFoundException, InvalidOperationException).
+// ============================================================================
+
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
@@ -5,12 +16,18 @@ using Melobarbershop.Domain.Interfaces.Repositories;
 
 namespace Melobarbershop.Application.Servicos.Implementacoes;
 
+/// <summary>
+/// Implementação do serviço de gestão de avaliações e satisfação de clientes.
+/// </summary>
 public class AvaliacaoService : IAvaliacaoService
 {
     private readonly IAvaliacaoRepository _avaliacaoRepo;
     private readonly IAgendamentoRepository _agendamentoRepo;
     private readonly IUsuarioRepository _usuarioRepo;
 
+    /// <summary>
+    /// Construtor com injeção dos repositórios de avaliação, agendamento e usuário.
+    /// </summary>
     public AvaliacaoService(
         IAvaliacaoRepository avaliacaoRepo,
         IAgendamentoRepository agendamentoRepo,
@@ -21,6 +38,9 @@ public class AvaliacaoService : IAvaliacaoService
         _usuarioRepo = usuarioRepo;
     }
 
+    /// <summary>
+    /// Obtém uma avaliação pelo identificador único e mapeia para DTO.
+    /// </summary>
     public async Task<AvaliacaoDto?> ObterPorIdAsync(int id)
     {
         try
@@ -34,6 +54,9 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
+    /// <summary>
+    /// Obtém a avaliação associada a um determinado agendamento.
+    /// </summary>
     public async Task<AvaliacaoDto?> ObterPorAgendamentoAsync(int agendamentoId)
     {
         try
@@ -47,6 +70,9 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
+    /// <summary>
+    /// Lista o histórico de avaliações recebidas por um barbeiro.
+    /// </summary>
     public async Task<IEnumerable<AvaliacaoDto>> ListarPorBarbeiroAsync(string barbeiroId)
     {
         try
@@ -60,6 +86,9 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
+    /// <summary>
+    /// Lista as avaliações já efetuadas por determinado cliente.
+    /// </summary>
     public async Task<IEnumerable<AvaliacaoDto>> ListarPorClienteAsync(string clienteId)
     {
         try
@@ -73,10 +102,14 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
+    /// <summary>
+    /// Monta o sumário analítico de reputação do barbeiro: média de estrelas arredondada a 1 casa decimal e total de feedbacks.
+    /// </summary>
     public async Task<ResumoAvaliacoesDto> ObterResumoAvaliacoesBarbeiroAsync(string barbeiroId)
     {
         try
         {
+            // Valida existência do profissional
             var barbeiro = await _usuarioRepo.ObterPorIdAsync(barbeiroId);
             if (barbeiro == null)
                 throw new KeyNotFoundException($"Barbeiro '{barbeiroId}' nao encontrado.");
@@ -99,20 +132,27 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
+    /// <summary>
+    /// Valida e registra a avaliação garantindo limite de notas (1-5) e unicidade por agendamento.
+    /// </summary>
     public async Task<AvaliacaoDto> RegistrarAvaliacaoAsync(CriarAvaliacaoDto dto)
     {
         try
         {
+            // Regra de validação: nota de 1 a 5 estrelas
             if (dto.NotaEstrelas < 1 || dto.NotaEstrelas > 5)
                 throw new InvalidOperationException("A nota deve ser entre 1 e 5 estrelas.");
 
+            // Valida existência do agendamento
             var agendamento = await _agendamentoRepo.ObterPorIdAsync(dto.AgendamentoId);
             if (agendamento == null)
                 throw new KeyNotFoundException($"Agendamento {dto.AgendamentoId} nao encontrado.");
 
+            // Regra de unicidade: impede avaliações duplicadas para o mesmo atendimento
             if (await _avaliacaoRepo.ExisteAvaliacaoParaAgendamentoAsync(dto.AgendamentoId))
                 throw new InvalidOperationException("Ja existe uma avaliacao para este agendamento.");
 
+            // Criação da entidade associando o barbeiro diretamente a partir do agendamento auditado
             var avaliacao = new Avaliacao
             {
                 AgendamentoId = dto.AgendamentoId,
@@ -125,7 +165,7 @@ public class AvaliacaoService : IAvaliacaoService
 
             await _avaliacaoRepo.AdicionarAsync(avaliacao);
 
-            var salva = await _avaliacaoRepo.ObterPorIdAsync(avaliacao.Id);
+            // Hidratação dos nomes para retorno completo no DTO
             var cliente = await _usuarioRepo.ObterPorIdAsync(avaliacao.ClienteId);
             var barbeiro = await _usuarioRepo.ObterPorIdAsync(avaliacao.BarbeiroId);
 
@@ -150,6 +190,9 @@ public class AvaliacaoService : IAvaliacaoService
         }
     }
 
+    /// <summary>
+    /// Método auxiliar privado para projeção direta da entidade Avaliacao para AvaliacaoDto.
+    /// </summary>
     private static AvaliacaoDto MapToDto(Avaliacao av) => new()
     {
         Id = av.Id,
@@ -163,3 +206,4 @@ public class AvaliacaoService : IAvaliacaoService
         DataCriacao = av.DataCriacao
     };
 }
+

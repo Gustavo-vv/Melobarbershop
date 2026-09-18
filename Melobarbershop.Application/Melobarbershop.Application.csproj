@@ -1,18 +1,50 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<!--
+  CAMADA: Application (Casos de Uso e Regras de Aplicação)
+  PROJETO: Melobarbershop.Application.csproj
+  PAPEL ARQUITETURAL:
+  - Esta camada orquestra os fluxos de casos de uso do sistema (Use Cases).
+  - Ela consome o Domain (regras de negócio puras, entidades e interfaces de repositórios)
+    e expõe serviços de aplicação (Services) e objetos de transferência de dados (DTOs)
+    para as camadas consumidoras (API, UI e Desktop).
+  - Regra de dependência: O Application depende unicamente do Domain. Ele NÃO conhece
+    detalhes de banco de dados (Infrastructure), nem rotas HTTP (API), nem componentes de tela (UI/Desktop).
+-->
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- Plataforma de execução .NET 9.0 -->
     <TargetFramework>net9.0</TargetFramework>
+    <!-- Ativa namespaces implícitos padrão do C# -->
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Força tratamento rigoroso de referências nulas para evitar NullReferenceException -->
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <!--
+      PACOTE: AutoMapper
+      PAPEL: Faz o mapeamento e transformação automática entre Entidades de Domínio e DTOs,
+      evitando código repetitivo manual de instanciação e isolando o modelo interno das APIs públicas.
+    -->
     <PackageReference Include="AutoMapper" Version="16.2.0" />
+
+    <!--
+      PACOTE: FluentValidation
+      PAPEL: Biblioteca de validação de regras de entrada fortemente tipadas com sintaxe fluente,
+      garantindo que payloads inválidos sejam rejeitados antes de atingir o domínio.
+    -->
     <PackageReference Include="FluentValidation" Version="12.1.1" />
+
+    <!--
+      PACOTE: Microsoft.Extensions.DependencyInjection.Abstractions
+      PAPEL: Permite que a camada declare suas próprias extensões de injeção de dependência
+      (ex: services.AddApplicationServices()) sem se acoplar a um container IoC específico.
+    -->
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Referência obrigatória e exclusiva da arquitetura: Application depende apenas do Domain -->
     <ProjectReference Include="..\Melobarbershop.Domain\Melobarbershop.Domain.csproj" />
   </ItemGroup>
 
