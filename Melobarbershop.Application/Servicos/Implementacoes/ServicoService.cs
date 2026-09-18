@@ -137,7 +137,7 @@ public class ServicoService : IServicoService
 
             return ApiResposta<bool>.Ok(true);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return ApiResposta<bool>.Falha(
                 "Não é possível remover este serviço permanentemente pois ele possui agendamentos, pacotes ou vendas vinculados. Recomenda-se desativá-lo em vez de excluir permanentemente.");

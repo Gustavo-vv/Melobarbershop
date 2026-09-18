@@ -8,13 +8,15 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
     {
         private readonly string _clienteId;
         private readonly string _nomeCliente;
+        private UsuarioDto? _usuario;
         private readonly AgendamentoApiService _agendamentoService = new();
         private readonly EmptyStatePanel _emptyState = new();
 
-        public FormHistoricoCliente(string clienteId, string nomeCliente)
+        public FormHistoricoCliente(string clienteId, string nomeCliente, UsuarioDto? usuario = null)
         {
             _clienteId = clienteId;
             _nomeCliente = nomeCliente;
+            _usuario = usuario;
 
             InitializeComponent();
             ConfigurarEstilo();
@@ -25,14 +27,89 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
 
         private void ConfigurarEstilo()
         {
-            this.Text = $"Histórico de {_nomeCliente}";
-            lblTitulo.Text = $"Histórico de {_nomeCliente}";
+            this.Text = $"Perfil e Histórico de {_nomeCliente}";
+            lblTitulo.Text = $"Perfil e Histórico de {_nomeCliente}";
             lblTitulo.Font = TemaMelobarbershop.BrandTitleFont;
             lblSubtitulo.Font = TemaMelobarbershop.BodyFont;
             lblStatus.Font = TemaMelobarbershop.SmallBoldFont;
 
+            lblPerfilTitulo.Font = TemaMelobarbershop.SmallBoldFont;
+            lblNomeValor.Font = TemaMelobarbershop.BodyFont;
+            lblEmailValor.Font = TemaMelobarbershop.BodyFont;
+            lblTelefoneValor.Font = TemaMelobarbershop.BodyFont;
+            lblNascimentoValor.Font = TemaMelobarbershop.BodyFont;
+            lblCadastroValor.Font = TemaMelobarbershop.BodyFont;
+            lblPreferenciasValor.Font = TemaMelobarbershop.BodyFont;
+            lblStatusBadge.Font = TemaMelobarbershop.SmallBoldFont;
+
             ConfigurarColunas();
             AplicarTema();
+            PreencherDadosPerfil();
+        }
+
+        private void PreencherDadosPerfil()
+        {
+            if (_usuario != null)
+            {
+                lblNomeValor.Text = $"Nome: {_usuario.Nome}";
+                lblEmailValor.Text = $"E-mail: {_usuario.Email}";
+                lblTelefoneValor.Text = $"Telefone: {(!string.IsNullOrWhiteSpace(_usuario.PhoneNumber) ? _usuario.PhoneNumber : "Não informado")}";
+
+                var nascTexto = _usuario.DataNascimento.HasValue
+                    ? _usuario.DataNascimento.Value.ToString("dd/MM/yyyy")
+                    : "Não informado";
+                lblNascimentoValor.Text = $"Nascimento: {nascTexto}";
+
+                lblCadastroValor.Text = $"Cadastro: {_usuario.DataCadastro:dd/MM/yyyy}";
+
+                if (!string.IsNullOrWhiteSpace(_usuario.PreferenciasNotas))
+                {
+                    lblPreferenciasValor.Text = $"Preferências / Observações:\n{_usuario.PreferenciasNotas}";
+                    lblPreferenciasValor.Visible = true;
+                }
+                else
+                {
+                    lblPreferenciasValor.Text = "Preferências / Observações: Nenhuma observação registrada.";
+                    lblPreferenciasValor.Visible = true;
+                }
+
+                ConfigurarBadgeStatus(_usuario.Ativo);
+            }
+            else
+            {
+                lblNomeValor.Text = $"Nome: {_nomeCliente}";
+                lblEmailValor.Text = "E-mail: -";
+                lblTelefoneValor.Text = "Telefone: -";
+                lblNascimentoValor.Text = "Nascimento: -";
+                lblCadastroValor.Text = "Cadastro: -";
+                lblPreferenciasValor.Text = "";
+                lblStatusBadge.Visible = false;
+            }
+        }
+
+        private void ConfigurarBadgeStatus(bool ativo)
+        {
+            lblStatusBadge.Visible = true;
+            if (ativo)
+            {
+                lblStatusBadge.Text = "Ativo";
+                lblStatusBadge.BackColor = TemaMelobarbershop.ModoClaro
+                    ? Color.FromArgb(220, 252, 231)
+                    : Color.FromArgb(20, 50, 30);
+                lblStatusBadge.ForeColor = TemaMelobarbershop.ModoClaro
+                    ? Color.FromArgb(22, 101, 52)
+                    : TemaMelobarbershop.SuccessColor;
+            }
+            else
+            {
+                lblStatusBadge.Text = "Inativo";
+                lblStatusBadge.BackColor = TemaMelobarbershop.ModoClaro
+                    ? Color.FromArgb(254, 226, 226)
+                    : Color.FromArgb(45, 16, 18);
+                lblStatusBadge.ForeColor = TemaMelobarbershop.ModoClaro
+                    ? Color.FromArgb(185, 28, 28)
+                    : TemaMelobarbershop.DangerColor;
+            }
         }
 
         public void AplicarTema()
@@ -42,6 +119,18 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
 
             lblTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
             lblSubtitulo.ForeColor = TemaMelobarbershop.TextMuted;
+
+            pnlPerfil.AplicarTema();
+            lblPerfilTitulo.ForeColor = TemaMelobarbershop.BlueAccent;
+            lblNomeValor.ForeColor = TemaMelobarbershop.TextPrimary;
+            lblEmailValor.ForeColor = TemaMelobarbershop.TextPrimary;
+            lblTelefoneValor.ForeColor = TemaMelobarbershop.TextPrimary;
+            lblNascimentoValor.ForeColor = TemaMelobarbershop.TextPrimary;
+            lblCadastroValor.ForeColor = TemaMelobarbershop.TextPrimary;
+            lblPreferenciasValor.ForeColor = TemaMelobarbershop.TextMuted;
+
+            if (_usuario != null)
+                ConfigurarBadgeStatus(_usuario.Ativo);
 
             TemaMelobarbershop.AplicarEstiloBotaoSecundario(btnFechar);
             TemaMelobarbershop.EstilizarDataGridView(dgvHistorico);

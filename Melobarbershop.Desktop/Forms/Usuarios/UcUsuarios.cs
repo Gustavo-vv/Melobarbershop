@@ -139,7 +139,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
 
             if (dgvUsuarios.Columns["Id"] != null)
             {
-                dgvUsuarios.Columns["Id"].Visible = false;
+                dgvUsuarios.Columns["Id"]!.Visible = false;
             }
 
             GarantirColunaHistorico();
@@ -223,7 +223,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
                 return;
             }
 
-            AbrirHistoricoCliente(usuario.Id, usuario.Nome);
+            AbrirHistoricoCliente(usuario.Id, usuario.Nome, usuario);
         }
 
         private void dgvUsuarios_CellContentClick(object? sender, DataGridViewCellEventArgs e)
@@ -237,14 +237,15 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
 
                 if (idObj is string id && nomeObj is string nome)
                 {
-                    AbrirHistoricoCliente(id, nome);
+                    var usuario = _listaUsuarios.FirstOrDefault(u => u.Id == id);
+                    AbrirHistoricoCliente(id, nome, usuario);
                 }
             }
         }
 
-        private void AbrirHistoricoCliente(string clienteId, string nomeCliente)
+        private void AbrirHistoricoCliente(string clienteId, string nomeCliente, UsuarioDto? usuario = null)
         {
-            using var form = new FormHistoricoCliente(clienteId, nomeCliente);
+            using var form = new FormHistoricoCliente(clienteId, nomeCliente, usuario);
             form.ShowDialog(this);
         }
 
