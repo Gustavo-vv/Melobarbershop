@@ -1,4 +1,4 @@
-﻿
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -520,17 +520,17 @@ namespace Melobarbershop.Infrastructure.Data
         {
             var barbeirosSeed = new[]
             {
-                new { Email = "carlos.barbeiro@melobarbershop.com", Nome = "Carlos Silva" },
-                new { Email = "rafael.barbeiro@melobarbershop.com", Nome = "Rafael Souza" },
+                new { Email = "carlos.barbeiro@melobarbershop.com", Nome = "Carlos Silva", Telefone = "(11) 98765-1001" },
+                new { Email = "rafael.barbeiro@melobarbershop.com", Nome = "Rafael Souza", Telefone = "(11) 98765-1002" },
             };
 
             var clientesSeed = new[]
             {
-                new { Email = "joao.cliente@melobarbershop.com", Nome = "João Pereira" },
-                new { Email = "marcos.cliente@melobarbershop.com", Nome = "Marcos Lima" },
-                new { Email = "felipe.cliente@melobarbershop.com", Nome = "Felipe Santos" },
-                new { Email = "andre.cliente@melobarbershop.com", Nome = "André Costa" },
-                new { Email = "bruno.cliente@melobarbershop.com", Nome = "Bruno Oliveira" },
+                new { Email = "joao.cliente@melobarbershop.com", Nome = "João Pereira", Telefone = "(11) 98765-2001" },
+                new { Email = "marcos.cliente@melobarbershop.com", Nome = "Marcos Lima", Telefone = "(11) 98765-2002" },
+                new { Email = "felipe.cliente@melobarbershop.com", Nome = "Felipe Santos", Telefone = "(11) 98765-2003" },
+                new { Email = "andre.cliente@melobarbershop.com", Nome = "André Costa", Telefone = "(11) 98765-2004" },
+                new { Email = "bruno.cliente@melobarbershop.com", Nome = "Bruno Oliveira", Telefone = "(11) 98765-2005" },
             };
 
             var barbeiros = new List<ApplicationUser>();
@@ -544,6 +544,7 @@ namespace Melobarbershop.Infrastructure.Data
                         UserName = b.Email,
                         Email = b.Email,
                         Nome = b.Nome,
+                        PhoneNumber = b.Telefone,
                         EmailConfirmed = true,
                         PhoneNumberConfirmed = true,
                         Ativo = true,
@@ -579,6 +580,7 @@ namespace Melobarbershop.Infrastructure.Data
                         UserName = c.Email,
                         Email = c.Email,
                         Nome = c.Nome,
+                        PhoneNumber = c.Telefone,
                         EmailConfirmed = true,
                         PhoneNumberConfirmed = true,
                         Ativo = true,

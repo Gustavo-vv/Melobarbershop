@@ -56,6 +56,7 @@ public static class DbSeeder
                 UserName = adminEmail,
                 Email = adminEmail,
                 Nome = "Administrador",
+                PhoneNumber = "(11) 98888-0001",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Ativo = true,
