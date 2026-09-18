@@ -696,19 +696,20 @@ body.dark-theme .theme-toggle{
 .booking-modal{
   background:#14171b;
   border:1px solid #2a2e33;
-  border-radius:20px;
+  border-radius:16px;
   width:100%;
-  max-width:460px;
-  box-shadow:0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(53,161,255,0.15);
+  max-width:440px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.55), 0 0 24px rgba(8,124,255,0.12);
   overflow:hidden;
-  animation:modalFadeIn 0.25s ease-out;
+  animation:modalFadeIn 0.22s ease-out;
 }
 
 @keyframes modalFadeIn{
-  from{opacity:0; transform:scale(0.94) translateY(10px);}
+  from{opacity:0; transform:scale(0.95) translateY(8px);}
   to{opacity:1; transform:scale(1) translateY(0);}
 }
 
+/* Cabeçalho do modal */
 .booking-modal-header{
   display:flex;
   align-items:center;
@@ -718,65 +719,85 @@ body.dark-theme .theme-toggle{
   border-bottom:1px solid #2a2e33;
 }
 
-.modal-badge{
-  font-family:Oswald,Arial,sans-serif;
-  text-transform:uppercase;
-  font-size:18px;
-  color:#35a1ff;
-  font-weight:700;
-  letter-spacing:0.5px;
+.modal-title-group{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.modal-check-icon{
+  width:22px;
+  height:22px;
+  flex-shrink:0;
+}
+
+.modal-title{
+  font-family:'Outfit', 'Segoe UI', sans-serif;
+  font-size:16px;
+  font-weight:600;
+  color:#f0f2f5;
+  margin:0;
+  letter-spacing:0;
 }
 
 .modal-close-btn{
   background:none;
   border:none;
-  color:#a9afb7;
-  font-size:18px;
+  color:#6b7280;
+  font-size:16px;
   cursor:pointer;
   padding:4px 8px;
   border-radius:6px;
-  transition:0.15s;
+  transition:color 0.15s, background 0.15s;
+  line-height:1;
 }
 
 .modal-close-btn:hover{
   color:#fff;
-  background:rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.08);
 }
 
+/* Corpo do modal */
 .booking-modal-body{
-  padding:20px;
+  padding:20px 20px 16px;
 }
 
 .modal-intro{
-  color:#a9afb7;
-  font-size:13.5px;
+  color:#8a9099;
+  font-size:13px;
+  margin:0 0 16px;
+  line-height:1.5;
+}
+
+/* Divisor tracejado — metáfora de comprovante/ticket picotado */
+.modal-ticket-divider{
+  border:none;
+  border-top:1px dashed #2e3540;
   margin-bottom:16px;
-  line-height:1.4;
 }
 
 .modal-summary-box{
-  background:#0e1013;
-  border:1px solid #23272d;
-  border-radius:14px;
-  padding:14px 16px;
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:11px;
 }
 
 .summary-item{
   display:flex;
   justify-content:space-between;
+  align-items:baseline;
   font-size:13.5px;
 }
 
 .summary-label{
-  color:#7d858c;
+  color:#6b7280;
+  font-weight:400;
 }
 
 .summary-val{
-  color:#f6f7f8;
+  color:#e8eaed;
   font-weight:600;
+  text-align:right;
 }
 
 .summary-val.highlight{
@@ -784,40 +805,53 @@ body.dark-theme .theme-toggle{
   font-weight:700;
 }
 
+/* Rodapé do modal */
 .booking-modal-footer{
   display:flex;
-  gap:12px;
-  padding:16px 20px;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  padding:16px 20px 20px;
   background:#181c22;
-  border-top:1px solid #2a2e33;
+  border-top:1px solid #23272d;
 }
 
-.btn-modal-action{
-  flex:1;
+/* Botão principal — ação esperada, destaque total */
+.btn-modal-primary{
+  width:100%;
   height:44px;
   border-radius:10px;
-  font-size:13.5px;
+  font-size:14px;
   font-weight:700;
   cursor:pointer;
-  transition:0.15s;
-}
-
-.btn-modal-action.secondary{
-  background:transparent;
-  border:1px solid #35a1ff;
-  color:#35a1ff;
-}
-
-.btn-modal-action.secondary:hover{
-  background:rgba(53,161,255,0.1);
-}
-
-.btn-modal-action.primary{
-  background:#087cff;
   border:none;
+  background:#087cff;
   color:#fff;
+  transition:background 0.15s, transform 0.1s;
 }
 
-.btn-modal-action.primary:hover{
-  background:#35a1ff;
+.btn-modal-primary:hover{
+  background:#1a8aff;
+}
+
+.btn-modal-primary:active{
+  transform:scale(0.98);
+}
+
+/* Botão ghost — ação secundária, sem borda, tom discreto */
+.btn-modal-ghost{
+  background:none;
+  border:none;
+  color:#6b7280;
+  font-size:12.5px;
+  font-weight:500;
+  cursor:pointer;
+  padding:2px 4px;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  transition:color 0.15s;
+}
+
+.btn-modal-ghost:hover{
+  color:#a9afb7;
 }
