@@ -31,6 +31,7 @@ namespace Melobarbershop.API.Controllers
                     Id = user.Id,
                     Nome = user.Nome,
                     Email = user.Email!,
+                    PhoneNumber = user.PhoneNumber,
                     DataNascimento = user.DataNascimento,
                     PreferenciasNotas = user.PreferenciasNotas,
                     //PercentualComissao = user.PercentualComissao,

@@ -137,6 +137,11 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
                 Status = u.Ativo ? "Ativo" : "Inativo"
             }).ToList();
 
+            if (dgvUsuarios.Columns["Id"] != null)
+            {
+                dgvUsuarios.Columns["Id"].Visible = false;
+            }
+
             GarantirColunaHistorico();
         }
 

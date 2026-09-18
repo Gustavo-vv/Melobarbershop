@@ -52,6 +52,7 @@ public static class DbSeeder
                 UserName = adminEmail,
                 Email = adminEmail,
                 Nome = "Administrador",
+                PhoneNumber = "(11) 98888-8888",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Ativo = true,
@@ -69,6 +70,11 @@ public static class DbSeeder
             {
                 logger.LogError($"Erro ao criar Admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
+        }
+        else if (string.IsNullOrEmpty(adminExistente.PhoneNumber))
+        {
+            adminExistente.PhoneNumber = "(11) 98888-8888";
+            await userManager.UpdateAsync(adminExistente);
         }
     }
 }

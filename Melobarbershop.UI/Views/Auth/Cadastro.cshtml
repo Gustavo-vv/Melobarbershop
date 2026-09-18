@@ -83,7 +83,7 @@
                         <label for="nascimento">Data de nascimento</label>
                         <div class="register-input">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
-                            <input type="date" id="nascimento" name="nascimento" value="@(Model.DataNascimento?.ToString("yyyy-MM-dd"))" autocomplete="bday">
+                            <input type="date" id="nascimento" name="nascimento" value="@(Model.DataNascimento?.ToString("yyyy-MM-dd"))" autocomplete="bday" min="1900-01-01" max="@DateTime.Today.ToString("yyyy-MM-dd")">
                         </div>
                     </div>
                 </div>
@@ -125,7 +125,13 @@
         </section>
     </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/imask/7.6.1/imask.min.js"></script>
     <script>
+        const telefoneInput = document.getElementById('telefone');
+        const telefoneMask = IMask(telefoneInput, {
+            mask: '(00) 00000-0000'
+        });
+
         document.querySelectorAll('.register-eye').forEach(button => {
             button.addEventListener('click', () => {
                 const input = document.getElementById(button.dataset.target);
@@ -153,6 +159,23 @@
                 message.textContent = 'Por favor, preencha todos os campos obrigatórios.';
                 message.className = 'register-message error';
                 return;
+            }
+
+            if (!telefoneMask.masked.isComplete) {
+                message.textContent = 'Por favor, insira um número de telefone celular válido e completo com DDD.';
+                message.className = 'register-message error';
+                return;
+            }
+
+            if (nascimento) {
+                const anoStr = nascimento.split('-')[0];
+                const ano = parseInt(anoStr, 10);
+                const anoAtual = new Date().getFullYear();
+                if (!/^\d{4}$/.test(anoStr) || isNaN(ano) || ano < 1900 || ano > anoAtual) {
+                    message.textContent = 'Por favor, insira uma data de nascimento com ano válido (entre 1900 e ' + anoAtual + ').';
+                    message.className = 'register-message error';
+                    return;
+                }
             }
 
             if (!termos) {
