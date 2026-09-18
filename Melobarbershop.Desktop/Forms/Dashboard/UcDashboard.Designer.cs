@@ -215,7 +215,10 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             pnlFilaLista.Location = new Point(15, 45);
             pnlFilaLista.Size = new Size(905, 185);
             pnlFilaLista.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            pnlFilaLista.AutoScroll = true;
+            pnlFilaLista.AutoScroll = false;
+            pnlFilaLista.HorizontalScroll.Enabled = false;
+            pnlFilaLista.HorizontalScroll.Visible = false;
+            pnlFilaLista.AutoScrollMinSize = new Size(0, 0);
             pnlFilaLista.Controls.Add(lblFilaVazia);
 
             // lblFilaVazia

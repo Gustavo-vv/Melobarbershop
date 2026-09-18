@@ -188,12 +188,10 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
 
         private void RenderizarFilaAgendamentos()
         {
+            // Desabilita scroll antes de limpar para evitar posição inválida
+            pnlFilaLista.AutoScroll = false;
             pnlFilaLista.SuspendLayout();
             pnlFilaLista.Controls.Clear();
-            pnlFilaLista.AutoScroll = false;
-            pnlFilaLista.HorizontalScroll.Maximum = 0;
-            pnlFilaLista.HorizontalScroll.Visible = false;
-            pnlFilaLista.AutoScroll = true;
 
             // Restantes = agendamentos ainda não atendidos e não cancelados
             var restantes = _agendamentosHoje.Count(a =>
@@ -209,7 +207,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
                 return;
             }
 
-            int itemWidth = Math.Max(200, pnlFilaLista.ClientSize.Width - (pnlFilaLista.VerticalScroll.Visible ? 20 : 10));
+            int itemWidth = Math.Max(200, pnlFilaLista.ClientSize.Width - 14);
             int top = 5;
 
             foreach (var ag in _agendamentosHoje)
@@ -224,7 +222,10 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
                 top += cardLinha.Height + 8;
             }
 
+            // Habilita scroll após adicionar todos os itens e forca topo
             pnlFilaLista.ResumeLayout(true);
+            pnlFilaLista.AutoScroll = true;
+            pnlFilaLista.AutoScrollPosition = new Point(0, 0);
         }
 
         private Panel CriarCardAgendamentoLinha(AgendamentoDto ag)

@@ -75,25 +75,25 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
 
             // btnAlternarStatus
             btnAlternarStatus.Location = new Point(0, 3);
-            btnAlternarStatus.Size = new Size(180, 36);
-            btnAlternarStatus.Text = "⚡ Ativar/Desativar Usuário";
+            btnAlternarStatus.Size = new Size(150, 36);
+            btnAlternarStatus.Text = "Ativar / Desativar";
             btnAlternarStatus.Click += btnAlternarStatus_Click;
 
             // btnHistoricoCliente
-            btnHistoricoCliente.Location = new Point(190, 3);
-            btnHistoricoCliente.Size = new Size(150, 36);
-            btnHistoricoCliente.Text = "📋 Ver Histórico";
+            btnHistoricoCliente.Location = new Point(158, 3);
+            btnHistoricoCliente.Size = new Size(130, 36);
+            btnHistoricoCliente.Text = "Ver Histórico";
             btnHistoricoCliente.Click += btnHistoricoCliente_Click;
 
             // lblFiltro
-            lblFiltro.Location = new Point(355, 10);
-            lblFiltro.Size = new Size(90, 22);
+            lblFiltro.Location = new Point(300, 10);
+            lblFiltro.Size = new Size(85, 22);
             lblFiltro.Text = "Filtrar perfil:";
             lblFiltro.ForeColor = Color.FromArgb(160, 163, 175);
 
             // cmbFiltroRole
-            cmbFiltroRole.Location = new Point(450, 7);
-            cmbFiltroRole.Size = new Size(170, 28);
+            cmbFiltroRole.Location = new Point(388, 7);
+            cmbFiltroRole.Size = new Size(175, 28);
             cmbFiltroRole.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbFiltroRole.SelectedIndexChanged += cmbFiltroRole_SelectedIndexChanged;
 
@@ -101,7 +101,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             btnAtualizar.Location = new Point(815, 3);
             btnAtualizar.Size = new Size(120, 36);
             btnAtualizar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnAtualizar.Text = "🔄 Recarregar";
+            btnAtualizar.Text = "Recarregar";
             btnAtualizar.Click += btnAtualizar_Click;
 
             // lblBusca
