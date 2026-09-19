@@ -1,23 +1,39 @@
+// ============================================================================
+// Arquivo: UcAgendamentos.cs
+// Camada: Melobarbershop.Desktop (Forms / Agendamentos)
+// Objetivo: Módulo de gestão completa de agendamentos com filtros dinâmicos, chips de status e ações operacionais.
+// Papel na Arquitetura:
+//   - Consulta a API via AgendamentoApiService para buscar agendamentos por períodos predefinidos ou personalizados.
+//   - Renderiza badges visuais com contadores por status (Pendente, Confirmado, Em Atendimento, Concluído, etc.).
+//   - Dispara transições de status (Check-in, Concluir, Cancelar, Falta) diretamente na grid ou via menu de contexto.
+// ============================================================================
+
 using Melobarbershop.Desktop.Models;
 using Melobarbershop.Desktop.Services;
 using Melobarbershop.Desktop.Theme;
 
-namespace Melobarbershop.Desktop.Forms.Agendamentos
-{
-    public partial class UcAgendamentos : UserControl
-    {
-        private readonly AgendamentoApiService _agendamentoService = new();
-        private List<AgendamentoDto> _listaAgendamentos = new();
-        private bool _carregando = false;
-        private StatusAgendamentoDto? _filtroStatusSelecionado = null;
-        private readonly EmptyStatePanel _emptyState = new();
+namespace Melobarbershop.Desktop.Forms.Agendamentos;
 
-        public UcAgendamentos()
-        {
-            InitializeComponent();
-            ConfigurarEstilo();
-            ConfigurarEmptyState();
-        }
+/// <summary>
+/// Controle de usuário responsável pela gestão detalhada de agendamentos, filtros por período e status.
+/// </summary>
+public partial class UcAgendamentos : UserControl
+{
+    private readonly AgendamentoApiService _agendamentoService = new();
+    private List<AgendamentoDto> _listaAgendamentos = new();
+    private bool _carregando = false;
+    private StatusAgendamentoDto? _filtroStatusSelecionado = null;
+    private readonly EmptyStatePanel _emptyState = new();
+
+    /// <summary>
+    /// Construtor do UserControl de Agendamentos.
+    /// </summary>
+    public UcAgendamentos()
+    {
+        InitializeComponent();
+        ConfigurarEstilo();
+        ConfigurarEmptyState();
+    }
 
         private void ConfigurarEmptyState()
         {

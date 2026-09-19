@@ -1,26 +1,47 @@
+// ============================================================================
+// Arquivo: FormEditarServico.cs
+// Camada: Melobarbershop.Desktop (Forms / Servicos)
+// Objetivo: Diálogo modal para criação ou edição de serviços da barbearia.
+// Papel na Arquitetura:
+//   - Recebe opcionalmente um ServicoDto existente para edição ou opera em modo de inserção.
+//   - Coleta e valida dados (Nome, Descrição, Preço, Duração em minutos, Ativo, Exibir no Site).
+//   - Expõe os DTOs preenchidos (ServicoCriado ou ServicoAtualizado) para persistência pelo chamador.
+// ============================================================================
+
 using Melobarbershop.Desktop.Models;
 using Melobarbershop.Desktop.Theme;
 
-namespace Melobarbershop.Desktop.Forms.Servicos
+namespace Melobarbershop.Desktop.Forms.Servicos;
+
+/// <summary>
+/// Janela de diálogo para cadastro e edição de informações de um serviço.
+/// </summary>
+public partial class FormEditarServico : Form
 {
-    public partial class FormEditarServico : Form
+    /// <summary>DTO preenchido em caso de criação de novo serviço.</summary>
+    public CriarServicoDto? ServicoCriado { get; private set; }
+
+    /// <summary>DTO preenchido em caso de edição de serviço existente.</summary>
+    public AtualizarServicoDto? ServicoAtualizado { get; private set; }
+
+    /// <summary>Indica se as alterações foram salvas com sucesso pelo operador.</summary>
+    public bool Salvo { get; private set; } = false;
+
+    private readonly ServicoDto? _servicoOriginal;
+    private readonly bool _modoEdicao;
+
+    /// <summary>
+    /// Construtor do formulário de serviço, aceitando opcionalmente uma entidade para edição.
+    /// </summary>
+    public FormEditarServico(ServicoDto? servico = null)
     {
-        public CriarServicoDto? ServicoCriado { get; private set; }
-        public AtualizarServicoDto? ServicoAtualizado { get; private set; }
-        public bool Salvo { get; private set; } = false;
+        _servicoOriginal = servico;
+        _modoEdicao = servico != null;
 
-        private readonly ServicoDto? _servicoOriginal;
-        private readonly bool _modoEdicao;
-
-        public FormEditarServico(ServicoDto? servico = null)
-        {
-            _servicoOriginal = servico;
-            _modoEdicao = servico != null;
-
-            InitializeComponent();
-            ConfigurarEstilo();
-            PreencherCampos();
-        }
+        InitializeComponent();
+        ConfigurarEstilo();
+        PreencherCampos();
+    }
 
         private void ConfigurarEstilo()
         {

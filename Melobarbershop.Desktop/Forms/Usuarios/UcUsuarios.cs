@@ -1,21 +1,37 @@
+// ============================================================================
+// Arquivo: UcUsuarios.cs
+// Camada: Melobarbershop.Desktop (Forms / Usuarios)
+// Objetivo: Controle de usuário para gestão e consulta de usuários (Barbeiros, Clientes e Administradores).
+// Papel na Arquitetura:
+//   - Integra com UsuarioApiService para carregar e filtrar usuários por papéis/roles.
+//   - Permite ativar e desativar contas de usuários diretamente pelo painel.
+//   - Abre a tela de histórico e perfil completo de clientes (FormHistoricoCliente).
+// ============================================================================
+
 using Melobarbershop.Desktop.Models;
 using Melobarbershop.Desktop.Services;
 using Melobarbershop.Desktop.Theme;
 
-namespace Melobarbershop.Desktop.Forms.Usuarios
-{
-    public partial class UcUsuarios : UserControl
-    {
-        private readonly UsuarioApiService _usuarioService = new();
-        private List<UsuarioDto> _listaUsuarios = new();
-        private readonly EmptyStatePanel _emptyState = new();
+namespace Melobarbershop.Desktop.Forms.Usuarios;
 
-        public UcUsuarios()
-        {
-            InitializeComponent();
-            ConfigurarEstilo();
-            ConfigurarEmptyState();
-        }
+/// <summary>
+/// Controle de usuário responsável pela gestão de usuários e acesso ao histórico de clientes.
+/// </summary>
+public partial class UcUsuarios : UserControl
+{
+    private readonly UsuarioApiService _usuarioService = new();
+    private List<UsuarioDto> _listaUsuarios = new();
+    private readonly EmptyStatePanel _emptyState = new();
+
+    /// <summary>
+    /// Construtor padrão do UserControl de Usuários.
+    /// </summary>
+    public UcUsuarios()
+    {
+        InitializeComponent();
+        ConfigurarEstilo();
+        ConfigurarEmptyState();
+    }
 
         private void ConfigurarEmptyState()
         {

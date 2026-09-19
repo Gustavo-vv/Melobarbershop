@@ -1,27 +1,43 @@
+// ============================================================================
+// Arquivo: FormHistoricoCliente.cs
+// Camada: Melobarbershop.Desktop (Forms / Usuarios)
+// Objetivo: Janela para consulta do histórico de agendamentos e métricas de fidelidade de um cliente específico.
+// Papel na Arquitetura:
+//   - Recebe o identificador do cliente e consome AgendamentoApiService para listar todo o histórico.
+//   - Apresenta métricas consolidadas (Total de visitas, Barbeiro favorito, Gasto acumulado).
+//   - Oferece visão em DataGridView estilizada com badges de status de atendimento.
+// ============================================================================
+
 using Melobarbershop.Desktop.Models;
 using Melobarbershop.Desktop.Services;
 using Melobarbershop.Desktop.Theme;
 
-namespace Melobarbershop.Desktop.Forms.Usuarios
+namespace Melobarbershop.Desktop.Forms.Usuarios;
+
+/// <summary>
+/// Formulário modal exibindo o histórico de atendimentos e perfil detalhado de um cliente.
+/// </summary>
+public partial class FormHistoricoCliente : Form
 {
-    public partial class FormHistoricoCliente : Form
+    private readonly string _clienteId;
+    private readonly string _nomeCliente;
+    private readonly AgendamentoApiService _agendamentoService = new();
+    private readonly EmptyStatePanel _emptyState = new();
+
+    /// <summary>
+    /// Construtor recebendo o ID e Nome do cliente selecionado.
+    /// </summary>
+    public FormHistoricoCliente(string clienteId, string nomeCliente)
     {
-        private readonly string _clienteId;
-        private readonly string _nomeCliente;
-        private readonly AgendamentoApiService _agendamentoService = new();
-        private readonly EmptyStatePanel _emptyState = new();
+        _clienteId = clienteId;
+        _nomeCliente = nomeCliente;
 
-        public FormHistoricoCliente(string clienteId, string nomeCliente)
-        {
-            _clienteId = clienteId;
-            _nomeCliente = nomeCliente;
+        InitializeComponent();
+        ConfigurarEstilo();
+        ConfigurarEmptyState();
 
-            InitializeComponent();
-            ConfigurarEstilo();
-            ConfigurarEmptyState();
-
-            TemaMelobarbershop.TemaAlterado += AplicarTema;
-        }
+        TemaMelobarbershop.TemaAlterado += AplicarTema;
+    }
 
         private void ConfigurarEstilo()
         {

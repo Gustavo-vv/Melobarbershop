@@ -1,22 +1,38 @@
+// ============================================================================
+// Arquivo: UcServicos.cs
+// Camada: Melobarbershop.Desktop (Forms / Servicos)
+// Objetivo: Controle de usuário para gestão do catálogo de serviços prestados (CRUD e status).
+// Papel na Arquitetura:
+//   - Integra com ServicoApiService para listar, cadastrar, editar, desativar ou excluir serviços.
+//   - Abre os diálogos modais de cadastro e edição (FormEditarServico).
+//   - Exibe status visual (badges) de ativação e visibilidade no site.
+// ============================================================================
+
 using Melobarbershop.Desktop.Forms;
 using Melobarbershop.Desktop.Models;
 using Melobarbershop.Desktop.Services;
 using Melobarbershop.Desktop.Theme;
 
-namespace Melobarbershop.Desktop.Forms.Servicos
-{
-    public partial class UcServicos : UserControl
-    {
-        private readonly ServicoApiService _servicoService = new();
-        private List<ServicoDto> _listaServicos = new();
-        private readonly EmptyStatePanel _emptyState = new();
+namespace Melobarbershop.Desktop.Forms.Servicos;
 
-        public UcServicos()
-        {
-            InitializeComponent();
-            ConfigurarEstilo();
-            ConfigurarEmptyState();
-        }
+/// <summary>
+/// Controle de usuário responsável pela listagem e ações do catálogo de serviços no painel Desktop.
+/// </summary>
+public partial class UcServicos : UserControl
+{
+    private readonly ServicoApiService _servicoService = new();
+    private List<ServicoDto> _listaServicos = new();
+    private readonly EmptyStatePanel _emptyState = new();
+
+    /// <summary>
+    /// Construtor padrão do UserControl de Serviços.
+    /// </summary>
+    public UcServicos()
+    {
+        InitializeComponent();
+        ConfigurarEstilo();
+        ConfigurarEmptyState();
+    }
 
         private void ConfigurarEmptyState()
         {

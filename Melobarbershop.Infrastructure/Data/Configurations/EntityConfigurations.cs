@@ -1,12 +1,22 @@
-// Arquivo: Melobarbershop.Infrastructure/Data/Configurations/EntityConfigurations.cs
-// Namespace: Melobarbershop.Infrastructure.Data.Configurations
-// Resumo: Contém configurações de mapeamento EF Core para entidades do domínio (Fluent API).
+// ============================================================================
+// Arquivo: EntityConfigurations.cs
+// Camada: Melobarbershop.Infrastructure (Data / Configurations)
+// Objetivo: Mapeamento de entidades do domínio para tabelas do banco de dados relacional (Fluent API).
+// Papel na Arquitetura:
+//   - Configura nomes de tabelas, chaves primárias, índices únicos e limites de tamanho (HasMaxLength).
+//   - Define precisão de campos monetários (HasPrecision(18, 2)).
+//   - Estabelece regras de integridade referencial e comportamentos de exclusão (Cascade, Restrict, SetNull).
+// ============================================================================
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Melobarbershop.Domain.Entidades;
 
 namespace Melobarbershop.Infrastructure.Data.Configurations;
 
+/// <summary>
+/// Mapeamento relacional da entidade de usuários do sistema (ApplicationUser).
+/// </summary>
 public class ApplicationUserConfiguration : IEntityTypeConfiguration<ApplicationUser>
 {
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
@@ -28,6 +38,9 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
     }
 }
 
+/// <summary>
+/// Mapeamento relacional da entidade de Serviços.
+/// </summary>
 public class ServicoConfiguration : IEntityTypeConfiguration<Servico>
 {
     public void Configure(EntityTypeBuilder<Servico> builder)
@@ -49,6 +62,9 @@ public class ServicoConfiguration : IEntityTypeConfiguration<Servico>
     }
 }
 
+/// <summary>
+/// Mapeamento relacional da entidade de Pacotes promocionais.
+/// </summary>
 public class PacoteConfiguration : IEntityTypeConfiguration<Pacote>
 {
     public void Configure(EntityTypeBuilder<Pacote> builder)
@@ -72,6 +88,9 @@ public class PacoteConfiguration : IEntityTypeConfiguration<Pacote>
     }
 }
 
+/// <summary>
+/// Mapeamento da entidade associativa de itens do pacote de serviços.
+/// </summary>
 public class PacoteItemConfiguration : IEntityTypeConfiguration<PacoteItem>
 {
     public void Configure(EntityTypeBuilder<PacoteItem> builder)
@@ -87,6 +106,9 @@ public class PacoteItemConfiguration : IEntityTypeConfiguration<PacoteItem>
     }
 }
 
+/// <summary>
+/// Mapeamento relacional de Produtos, índices de código de barras e relacionamentos de estoque.
+/// </summary>
 public class ProdutoConfiguration : IEntityTypeConfiguration<Produto>
 {
     public void Configure(EntityTypeBuilder<Produto> builder)
@@ -119,6 +141,9 @@ public class ProdutoConfiguration : IEntityTypeConfiguration<Produto>
     }
 }
 
+/// <summary>
+/// Mapeamento de logs de movimentação de estoque de produtos.
+/// </summary>
 public class MovimentacaoEstoqueConfiguration : IEntityTypeConfiguration<MovimentacaoEstoque>
 {
     public void Configure(EntityTypeBuilder<MovimentacaoEstoque> builder)
@@ -132,6 +157,9 @@ public class MovimentacaoEstoqueConfiguration : IEntityTypeConfiguration<Movimen
     }
 }
 
+/// <summary>
+/// Mapeamento da entidade de Agendamentos, incluindo vínculos de Cliente, Barbeiro, Itens e Avaliação.
+/// </summary>
 public class AgendamentoConfiguration : IEntityTypeConfiguration<Agendamento>
 {
     public void Configure(EntityTypeBuilder<Agendamento> builder)
@@ -165,6 +193,9 @@ public class AgendamentoConfiguration : IEntityTypeConfiguration<Agendamento>
     }
 }
 
+/// <summary>
+/// Mapeamento dos itens de serviços vinculados a um agendamento.
+/// </summary>
 public class AgendamentoItemConfiguration : IEntityTypeConfiguration<AgendamentoItem>
 {
     public void Configure(EntityTypeBuilder<AgendamentoItem> builder)
@@ -183,6 +214,9 @@ public class AgendamentoItemConfiguration : IEntityTypeConfiguration<Agendamento
     }
 }
 
+/// <summary>
+/// Mapeamento de bloqueios de horários e folgas na agenda de barbeiros.
+/// </summary>
 public class BloqueioAgendaConfiguration : IEntityTypeConfiguration<BloqueioAgenda>
 {
     public void Configure(EntityTypeBuilder<BloqueioAgenda> builder)
@@ -202,6 +236,9 @@ public class BloqueioAgendaConfiguration : IEntityTypeConfiguration<BloqueioAgen
     }
 }
 
+/// <summary>
+/// Mapeamento de vendas, comandas e caixas fechados com vínculos a clientes, itens e pagamentos.
+/// </summary>
 public class VendaConfiguration : IEntityTypeConfiguration<Venda>
 {
     public void Configure(EntityTypeBuilder<Venda> builder)
@@ -241,6 +278,9 @@ public class VendaConfiguration : IEntityTypeConfiguration<Venda>
     }
 }
 
+/// <summary>
+/// Mapeamento dos itens vendidos (serviços ou produtos físicos) em uma comanda.
+/// </summary>
 public class VendaItemConfiguration : IEntityTypeConfiguration<VendaItem>
 {
     public void Configure(EntityTypeBuilder<VendaItem> builder)
@@ -269,6 +309,9 @@ public class VendaItemConfiguration : IEntityTypeConfiguration<VendaItem>
     }
 }
 
+/// <summary>
+/// Mapeamento de parcelas e liquidações de pagamentos no caixa.
+/// </summary>
 public class PagamentoConfiguration : IEntityTypeConfiguration<Pagamento>
 {
     public void Configure(EntityTypeBuilder<Pagamento> builder)
@@ -282,6 +325,9 @@ public class PagamentoConfiguration : IEntityTypeConfiguration<Pagamento>
     }
 }
 
+/// <summary>
+/// Mapeamento das notas e comentários deixados pelos clientes após os atendimentos.
+/// </summary>
 public class AvaliacaoConfiguration : IEntityTypeConfiguration<Avaliacao>
 {
     public void Configure(EntityTypeBuilder<Avaliacao> builder)
@@ -305,6 +351,9 @@ public class AvaliacaoConfiguration : IEntityTypeConfiguration<Avaliacao>
     }
 }
 
+/// <summary>
+/// Mapeamento dos modelos textuais para notificações automatizadas aos clientes.
+/// </summary>
 public class TemplateMensagemConfiguration : IEntityTypeConfiguration<TemplateMensagem>
 {
     public void Configure(EntityTypeBuilder<TemplateMensagem> builder)
@@ -323,6 +372,9 @@ public class TemplateMensagemConfiguration : IEntityTypeConfiguration<TemplateMe
     }
 }
 
+/// <summary>
+/// Mapeamento da auditoria de notificações enviadas via mensageria aos clientes.
+/// </summary>
 public class NotificacaoLogConfiguration : IEntityTypeConfiguration<NotificacaoLog>
 {
     public void Configure(EntityTypeBuilder<NotificacaoLog> builder)
