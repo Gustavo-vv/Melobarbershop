@@ -1,1320 +1,207 @@
-@model Melobarbershop.UI.ViewModels.AdminViewModel
 @{
-    Layout = null;
+    ViewData["Title"] = "Painel";
+    ViewData["ActiveNav"] = "visao-geral";
+    ViewData["PageTitle"] = "Visão geral do dia";
+    ViewData["PageSubtitle"] = "Terça-feira, 16 de setembro — atualizado agora";
+    Layout = "_AdminLayout";
 }
 
-<!DOCTYPE html>
-<html lang="pt-BR" class="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Melo Barber Shop - Desktop Admin Pro</title>
-  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
-  <link rel="stylesheet" href="~/css/admin-theme.css" />
-</head>
-<body class="h-screen w-screen overflow-hidden flex flex-col bg-[#08090d] text-slate-100 antialiased selection:bg-cyan-500 selection:text-black">
-
-  <!-- ========================================================================= -->
-  <!-- NATIVE DESKTOP WINDOW TITLEBAR (WINDOWS 11 / MACOS COMPATIBLE STYLE) -->
-  <!-- ========================================================================= -->
-  <header class="h-10 bg-[#0d0f16] border-b border-slate-800/80 flex items-center justify-between px-3 select-none flex-shrink-0 z-50">
-    <!-- Left: App Identity & Window Icon -->
-    <div class="flex items-center gap-3">
-      <!-- App Brand Mini Icon -->
-      <div class="flex items-center gap-2">
-        <div class="w-6 h-6 rounded-md bg-gradient-to-tr from-rose-600 via-purple-600 to-sky-500 flex items-center justify-center shadow-sm">
-          <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="6" cy="6" r="3"/>
-            <circle cx="6" cy="18" r="3"/>
-            <line x1="20" y1="4" x2="8.12" y2="15.88"/>
-            <line x1="14.47" y1="14.48" x2="20" y2="20"/>
-            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
-          </svg>
+@section TopbarActions {
+    <div class="filters">
+        <div class="seg" id="periodSeg">
+            <button data-period="hoje" class="active">Hoje</button>
+            <button data-period="semana">Semana</button>
+            <button data-period="mes">Mês</button>
         </div>
-        <span class="font-extrabold tracking-wider text-xs uppercase bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-sky-400 font-brand">
-          MELO BARBER <span class="text-rose-500 text-[10px] ml-0.5 px-1.5 py-0.5 rounded bg-rose-500/10 border border-rose-500/20">ADMIN v2.4</span>
-        </span>
-      </div>
-
-      <div class="h-3.5 w-px bg-slate-800 mx-1"></div>
-
-      <!-- Quick Status Indicators -->
-      <div class="flex items-center gap-2 text-[11px] text-slate-400">
-        <span class="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          Web Sync Ativo
-        </span>
-        <span class="hidden md:inline-block text-slate-500">•</span>
-        <span class="hidden md:inline-flex items-center gap-1 text-slate-400">
-          <svg class="w-3 h-3 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-          melobarbershop.com.br
-        </span>
-      </div>
+        <select class="select-filter" id="filterProf">
+            <option value="todos">Todos os profissionais</option>
+            <option value="melo">Melo</option>
+            <option value="lucas">Lucas</option>
+            <option value="diego">Diego</option>
+            <option value="andre">André</option>
+        </select>
+        <select class="select-filter" id="filterOrigin">
+            <option value="todas">Todas as origens</option>
+            <option value="site">Site</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="app">Aplicativo</option>
+            <option value="balcao">Balcão</option>
+        </select>
+        <button class="btn-ghost" onclick="refreshData()">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIcon"><path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" /></svg>
+            Atualizar
+        </button>
     </div>
+}
 
-    <!-- Center: Search Bar / Quick Command (Ctrl+K) -->
-    <div class="hidden lg:flex items-center">
-      <button onclick="triggerQuickSearch()" class="flex items-center gap-3 px-3 py-1 bg-[#131622] hover:bg-[#1a1e2f] border border-slate-800 rounded-lg text-xs text-slate-400 hover:text-slate-200 transition-all w-72 justify-between group">
-        <div class="flex items-center gap-2">
-          <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <span>Buscar cliente, corte, agendamento...</span>
-        </div>
-        <kbd class="text-[10px] bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400 font-mono">Ctrl+K</kbd>
-      </button>
+<!-- error banner -->
+<div class="banner hidden" id="errorBanner">
+    <span>Não foi possível carregar os dados mais recentes. Exibindo a última versão sincronizada.</span>
+    <button onclick="hideBanner()">Tentar novamente</button>
+</div>
+
+<!-- dev state simulator (didactic – demonstra os 3 estados de cada bloco) -->
+<div class="panel" style="padding:12px 16px;">
+    <div class="dev-controls">
+        <span>Simular estado dos dados:</span>
+        <button id="stateData" class="on" onclick="setDataState('data')">Com dados</button>
+        <button id="stateLoading" onclick="setDataState('loading')">Carregando</button>
+        <button id="stateEmpty" onclick="setDataState('empty')">Sem dados</button>
+        <button id="stateError" onclick="setDataState('error')">Erro de conexão</button>
     </div>
+</div>
 
-    <!-- Right: Window Controls (Minimize, Maximize, Close) -->
-    <div class="flex items-center gap-2">
-      <!-- Live Clock -->
-      <div id="liveClock" class="text-[11px] font-mono text-slate-400 mr-2 hidden sm:block">19:54:00</div>
-      
-      <!-- Botão Voltar ao Site -->
-      <a href="/Home/Index" title="Voltar para o site principal" class="flex items-center gap-1.5 px-2.5 py-1 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-400 hover:text-sky-300 rounded-lg text-xs font-semibold transition-all">
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        <span class="hidden sm:inline">Voltar ao Site</span>
-      </a>
-
-      <!-- Notifications Icon -->
-      <button onclick="showToast('Você tem 3 novos agendamentos feitos pelo site!')" class="relative p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition-colors mr-1">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-        <span class="absolute top-0.5 right-0.5 w-2 h-2 bg-rose-500 rounded-full animate-ping"></span>
-        <span class="absolute top-0.5 right-0.5 w-2 h-2 bg-rose-500 rounded-full"></span>
-      </button>
-
-      <!-- Window Action Buttons -->
-      <div class="flex items-center -mr-1">
-        <button title="Minimizar" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800/60 rounded transition-colors">
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
-        <button title="Maximizar" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800/60 rounded transition-colors">
-          <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-        </button>
-        <button title="Fechar" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-rose-600 rounded transition-colors">
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
+<!-- ================= KPIs ================= -->
+<section>
+    <div class="section-head">
+        <div><h2>Indicadores do período</h2><p>Calculados a partir dos agendamentos concluídos e vendas do período selecionado.</p></div>
     </div>
-  </header>
+    <div class="kpi-grid" id="kpiGrid"><!-- injected --></div>
+</section>
 
-  <!-- ========================================================================= -->
-  <!-- MAIN WORKSPACE LAYOUT (SIDEBAR + MAIN CONTENT AREA) -->
-  <!-- ========================================================================= -->
-  <div class="flex-1 flex overflow-hidden">
-
-    <!-- ==================== LEFT SIDEBAR NAVIGATION ==================== -->
-    <aside class="w-64 bg-[#0b0d14] border-r border-slate-800/80 flex flex-col justify-between flex-shrink-0">
-      
-      <!-- Brand & Navigation Items -->
-      <div class="p-3 space-y-6">
-        
-        <!-- Barber Admin Profile Badge -->
-        <div class="p-3 rounded-xl bg-[#121520] border border-slate-800/80 flex items-center gap-3">
-          <div class="relative">
-            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 via-purple-600 to-sky-500 p-0.5">
-              <div class="w-full h-full bg-[#0e1017] rounded-[7px] flex items-center justify-center font-bold text-sky-400 text-sm font-brand">
-                MB
-              </div>
-            </div>
-            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-[#0b0d14] rounded-full"></span>
-          </div>
-          <div class="overflow-hidden">
-            <h4 class="text-xs font-bold text-white truncate flex items-center gap-1.5">
-              Melo Master
-              <span class="text-[9px] px-1 bg-sky-500/20 text-sky-400 rounded font-normal">Dono</span>
-            </h4>
-            <p class="text-[11px] text-slate-400 truncate">Gerenciando Unidade 01</p>
-          </div>
+<!-- ================= AGENDA + EQUIPE AO VIVO ================= -->
+<div class="grid-2">
+    <section class="panel">
+        <div class="section-head">
+            <div><h2>Agenda do dia</h2><p>Agrupada por status. As ações abaixo alteram o status real do agendamento.</p></div>
+            <span class="tag" id="agendaCountTag">— agendamentos</span>
         </div>
-
-        <!-- Navigation Categories -->
-        <div class="space-y-1">
-          <div class="px-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Painel Operacional</div>
-
-          <!-- Nav Item: Dashboard -->
-          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold text-white bg-sky-500/15 border border-sky-500/30 transition-all">
-            <div class="flex items-center gap-3">
-              <svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-              <span>Visão Geral & Métricas</span>
-            </div>
-            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
-          </button>
-
-          <!-- Nav Item: Agenda / Agendamentos -->
-          <button onclick="switchTab('agenda')" id="nav-agenda" class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all">
-            <div class="flex items-center gap-3">
-              <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              <span>Agenda & Marcações</span>
-            </div>
-            <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-rose-500 text-white animate-pulse">4 Web</span>
-          </button>
-
-          <!-- Nav Item: Gestão do Site Web (Landing Page CMS) -->
-          <button onclick="switchTab('site-cms')" id="nav-site-cms" class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all group">
-            <div class="flex items-center gap-3">
-              <svg class="w-4 h-4 text-rose-400 group-hover:text-rose-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              <span>Controle do Site Web</span>
-            </div>
-            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">CMS</span>
-          </button>
-
-          <!-- Nav Item: Barbeiros & Cadeiras -->
-          <button onclick="switchTab('barbeiros')" id="nav-barbeiros" class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all">
-            <div class="flex items-center gap-3">
-              <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-              <span>Barbeiros & Equipe</span>
-            </div>
-            <span class="text-[10px] text-slate-400">4 Ativos</span>
-          </button>
-
-          <!-- Nav Item: Serviços & Preços -->
-          <button onclick="switchTab('servicos')" id="nav-servicos" class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all">
-            <div class="flex items-center gap-3">
-              <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879a3 3 0 11-4.242-4.242L11 8m2 2l-2-2m-2-2l2-2"/></svg>
-              <span>Catálogo & Preços</span>
-            </div>
-          </button>
-
-          <!-- Nav Item: Financeiro & Caixa -->
-          <button onclick="switchTab('financeiro')" id="nav-financeiro" class="nav-item w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all">
-            <div class="flex items-center gap-3">
-              <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              <span>Caixa & Financeiro</span>
-            </div>
-            <span class="text-[10px] text-emerald-400 font-mono font-bold">R$ 2.450</span>
-          </button>
+        <div class="real-content" id="agendaBlock">
+            <div class="kanban" id="kanban"><!-- injected --></div>
         </div>
+        <div class="state-loading" id="agendaLoading"><div class="spinner"></div>Carregando agenda…</div>
+        <div class="state-empty" id="agendaEmpty">Nenhum agendamento encontrado para os filtros selecionados.</div>
+    </section>
 
-        <!-- Quick System Settings -->
-        <div class="space-y-1">
-          <div class="px-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Configurações Locais</div>
-          
-          <button onclick="showToast('Abrindo gerenciador de impressora térmica para cupom')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">
-            <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-            <span>Impressora Térmica (ESC/POS)</span>
-          </button>
-
-          <a href="/Home/Index" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs text-sky-400 hover:text-sky-300 hover:bg-sky-500/10 transition-all font-semibold">
-            <svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-            <span>Voltar para o Site</span>
-          </a>
+    <section class="panel">
+        <div class="section-head">
+            <div><h2>Equipe agora</h2><p>Situação em tempo real de cada profissional.</p></div>
         </div>
-
-      </div>
-
-      <!-- Sidebar Bottom: Fast Action Button & System Diagnostics -->
-      <div class="p-3 border-t border-slate-800/80 space-y-2 bg-[#090a10]">
-        <button onclick="openModal('modalNovoAgendamento')" class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20 active:scale-95 transition-all">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          Novo Agendamento
-        </button>
-
-        <div class="flex items-center justify-between text-[10px] text-slate-500 px-1 pt-1">
-          <span class="flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Servidor Local: 12ms
-          </span>
-          <span>Porta: 8080</span>
+        <div class="real-content" id="teamBlock">
+            <div class="team-list" id="teamList"><!-- injected --></div>
         </div>
-      </div>
+        <div class="state-loading" id="teamLoading"><div class="spinner"></div>Sincronizando equipe…</div>
+        <div class="state-empty" id="teamEmpty">Nenhum profissional ativo no momento.</div>
+    </section>
+</div>
 
-    </aside>
-
-    <!-- ==================== MAIN CONTENT CANVAS ==================== -->
-    <main class="flex-1 flex flex-col overflow-hidden bg-[#07080c]">
-      
-      <!-- Top Action Bar for Main Canvas -->
-      <div class="h-14 border-b border-slate-800/70 bg-[#0c0e15]/70 px-6 flex items-center justify-between flex-shrink-0 backdrop-blur-md">
-        
-        <!-- Left: Current Section Title & Breadcrumb -->
-        <div class="flex items-center gap-3">
-          <h1 id="pageTitle" class="text-base font-extrabold tracking-tight text-white font-brand flex items-center gap-2">
-            Visão Geral & Dashboard em Tempo Real
-          </h1>
-          <span class="text-slate-600 text-sm">/</span>
-          <span id="pageSubTitle" class="text-xs text-slate-400 font-medium">Hoje, 27 de Agosto de 2026</span>
+<!-- ================= FINANCEIRO ================= -->
+<div class="grid-2">
+    <section class="panel">
+        <div class="section-head">
+            <div><h2>Evolução do faturamento</h2><p>Serviços e produtos, por dia do período.</p></div>
+            <div class="chart-legend">
+                <span><span class="dot" style="background:var(--blue)"></span>Serviços</span>
+                <span><span class="dot" style="background:var(--panel-3);border:1px solid var(--border-strong)"></span>Produtos</span>
+            </div>
         </div>
-
-        <!-- Right: Actions, Date Picker & Quick Live Sync -->
-        <div class="flex items-center gap-3">
-          <!-- Barber Chairs Filter -->
-          <div class="flex items-center bg-[#131622] p-1 rounded-lg border border-slate-800 text-xs">
-            <button class="px-2.5 py-1 rounded bg-slate-800 text-white font-medium text-[11px] shadow-sm">Todas Cadeiras</button>
-            <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white font-medium text-[11px] transition-colors">Cadeira 01 (Melo)</button>
-            <button class="px-2.5 py-1 rounded text-slate-400 hover:text-white font-medium text-[11px] transition-colors">Cadeira 02 (Lucas)</button>
-          </div>
-
-          <!-- Quick Web Sync Button -->
-          <button onclick="syncWithWebsite()" id="btnSyncWeb" class="flex items-center gap-2 px-3 py-1.5 bg-[#141824] hover:bg-slate-800 border border-sky-500/30 rounded-lg text-xs font-semibold text-sky-400 hover:text-sky-300 transition-all shadow-sm">
-            <svg id="syncIcon" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            <span>Sincronizar Web</span>
-          </button>
-
-          <!-- Abrir Caixa / Fechar Caixa -->
-          <button onclick="showToast('Status do Caixa: Aberto com R$ 250,00 de fundo')" class="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-xs font-semibold text-emerald-400 transition-all">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span>Caixa Aberto</span>
-          </button>
+        <div class="real-content" id="revenueBlock">
+            <div class="bars-wrap" id="revenueBars"><!-- injected --></div>
         </div>
+        <div class="state-loading" id="revenueLoading"><div class="spinner"></div>Calculando faturamento…</div>
+        <div class="state-empty" id="revenueEmpty">Sem vendas registradas neste período.</div>
+    </section>
 
-      </div>
-
-      <!-- Tab Contents Scrollable Container -->
-      <div class="flex-1 overflow-y-auto p-6 space-y-6">
-
-        <!-- ================================================================= -->
-        <!-- TAB 1: DASHBOARD & REALTIME METRICS (DEFAULT) -->
-        <!-- ================================================================= -->
-        <div id="tab-dashboard" class="tab-content space-y-6">
-          
-          @if (!string.IsNullOrEmpty(Model.MensagemErro))
-          {
-            <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>@Model.MensagemErro</span>
-              </div>
-              <button type="button" onclick="location.reload()" class="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500/30 rounded text-rose-300 font-semibold transition-colors">Tentar novamente</button>
-            </div>
-          }
-
-          <!-- TOP STAT CARDS (Reflects Web Brand: 10h-21h, 20+ Clientes, 2024) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            
-            <!-- Card 1: Faturamento Hoje -->
-            <div class="p-4 rounded-xl bg-[#11141d] border border-slate-800/80 hover:border-slate-700 transition-all relative overflow-hidden group">
-              <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-all"></div>
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Faturamento Hoje</span>
-                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-              </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-white font-brand">@Model.FaturamentoHojeFormatado</span>
-                <span class="text-xs font-semibold text-emerald-400 flex items-center">+18% vs ontem</span>
-              </div>
-              <p class="text-[11px] text-slate-500 mt-2">Ticket médio: <strong class="text-slate-300 font-semibold">R$ 68,00</strong> / cliente</p>
-            </div>
-
-            <!-- Card 2: Agendamentos & Atendimentos -->
-            <div class="p-4 rounded-xl bg-[#11141d] border border-slate-800/80 hover:border-slate-700 transition-all relative overflow-hidden group">
-              <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-sky-500/5 rounded-full blur-xl group-hover:bg-sky-500/10 transition-all"></div>
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Atendimentos / Dia</span>
-                <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                </div>
-              </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-white font-brand">@Model.AtendimentosHoje Clientes</span>
-                <span class="text-xs font-semibold text-sky-400">Meta: 20+</span>
-              </div>
-              <p class="text-[11px] text-slate-500 mt-2">19 finalizados • <strong class="text-amber-400">4 na cadeira</strong> • 5 na fila</p>
-            </div>
-
-            <!-- Card 3: Origem dos Clientes (Web vs Presencial) -->
-            <div class="p-4 rounded-xl bg-[#11141d] border border-slate-800/80 hover:border-slate-700 transition-all relative overflow-hidden group">
-              <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-rose-500/5 rounded-full blur-xl group-hover:bg-rose-500/10 transition-all"></div>
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Agendados Pelo Site Web</span>
-                <div class="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-                </div>
-              </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-white font-brand">72%</span>
-                <span class="text-xs font-semibold text-rose-400">@Model.AgendamentosWeb agendamentos</span>
-              </div>
-              <p class="text-[11px] text-slate-500 mt-2">Landing Page convertendo <strong class="text-emerald-400">+34%</strong> nesta semana</p>
-            </div>
-
-            <!-- Card 4: Ocupação das Cadeiras -->
-            <div class="p-4 rounded-xl bg-[#11141d] border border-slate-800/80 hover:border-slate-700 transition-all relative overflow-hidden group">
-              <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-purple-500/5 rounded-full blur-xl group-hover:bg-purple-500/10 transition-all"></div>
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Taxa de Ocupação</span>
-                <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-              </div>
-              <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-white font-brand">@Model.TaxaOcupacao%</span>
-                <span class="text-xs font-semibold text-purple-400">Horário Nobre</span>
-              </div>
-              <p class="text-[11px] text-slate-500 mt-2">Horário de Pico: <strong class="text-slate-300">17h00 às 20h30</strong></p>
-            </div>
-
-          </div>
-
-          <!-- MIDDLE SECTION: LIVE FLOOR STATUS + APPOINTMENTS TIMELINE -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- LEFT 2 COLS: Cadeiras ao Vivo no Salão (Live Floor Monitor) -->
-            <div class="lg:col-span-2 space-y-4">
-              
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <h3 class="text-sm font-bold text-white font-brand flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Monitor de Cadeiras & Atendimentos em Tempo Real
-                  </h3>
-                </div>
-                <span class="text-[11px] text-slate-400 font-mono">4 Bancadas em Operação</span>
-              </div>
-
-              <!-- 4 Barber Workstations Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                
-                <!-- Cadeira 01 - Melo (Master) -->
-                <div class="p-4 rounded-xl bg-[#11141e] border border-sky-500/40 relative overflow-hidden shadow-lg shadow-sky-500/5">
-                  <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-9 h-9 rounded-lg bg-sky-500/20 border border-sky-400 flex items-center justify-center font-bold text-sky-400 font-brand text-xs">
-                        C1
-                      </div>
-                      <div>
-                        <h4 class="text-xs font-bold text-white">Melo (Master Barber)</h4>
-                        <span class="text-[10px] text-slate-400 font-mono">Cadeira Principal</span>
-                      </div>
-                    </div>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                      Em Atendimento
-                    </span>
-                  </div>
-
-                  <!-- Current Client Box -->
-                  <div class="p-3 rounded-lg bg-[#090b10] border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between text-xs">
-                      <span class="font-bold text-slate-200">Gabriel Ramos (Web #1042)</span>
-                      <span class="text-sky-400 font-bold font-mono">R$ 75,00</span>
-                    </div>
-                    <div class="text-[11px] text-slate-400 flex items-center justify-between">
-                      <span>Corte Degradê + Barba Terapia</span>
-                      <span class="font-mono text-amber-400">25 / 45 min</span>
-                    </div>
-                    <!-- Progress Bar -->
-                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div class="bg-gradient-to-r from-sky-500 to-blue-600 h-full rounded-full" style="width: 55%"></div>
-                    </div>
-                  </div>
-
-                  <div class="mt-3 flex items-center justify-between text-[11px]">
-                    <span class="text-slate-400">Próximo: <strong class="text-slate-200 font-medium">Lucas V. (20:30)</strong></span>
-                    <button onclick="showToast('Finalizando atendimento de Gabriel Ramos. Abrindo tela de pagamento...')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-sky-600 text-white font-semibold text-[10px] transition-colors">
-                      Finalizar & Cobrar
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Cadeira 02 - Lucas Fade -->
-                <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 relative overflow-hidden">
-                  <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-9 h-9 rounded-lg bg-purple-500/20 border border-purple-400 flex items-center justify-center font-bold text-purple-400 font-brand text-xs">
-                        C2
-                      </div>
-                      <div>
-                        <h4 class="text-xs font-bold text-white">Lucas Fade</h4>
-                        <span class="text-[10px] text-slate-400 font-mono">Especialista Fade & Razor</span>
-                      </div>
-                    </div>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                      Em Atendimento
-                    </span>
-                  </div>
-
-                  <!-- Current Client Box -->
-                  <div class="p-3 rounded-lg bg-[#090b10] border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between text-xs">
-                      <span class="font-bold text-slate-200">Matheus Silva (Web #1044)</span>
-                      <span class="text-purple-400 font-bold font-mono">R$ 50,00</span>
-                    </div>
-                    <div class="text-[11px] text-slate-400 flex items-center justify-between">
-                      <span>Degradê Navalhado + Freestyle</span>
-                      <span class="font-mono text-emerald-400">40 / 45 min</span>
-                    </div>
-                    <!-- Progress Bar -->
-                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div class="bg-gradient-to-r from-purple-500 to-rose-500 h-full rounded-full" style="width: 88%"></div>
-                    </div>
-                  </div>
-
-                  <div class="mt-3 flex items-center justify-between text-[11px]">
-                    <span class="text-slate-400">Próximo: <strong class="text-slate-200 font-medium">Rafael M. (20:45)</strong></span>
-                    <button onclick="showToast('Finalizando atendimento de Matheus Silva')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-purple-600 text-white font-semibold text-[10px] transition-colors">
-                      Finalizar & Cobrar
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Cadeira 03 - Diego Navalha -->
-                <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 relative overflow-hidden">
-                  <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-9 h-9 rounded-lg bg-rose-500/20 border border-rose-400 flex items-center justify-center font-bold text-rose-400 font-brand text-xs">
-                        C3
-                      </div>
-                      <div>
-                        <h4 class="text-xs font-bold text-white">Diego Navalha</h4>
-                        <span class="text-[10px] text-slate-400 font-mono">Barboterapia & Pigmentação</span>
-                      </div>
-                    </div>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/10 text-sky-400 border border-sky-500/30 flex items-center gap-1">
-                      <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-                      Livre / Aguardando
-                    </span>
-                  </div>
-
-                  <!-- Idle Box -->
-                  <div class="p-3 rounded-lg bg-[#090b10] border border-dashed border-slate-800 flex flex-col items-center justify-center text-center py-4">
-                    <span class="text-xs text-slate-300 font-medium">Cadeira pronta para atendimento</span>
-                    <span class="text-[10px] text-slate-500 mt-1">Próximo agendamento web às 20h15 (Renan Costa)</span>
-                  </div>
-
-                  <div class="mt-3 flex items-center justify-between text-[11px]">
-                    <span class="text-slate-400">Total hoje: <strong class="text-emerald-400 font-mono">7 cortes (R$ 490)</strong></span>
-                    <button onclick="openModal('modalNovoAgendamento')" class="px-2.5 py-1 rounded bg-sky-600 hover:bg-sky-500 text-white font-semibold text-[10px] transition-colors">
-                      + Encaixar Cliente
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Cadeira 04 - André Tranças & Estilo -->
-                <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 relative overflow-hidden">
-                  <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-400 flex items-center justify-center font-bold text-amber-400 font-brand text-xs">
-                        C4
-                      </div>
-                      <div>
-                        <h4 class="text-xs font-bold text-white">André Tranças</h4>
-                        <span class="text-[10px] text-slate-400 font-mono">Tranças & Alinhamento</span>
-                      </div>
-                    </div>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                      Em Atendimento
-                    </span>
-                  </div>
-
-                  <!-- Current Client Box -->
-                  <div class="p-3 rounded-lg bg-[#090b10] border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between text-xs">
-                      <span class="font-bold text-slate-200">Felipe Santana (Web #1039)</span>
-                      <span class="text-amber-400 font-bold font-mono">R$ 110,00</span>
-                    </div>
-                    <div class="text-[11px] text-slate-400 flex items-center justify-between">
-                      <span>Trança Nagô + Pezinho</span>
-                      <span class="font-mono text-amber-400">50 / 90 min</span>
-                    </div>
-                    <!-- Progress Bar -->
-                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full" style="width: 55%"></div>
-                    </div>
-                  </div>
-
-                  <div class="mt-3 flex items-center justify-between text-[11px]">
-                    <span class="text-slate-400">Total hoje: <strong class="text-emerald-400 font-mono">5 atendimentos</strong></span>
-                    <button onclick="showToast('Abrindo ficha do cliente Felipe Santana')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-white font-semibold text-[10px] transition-colors">
-                      Ver Detalhes
-                    </button>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-
-            <!-- RIGHT 1 COL: Fila de Próximos Agendamentos do Site Web -->
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <h3 class="text-sm font-bold text-white font-brand flex items-center gap-2">
-                  <svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                  Fila do Agendamento Web
-                </h3>
-                <span class="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full font-bold border border-rose-500/30">
-                  5 Restantes
-                </span>
-              </div>
-
-              <!-- List of Upcoming Web Appointments -->
-              <div class="p-3 rounded-xl bg-[#11141d] border border-slate-800/80 space-y-2.5 max-h-[380px] overflow-y-auto">
-                
-                @foreach (var ag in Model.AgendamentosFila)
-                {
-                  <div class="p-2.5 rounded-lg bg-[#0d0f17] border border-slate-800 hover:border-sky-500/40 transition-all flex items-start justify-between">
-                    <div class="space-y-1">
-                      <div class="flex items-center gap-2">
-                        <span class="text-xs font-bold text-white">@ag.ClienteNome</span>
-                        <span class="text-[9px] font-bold bg-sky-500/20 text-sky-300 px-1.5 py-0.2 rounded border border-sky-500/30">@ag.Origem.ToUpper()</span>
-                      </div>
-                      <p class="text-[11px] text-slate-400">@ag.ServicoNome • @ag.BarbeiroNome</p>
-                      @if (!string.IsNullOrEmpty(ag.Telefone))
-                      {
-                        <div class="flex items-center gap-2 text-[10px] text-slate-500 font-mono">
-                          <span>📞 @ag.Telefone</span>
-                        </div>
-                      }
-                    </div>
-                    <div class="text-right space-y-1">
-                      <span class="text-xs font-bold text-emerald-400 font-mono">@ag.Horario</span>
-                      <button onclick="showToast('Confirmando chegada de @ag.ClienteNome')" class="block text-[10px] px-2 py-0.5 rounded bg-sky-600 hover:bg-sky-500 text-white font-medium">
-                        Check-in
-                      </button>
-                    </div>
-                  </div>
-                }
-
-              </div>
-
-              <!-- Quick Summary Footer -->
-              <div class="p-3 rounded-lg bg-gradient-to-r from-[#121625] to-[#181d30] border border-slate-800 text-[11px] flex items-center justify-between text-slate-300">
-                <span>Horário de Funcionamento:</span>
-                <strong class="text-white font-mono">10h às 21h (Encerra em 1h06m)</strong>
-              </div>
-
-            </div>
-
-          </div>
-
-          <!-- BOTTOM SECTION: PERFORMANCE CHARTS & DAILY FINANCIAL SUMMARY -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Revenue & Appointments Chart -->
-            <div class="lg:col-span-2 p-5 rounded-xl bg-[#11141e] border border-slate-800/80 space-y-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="text-sm font-bold text-white font-brand">Desempenho da Semana (Agendamentos Web vs Presencial)</h3>
-                  <p class="text-[11px] text-slate-400">Fluxo diário de atendimentos e receita gerada</p>
-                </div>
-                <div class="flex items-center gap-4 text-xs">
-                  <span class="flex items-center gap-1.5 text-sky-400 font-medium">
-                    <span class="w-2.5 h-2.5 rounded-sm bg-sky-400"></span> Site Web
-                  </span>
-                  <span class="flex items-center gap-1.5 text-rose-500 font-medium">
-                    <span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span> Presencial
-                  </span>
-                </div>
-              </div>
-
-              <!-- Custom SVG Graphic Chart Bar representation -->
-              <div class="h-44 flex items-end justify-between gap-3 pt-6 px-2">
-                <!-- Seg -->
-                <div class="flex-1 flex flex-col items-center gap-2 group">
-                  <span class="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity font-mono">R$ 1.8k</span>
-                  <div class="w-full flex items-end justify-center gap-1 h-32">
-                    <div class="w-1/2 bg-sky-500 rounded-t-sm transition-all group-hover:brightness-125" style="height: 60%"></div>
-                    <div class="w-1/2 bg-rose-500 rounded-t-sm transition-all group-hover:brightness-125" style="height: 35%"></div>
-                  </div>
-                  <span class="text-[11px] text-slate-400 font-medium">Seg</span>
-                </div>
-                <!-- Ter -->
-                <div class="flex-1 flex flex-col items-center gap-2 group">
-                  <span class="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity font-mono">R$ 2.1k</span>
-                  <div class="w-full flex items-end justify-center gap-1 h-32">
-                    <div class="w-1/2 bg-sky-500 rounded-t-sm transition-all group-hover:brightness-125" style="height: 70%"></div>
-                    <div class="w-1/2 bg-rose-500 rounded-t-sm transition-all group-hover:brightness-125" style="height: 25%"></div>
-                  </div>
-                  <span class="text-[11px] text-slate-400 font-medium">Ter</span>
-                </div>
-                <!-- Qua (Hoje) -->
-                <div class="flex-1 flex flex-col items-center gap-2 group">
-                  <span class="text-[10px] text-emerald-400 font-bold opacity-100 font-mono">R$ 2.45k</span>
-                  <div class="w-full flex items-end justify-center gap-1 h-32 p-0.5 rounded bg-sky-500/10 border border-sky-500/30">
-                    <div class="w-1/2 bg-gradient-to-t from-sky-600 to-sky-400 rounded-t-sm" style="height: 85%"></div>
-                    <div class="w-1/2 bg-gradient-to-t from-rose-600 to-rose-400 rounded-t-sm" style="height: 30%"></div>
-                  </div>
-                  <span class="text-[11px] text-sky-400 font-bold">Hoje</span>
-                </div>
-                <!-- Qui -->
-                <div class="flex-1 flex flex-col items-center gap-2 group opacity-60">
-                  <span class="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 font-mono">Prev. 2.6k</span>
-                  <div class="w-full flex items-end justify-center gap-1 h-32 border-b border-dashed border-slate-700">
-                    <div class="w-1/2 bg-slate-700 rounded-t-sm" style="height: 75%"></div>
-                    <div class="w-1/2 bg-slate-800 rounded-t-sm" style="height: 25%"></div>
-                  </div>
-                  <span class="text-[11px] text-slate-500 font-medium">Qui</span>
-                </div>
-                <!-- Sex -->
-                <div class="flex-1 flex flex-col items-center gap-2 group opacity-60">
-                  <span class="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 font-mono">Prev. 3.4k</span>
-                  <div class="w-full flex items-end justify-center gap-1 h-32 border-b border-dashed border-slate-700">
-                    <div class="w-1/2 bg-slate-700 rounded-t-sm" style="height: 95%"></div>
-                    <div class="w-1/2 bg-slate-800 rounded-t-sm" style="height: 30%"></div>
-                  </div>
-                  <span class="text-[11px] text-slate-500 font-medium">Sex</span>
-                </div>
-                <!-- Sab -->
-                <div class="flex-1 flex flex-col items-center gap-2 group opacity-60">
-                  <span class="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 font-mono">Prev. 4.2k</span>
-                  <div class="w-full flex items-end justify-center gap-1 h-32 border-b border-dashed border-slate-700">
-                    <div class="w-1/2 bg-slate-700 rounded-t-sm" style="height: 100%"></div>
-                    <div class="w-1/2 bg-slate-800 rounded-t-sm" style="height: 40%"></div>
-                  </div>
-                  <span class="text-[11px] text-slate-500 font-medium">Sáb</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Payment Methods Split -->
-            <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800/80 space-y-4">
-              <h3 class="text-sm font-bold text-white font-brand">Distribuição de Recebimento</h3>
-              
-              <div class="space-y-3 pt-2">
-                <!-- PIX -->
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="font-medium text-slate-300">PIX Instantâneo</span>
-                    <span class="font-bold text-sky-400 font-mono">R$ 1.520 (62%)</span>
-                  </div>
-                  <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div class="bg-sky-400 h-full rounded-full" style="width: 62%"></div>
-                  </div>
-                </div>
-
-                <!-- Cartão Crédito/Débito -->
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="font-medium text-slate-300">Cartão de Crédito / Débito</span>
-                    <span class="font-bold text-purple-400 font-mono">R$ 730 (30%)</span>
-                  </div>
-                  <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div class="bg-purple-500 h-full rounded-full" style="width: 30%"></div>
-                  </div>
-                </div>
-
-                <!-- Dinheiro -->
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="font-medium text-slate-300">Dinheiro Físico</span>
-                    <span class="font-bold text-emerald-400 font-mono">R$ 200 (8%)</span>
-                  </div>
-                  <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div class="bg-emerald-500 h-full rounded-full" style="width: 8%"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Quick Action Print Summary -->
-              <div class="pt-2 border-t border-slate-800">
-                <button onclick="showToast('Imprimindo relatório de fechamento parcial na impressora térmica...')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white rounded-lg flex items-center justify-center gap-2 transition-colors">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                  Imprimir Prévia do Fechamento
-                </button>
-              </div>
-            </div>
-
-          </div>
-
+    <section class="panel">
+        <div class="section-head">
+            <div><h2>Formas de pagamento</h2><p>Distribuição do valor recebido.</p></div>
         </div>
-
-        <!-- ================================================================= -->
-        <!-- TAB 2: GESTÃO DO SITE WEB (LANDING PAGE CMS / ADMIN DO SITE) -->
-        <!-- ================================================================= -->
-        <div id="tab-site-cms" class="tab-content hidden space-y-6">
-          
-          <!-- CMS Banner & Sync Status -->
-          <div class="p-6 rounded-2xl bg-gradient-to-r from-[#121625] via-[#171b2d] to-[#0e111a] border border-sky-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2">
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-500 text-black uppercase tracking-wider">CMS Web Ao Vivo</span>
-                <span class="text-xs text-slate-400">Última atualização enviada há 12 min</span>
-              </div>
-              <h2 class="text-lg font-black text-white font-brand">Administrador da Landing Page: Melo Barber Shop</h2>
-              <p class="text-xs text-slate-300">Altere textos, fotos da galeria, horários e preços que aparecem para os clientes no site sem precisar programar.</p>
+        <div class="real-content" id="paymentBlock">
+            <div class="donut-wrap">
+                <svg width="130" height="130" viewBox="0 0 42 42" id="donutSvg"></svg>
+                <div class="donut-legend" id="donutLegend"><!-- injected --></div>
             </div>
-
-            <div class="flex items-center gap-3">
-              <button onclick="showToast('Pré-visualização do site aberta em aba separada!')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white rounded-xl border border-slate-700 flex items-center gap-2 transition-all">
-                <svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                Visualizar Site
-              </button>
-              <button onclick="saveAndPublishCMS()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-xs font-bold text-white rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 active:scale-95 transition-all">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Publicar no Site Web
-              </button>
-            </div>
-          </div>
-
-          <!-- 2 Columns CMS Editor Grid -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
-            <!-- Left 7 Cols: Seções Editáveis do Site -->
-            <div class="lg:col-span-7 space-y-5">
-              
-              <!-- SECTION 1: HERO / BANNER PRINCIPAL -->
-              <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800 space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-md bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold text-xs">1</span>
-                    <h3 class="text-xs font-bold text-white uppercase tracking-wider">Banner Principal (Hero Section)</h3>
-                  </div>
-                  <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Visível no Site</span>
-                </div>
-
-                <div class="space-y-3">
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Título de Impacto (H1)</label>
-                    <input type="text" value="O MELHOR VISUAL COMEÇA AQUI" class="w-full px-3 py-2 rounded-lg bg-[#090b11] border border-slate-800 text-xs text-white focus:border-sky-500 outline-none font-bold">
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Subtítulo / Descrição da Marca</label>
-                    <textarea rows="2" class="w-full px-3 py-2 rounded-lg bg-[#090b11] border border-slate-800 text-xs text-slate-200 focus:border-sky-500 outline-none">Estilo, atitude e confiança. Do corte ao acabamento, a experiência que eleva o seu visual.</textarea>
-                  </div>
-                  <div class="grid grid-cols-2 gap-3">
-                    <div>
-                      <label class="block text-xs font-semibold text-slate-300 mb-1">Texto do Botão CTA</label>
-                      <input type="text" value="AGENDAR AGORA" class="w-full px-3 py-2 rounded-lg bg-[#090b11] border border-slate-800 text-xs text-white focus:border-sky-500 outline-none font-semibold">
-                    </div>
-                    <div>
-                      <label class="block text-xs font-semibold text-slate-300 mb-1">Ação do Botão</label>
-                      <select class="w-full px-3 py-2 rounded-lg bg-[#090b11] border border-slate-800 text-xs text-white focus:border-sky-500 outline-none">
-                        <option>Abrir Agendador Online Integrado</option>
-                        <option>Abrir WhatsApp Direto</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- SECTION 2: BARRA DE INFORMAÇÕES & HORÁRIOS (10h às 21h, 20+, 2024) -->
-              <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800 space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-md bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-xs">2</span>
-                    <h3 class="text-xs font-bold text-white uppercase tracking-wider">Barra de Destaques & Horários</h3>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-3">
-                  <div class="p-3 rounded-lg bg-[#090b11] border border-slate-800/80 space-y-1.5">
-                    <span class="text-[10px] text-sky-400 font-bold uppercase">Horário no Site</span>
-                    <input type="text" value="10h às 21h" class="w-full px-2 py-1 bg-[#121520] border border-slate-700 rounded text-xs font-bold text-white">
-                    <span class="text-[10px] text-slate-500 block">Texto: Horário de Atendimento</span>
-                  </div>
-                  <div class="p-3 rounded-lg bg-[#090b11] border border-slate-800/80 space-y-1.5">
-                    <span class="text-[10px] text-rose-400 font-bold uppercase">Meta de Clientes</span>
-                    <input type="text" value="20+" class="w-full px-2 py-1 bg-[#121520] border border-slate-700 rounded text-xs font-bold text-white">
-                    <span class="text-[10px] text-slate-500 block">Texto: Clientes por dia</span>
-                  </div>
-                  <div class="p-3 rounded-lg bg-[#090b11] border border-slate-800/80 space-y-1.5">
-                    <span class="text-[10px] text-emerald-400 font-bold uppercase">Ano de Fundação</span>
-                    <input type="text" value="2024" class="w-full px-2 py-1 bg-[#121520] border border-slate-700 rounded text-xs font-bold text-white">
-                    <span class="text-[10px] text-slate-500 block">Texto: Ano de fundação</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- SECTION 3: GALERIA DE FOTOS (FOTO UPLOAD & REORDENAR) -->
-              <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800 space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-md bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-xs">3</span>
-                    <h3 class="text-xs font-bold text-white uppercase tracking-wider">Galeria de Cortes do Site (4 Fotos Destaque)</h3>
-                  </div>
-                  <button onclick="showToast('Selecione uma imagem do computador para upload na galeria')" class="text-xs text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    + Enviar Foto
-                  </button>
-                </div>
-
-                <!-- 4 Photo Cards Grid with Neon Borders matching layout -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  
-                  <div class="relative group rounded-lg overflow-hidden border border-rose-500/50 bg-[#090b11]">
-                    <div class="aspect-square bg-slate-800 flex flex-col items-center justify-center text-center p-2">
-                      <span class="text-xs font-bold text-slate-200">Fade + Freestyle</span>
-                      <span class="text-[9px] text-slate-400 mt-1">foto_corte_01.jpg</span>
-                    </div>
-                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                      <button class="p-1 rounded bg-sky-600 text-white"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
-                      <button class="p-1 rounded bg-rose-600 text-white"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                    </div>
-                  </div>
-
-                  <div class="relative group rounded-lg overflow-hidden border border-sky-500/50 bg-[#090b11]">
-                    <div class="aspect-square bg-slate-800 flex flex-col items-center justify-center text-center p-2">
-                      <span class="text-xs font-bold text-slate-200">Barba Alinhada</span>
-                      <span class="text-[9px] text-slate-400 mt-1">foto_barba_02.jpg</span>
-                    </div>
-                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                      <button class="p-1 rounded bg-sky-600 text-white"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
-                      <button class="p-1 rounded bg-rose-600 text-white"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                    </div>
-                  </div>
-
-                  <div class="relative group rounded-lg overflow-hidden border border-rose-500/50 bg-[#090b11]">
-                    <div class="aspect-square bg-slate-800 flex flex-col items-center justify-center text-center p-2">
-                      <span class="text-xs font-bold text-slate-200">Degradê Navalhado</span>
-                      <span class="text-[9px] text-slate-400 mt-1">foto_corte_03.jpg</span>
-                    </div>
-                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                      <button class="p-1 rounded bg-sky-600 text-white"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
-                      <button class="p-1 rounded bg-rose-600 text-white"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                    </div>
-                  </div>
-
-                  <div class="relative group rounded-lg overflow-hidden border border-sky-500/50 bg-[#090b11]">
-                    <div class="aspect-square bg-slate-800 flex flex-col items-center justify-center text-center p-2">
-                      <span class="text-xs font-bold text-slate-200">Freestyle Infantil</span>
-                      <span class="text-[9px] text-slate-400 mt-1">foto_corte_04.jpg</span>
-                    </div>
-                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                      <button class="p-1 rounded bg-sky-600 text-white"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
-                      <button class="p-1 rounded bg-rose-600 text-white"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Right 5 Cols: Live Web Analytics & Online Booking Config -->
-            <div class="lg:col-span-5 space-y-5">
-              
-              <!-- Web Traffic & Conversion Card -->
-              <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800 space-y-4">
-                <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-sky-400"></span>
-                  Métricas da Landing Page (Hoje)
-                </h3>
-
-                <div class="space-y-3">
-                  <div class="flex items-center justify-between p-3 rounded-lg bg-[#090b11] border border-slate-800">
-                    <span class="text-xs text-slate-300">Visitantes Únicos</span>
-                    <span class="text-sm font-bold text-white font-mono">148 pessoas</span>
-                  </div>
-                  <div class="flex items-center justify-between p-3 rounded-lg bg-[#090b11] border border-slate-800">
-                    <span class="text-xs text-slate-300">Cliques em 'Agendar Agora'</span>
-                    <span class="text-sm font-bold text-sky-400 font-mono">39 cliques (26%)</span>
-                  </div>
-                  <div class="flex items-center justify-between p-3 rounded-lg bg-[#090b11] border border-slate-800">
-                    <span class="text-xs text-slate-300">Agendamentos Concluídos</span>
-                    <span class="text-sm font-bold text-emerald-400 font-mono">20 finalizados</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Regras do Agendamento Online -->
-              <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800 space-y-4">
-                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Regras do Agendamento Online</h3>
-
-                <div class="space-y-3">
-                  <label class="flex items-center justify-between p-3 rounded-lg bg-[#090b11] border border-slate-800 cursor-pointer">
-                    <div>
-                      <span class="text-xs font-bold text-white block">Exigir Sinal / Pagamento Antecipado</span>
-                      <span class="text-[10px] text-slate-400">Reduz faltas cobrando 30% via PIX no agendamento</span>
-                    </div>
-                    <input type="checkbox" checked class="w-4 h-4 accent-sky-500 rounded">
-                  </label>
-
-                  <label class="flex items-center justify-between p-3 rounded-lg bg-[#090b11] border border-slate-800 cursor-pointer">
-                    <div>
-                      <span class="text-xs font-bold text-white block">Aviso Automático de WhatsApp</span>
-                      <span class="text-[10px] text-slate-400">Envia lembrete 2h antes do corte</span>
-                    </div>
-                    <input type="checkbox" checked class="w-4 h-4 accent-sky-500 rounded">
-                  </label>
-
-                  <label class="flex items-center justify-between p-3 rounded-lg bg-[#090b11] border border-slate-800 cursor-pointer">
-                    <div>
-                      <span class="text-xs font-bold text-white block">Permitir Escolha de Barbeiro Específico</span>
-                      <span class="text-[10px] text-slate-400">Cliente pode escolher profissional favorito</span>
-                    </div>
-                    <input type="checkbox" checked class="w-4 h-4 accent-sky-500 rounded">
-                  </label>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
         </div>
+        <div class="state-loading" id="paymentLoading"><div class="spinner"></div>Somando pagamentos…</div>
+        <div class="state-empty" id="paymentEmpty">Nenhum pagamento registrado no período.</div>
+    </section>
+</div>
 
-        <!-- ================================================================= -->
-        <!-- TAB 3: AGENDA COMPLETA / CALENDÁRIO KANBAN -->
-        <!-- ================================================================= -->
-        <div id="tab-agenda" class="tab-content hidden space-y-6">
-          
-          <div class="flex items-center justify-between bg-[#11141e] p-4 rounded-xl border border-slate-800">
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-bold text-slate-400 uppercase">Filtrar por Barbeiro:</span>
-              <select class="px-3 py-1.5 bg-[#090b11] border border-slate-700 rounded-lg text-xs text-white">
-                <option>Todos os Barbeiros (4)</option>
-                <option>Melo Master</option>
-                <option>Lucas Fade</option>
-                <option>Diego Navalha</option>
-                <option>André Tranças</option>
-              </select>
-            </div>
+<!-- ================= RANKING + ESTOQUE ================= -->
+<div class="grid-2">
+    <section class="panel">
+        <div class="section-head">
+            <div><h2>Mais vendidos</h2><p>Serviços e produtos com maior receita no período.</p></div>
+        </div>
+        <div class="real-content" id="rankBlock">
+            <div class="rank-list" id="rankList"><!-- injected --></div>
+        </div>
+        <div class="state-loading" id="rankLoading"><div class="spinner"></div>Montando ranking…</div>
+        <div class="state-empty" id="rankEmpty">Nenhum item vendido no período.</div>
+    </section>
 
-            <div class="flex items-center gap-2">
-              <button class="px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/30 text-xs font-bold">Visão Lista / Horários</button>
-              <button class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white text-xs font-medium">Visão Kanban</button>
-            </div>
-          </div>
+    <section class="panel">
+        <div class="section-head">
+            <div><h2>Estoque baixo</h2><p>Produtos abaixo da quantidade mínima definida.</p></div>
+            <span class="tag" id="stockCountTag">—</span>
+        </div>
+        <div class="real-content" id="stockBlock">
+            <div id="stockList"><!-- injected --></div>
+        </div>
+        <div class="state-loading" id="stockLoading"><div class="spinner"></div>Verificando estoque…</div>
+        <div class="state-empty" id="stockEmpty">Nenhum produto abaixo do estoque mínimo. Tudo certo por aqui.</div>
+    </section>
+</div>
 
-          <!-- Table of Today Appointments -->
-          <div class="bg-[#11141e] rounded-xl border border-slate-800 overflow-hidden">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-[#090b12] text-slate-400 uppercase font-bold text-[10px] border-b border-slate-800">
-                <tr>
-                  <th class="p-3.5">Horário</th>
-                  <th class="p-3.5">Cliente</th>
-                  <th class="p-3.5">Telefone / Contato</th>
-                  <th class="p-3.5">Serviço Selecionado</th>
-                  <th class="p-3.5">Barbeiro</th>
-                  <th class="p-3.5">Valor</th>
-                  <th class="p-3.5">Origem</th>
-                  <th class="p-3.5">Status</th>
-                  <th class="p-3.5 text-right">Ação</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-800/60 text-slate-300">
-                
-                <tr class="hover:bg-[#151926] transition-colors">
-                  <td class="p-3.5 font-bold text-white font-mono">19:30</td>
-                  <td class="p-3.5 font-bold text-white">Gabriel Ramos</td>
-                  <td class="p-3.5 text-slate-400 font-mono">(11) 98765-1122</td>
-                  <td class="p-3.5">Degradê + Barba Terapia</td>
-                  <td class="p-3.5 text-sky-400 font-medium">Melo</td>
-                  <td class="p-3.5 font-mono font-bold text-emerald-400">R$ 75,00</td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 text-[10px] font-bold">Site Web</span></td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">Na Cadeira</span></td>
-                  <td class="p-3.5 text-right">
-                    <button onclick="showToast('Abrindo cobrança')" class="px-2 py-1 bg-slate-800 hover:bg-sky-600 text-white rounded font-medium text-[10px]">Cobrar</button>
-                  </td>
-                </tr>
-
-                <tr class="hover:bg-[#151926] transition-colors">
-                  <td class="p-3.5 font-bold text-white font-mono">19:45</td>
-                  <td class="p-3.5 font-bold text-white">Matheus Silva</td>
-                  <td class="p-3.5 text-slate-400 font-mono">(11) 99123-4455</td>
-                  <td class="p-3.5">Degradê Navalhado + Freestyle</td>
-                  <td class="p-3.5 text-purple-400 font-medium">Lucas Fade</td>
-                  <td class="p-3.5 font-mono font-bold text-emerald-400">R$ 50,00</td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 text-[10px] font-bold">Site Web</span></td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">Na Cadeira</span></td>
-                  <td class="p-3.5 text-right">
-                    <button onclick="showToast('Abrindo cobrança')" class="px-2 py-1 bg-slate-800 hover:bg-purple-600 text-white rounded font-medium text-[10px]">Cobrar</button>
-                  </td>
-                </tr>
-
-                <tr class="hover:bg-[#151926] transition-colors">
-                  <td class="p-3.5 font-bold text-white font-mono">20:15</td>
-                  <td class="p-3.5 font-bold text-white">Renan Costa</td>
-                  <td class="p-3.5 text-slate-400 font-mono">(11) 98765-4321</td>
-                  <td class="p-3.5">Corte Americano</td>
-                  <td class="p-3.5 text-rose-400 font-medium">Diego Navalha</td>
-                  <td class="p-3.5 font-mono font-bold text-emerald-400">R$ 45,00</td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 text-[10px] font-bold">Site Web</span></td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold">Confirmado</span></td>
-                  <td class="p-3.5 text-right">
-                    <button onclick="showToast('Iniciando atendimento de Renan Costa')" class="px-2 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded font-medium text-[10px]">Iniciar</button>
-                  </td>
-                </tr>
-
-                <tr class="hover:bg-[#151926] transition-colors">
-                  <td class="p-3.5 font-bold text-white font-mono">20:30</td>
-                  <td class="p-3.5 font-bold text-white">Lucas Vasconcelos</td>
-                  <td class="p-3.5 text-slate-400 font-mono">(11) 97112-9988</td>
-                  <td class="p-3.5">Combo Completo (Cabelo + Barba + Sobrancelha)</td>
-                  <td class="p-3.5 text-sky-400 font-medium">Melo</td>
-                  <td class="p-3.5 font-mono font-bold text-emerald-400">R$ 80,00</td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 text-[10px] font-bold">Site Web</span></td>
-                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold">Confirmado</span></td>
-                  <td class="p-3.5 text-right">
-                    <button class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded font-medium text-[10px]">Detalhes</button>
-                  </td>
-                </tr>
-
-              </tbody>
+<!-- ================= DESEMPENHO PROFISSIONAIS ================= -->
+<section class="panel">
+    <div class="section-head">
+        <div><h2>Desempenho por profissional</h2><p>Atendimentos, faturamento gerado, comissão e avaliação média no período.</p></div>
+    </div>
+    <div class="real-content" id="profBlock">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Profissional</th><th>Atendimentos</th><th>Faturamento gerado</th><th>Comissão</th><th>Avaliação</th></tr>
+                </thead>
+                <tbody id="profTableBody"><!-- injected --></tbody>
             </table>
-          </div>
-
         </div>
-
-        <!-- ================================================================= -->
-        <!-- TAB 4: CATÁLOGO DE SERVIÇOS & PREÇOS -->
-        <!-- ================================================================= -->
-        <div id="tab-servicos" class="tab-content hidden space-y-6">
-          
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-base font-bold text-white font-brand">Tabela de Serviços & Valores no Site</h2>
-              <p class="text-xs text-slate-400">Os preços e tempos médios cadastrados aqui atualizam instantaneamente na landing page</p>
-            </div>
-            <button onclick="showToast('Adicionando novo serviço ao catálogo')" class="px-3.5 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-              + Novo Serviço
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            
-            @foreach (var s in Model.Servicos)
-            {
-              <div class="p-4 rounded-xl bg-[#11141e] border border-slate-800 space-y-3">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-white">@s.Nome</span>
-                  <span class="text-sm font-black text-sky-400 font-mono">@s.PrecoFormatado</span>
-                </div>
-                <p class="text-[11px] text-slate-400">@(string.IsNullOrWhiteSpace(s.Descricao) ? "Serviço profissional de alta qualidade Melo Barber." : s.Descricao)</p>
-                <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800 text-slate-400">
-                  <span>Duração: @s.DuracaoMinutos min</span>
-                  <span class="@(s.Ativo ? "text-emerald-400 font-bold" : "text-rose-400 font-bold")">@(s.Ativo ? "Ativo no Site" : "Inativo")</span>
-                </div>
-              </div>
-            }
-
-          </div>
-
-        </div>
-
-        <!-- ================================================================= -->
-        <!-- TAB 5: EQUIPE & BARBEIROS (COMISSÕES & PERFORMANCE) -->
-        <!-- ================================================================= -->
-        <div id="tab-barbeiros" class="tab-content hidden space-y-6">
-          
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            
-            @foreach (var b in Model.Barbeiros)
-            {
-              <div class="p-5 rounded-xl bg-[#11141e] border border-slate-800 hover:border-sky-500/40 transition-all space-y-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 rounded-xl bg-sky-500/20 border border-sky-400 flex items-center justify-center font-black text-sky-400 font-brand text-base">
-                    @b.Inicial
-                  </div>
-                  <div class="overflow-hidden">
-                    <h3 class="text-sm font-bold text-white font-brand truncate">@b.Nome</h3>
-                    <span class="text-[11px] text-sky-400">@(b.Roles.FirstOrDefault() ?? "Barbeiro")</span>
-                  </div>
-                </div>
-                <div class="space-y-1 text-xs border-t border-slate-800 pt-3">
-                  <div class="flex justify-between text-slate-400"><span>Status:</span> <strong class="@(b.Ativo ? "text-emerald-400" : "text-rose-400")">@(b.Ativo ? "Ativo" : "Inativo")</strong></div>
-                  <div class="flex justify-between text-slate-400"><span>Email:</span> <span class="text-slate-300 truncate max-w-[120px]" title="@b.Email">@b.Email</span></div>
-                  <div class="flex justify-between text-slate-400"><span>Avaliação Web:</span> <strong class="text-amber-400">⭐ 5.0</strong></div>
-                </div>
-              </div>
-            }
-
-          </div>
-
-        </div>
-
-        <!-- ================================================================= -->
-        <!-- TAB 6: FINANCEIRO & FECHAMENTO DE CAIXA -->
-        <!-- ================================================================= -->
-        <div id="tab-financeiro" class="tab-content hidden space-y-6">
-          
-          <div class="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-[#111624] to-[#0c0e16] border border-emerald-500/30 flex items-center justify-between">
-            <div class="space-y-1">
-              <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Fechamento do Dia (27/08/2026)</span>
-              <h2 class="text-2xl font-black text-white font-brand">Total Líquido em Caixa: R$ 2.450,00</h2>
-              <p class="text-xs text-slate-400">Fundo de abertura (R$ 250,00) + Entradas (R$ 2.200,00)</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <button onclick="showToast('Imprimindo relatório financeiro!')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white rounded-xl">Imprimir Extrato</button>
-              <button onclick="showToast('Caixa fechado com sucesso! Relatório salvo em PDF.')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white rounded-xl shadow-lg shadow-emerald-600/20">Encerrar Caixa do Dia</button>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </main>
-
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- MODAL: NOVO AGENDAMENTO RÁPIDO (DESKTOP MODAL) -->
-  <!-- ========================================================================= -->
-  <div id="modalNovoAgendamento" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="w-full max-w-lg bg-[#11141e] border border-sky-500/40 rounded-2xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150">
-      
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          </div>
-          <div>
-            <h3 class="text-sm font-bold text-white font-brand">Novo Agendamento Balcão / Telefone</h3>
-            <p class="text-[11px] text-slate-400">Insira os dados do cliente para bloquear o horário na agenda</p>
-          </div>
-        </div>
-        <button onclick="closeModal('modalNovoAgendamento')" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
-
-      <!-- Form Inputs -->
-      <div class="space-y-3 text-xs">
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Nome Completo do Cliente</label>
-          <input type="text" placeholder="Ex: Rodrigo Albuquerque" class="w-full px-3 py-2 rounded-lg bg-[#090b11] border border-slate-800 text-white focus:border-sky-500 outline-none">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-300 mb-1">WhatsApp / Telefone</label>
-            <input type="text" placeholder="(11) 90000-0000" class="w-full px-3 py-2 rounded-lg bg-[#090b11] border border-slate-800 text-white focus:border-sky-500 outline-none">
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-300 mb-1">Horário</label>
-            <input type="time" value="20:00" class="w-full px-3 py-2 rounded-lg bg-[#090b11] border border-slate-800 text-white focus:border-sky-500 outline-none">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-300 mb-1">Barbeiro Escolhido</label>
-            <select class="w-full px-3 py-2 rounded-lg bg-[#090b11] border border-slate-800 text-white focus:border-sky-500 outline-none">
-              <option>Melo Master (Cadeira 01)</option>
-              <option>Lucas Fade (Cadeira 02)</option>
-              <option>Diego Navalha (Cadeira 03)</option>
-              <option>André Tranças (Cadeira 04)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-300 mb-1">Serviço</label>
-            <select class="w-full px-3 py-2 rounded-lg bg-[#090b11] border border-slate-800 text-white focus:border-sky-500 outline-none">
-              <option>Corte Degradê / Fade (R$ 45,00)</option>
-              <option>Barba Terapia (R$ 35,00)</option>
-              <option>Combo Cabelo + Barba (R$ 75,00)</option>
-              <option>Pigmentação (R$ 90,00)</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Observações do Corte</label>
-          <input type="text" placeholder="Ex: Gosta de risco na sobrancelha, navalhado na zero" class="w-full px-3 py-2 rounded-lg bg-[#090b11] border border-slate-800 text-white focus:border-sky-500 outline-none">
-        </div>
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-        <button onclick="closeModal('modalNovoAgendamento')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white">Cancelar</button>
-        <button onclick="salvarNovoAgendamento()" class="px-4 py-2 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-xs font-bold text-white shadow-lg shadow-sky-500/20">Confirmar Agendamento</button>
-      </div>
-
     </div>
-  </div>
+    <div class="state-loading" id="profLoading"><div class="spinner"></div>Calculando desempenho…</div>
+    <div class="state-empty" id="profEmpty">Nenhum profissional com atendimento no período.</div>
+</section>
 
-  <!-- ========================================================================= -->
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <!-- ========================================================================= -->
-  <div id="toast" class="fixed bottom-5 right-5 bg-[#141824] border border-sky-500/50 text-white px-4 py-3 rounded-xl shadow-2xl z-50 text-xs flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-    <div class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></div>
-    <span id="toastMsg">Mensagem do sistema</span>
-  </div>
+<!-- ================= ORIGEM + CANCELAMENTOS ================= -->
+<div class="grid-2">
+    <section class="panel">
+        <div class="section-head">
+            <div><h2>Origem dos agendamentos</h2><p>De onde vieram os agendamentos do período.</p></div>
+        </div>
+        <div class="real-content" id="originBlock" style="margin-top:8px;">
+            <div id="originList"><!-- injected --></div>
+        </div>
+        <div class="state-loading" id="originLoading"><div class="spinner"></div>Agrupando origens…</div>
+        <div class="state-empty" id="originEmpty">Sem agendamentos no período para calcular origem.</div>
+    </section>
 
-  <!-- ========================================================================= -->
-  <!-- JAVASCRIPT CONTROLLER -->
-  <!-- ========================================================================= -->
-  <script>
-    // Tab switching logic
-    function switchTab(tabId) {
-      // Hide all tabs
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      
-      // Remove active classes on nav
-      document.querySelectorAll('.nav-item').forEach(el => {
-        el.classList.remove('bg-sky-500/15', 'border-sky-500/30', 'text-white');
-        el.classList.add('text-slate-300');
-      });
+    <section class="panel">
+        <div class="section-head">
+            <div><h2>Cancelamentos e faltas</h2><p>Taxas calculadas sobre o total de agendamentos do período.</p></div>
+        </div>
+        <div class="real-content" id="cancelBlock">
+            <div id="cancelStats"><!-- injected --></div>
+        </div>
+        <div class="state-loading" id="cancelLoading"><div class="spinner"></div>Calculando taxas…</div>
+        <div class="state-empty" id="cancelEmpty">Nenhum cancelamento ou falta registrada no período.</div>
+    </section>
+</div>
 
-      // Show selected tab
-      const targetTab = document.getElementById('tab-' + tabId);
-      if (targetTab) {
-        targetTab.classList.remove('hidden');
-      }
+<!-- ================= AVALIAÇÕES ================= -->
+<section class="panel">
+    <div class="section-head">
+        <div><h2>Avaliações recentes</h2><p>Últimos comentários deixados pelos clientes após o atendimento.</p></div>
+    </div>
+    <div class="real-content" id="reviewBlock">
+        <div class="review-grid" id="reviewGrid"><!-- injected --></div>
+    </div>
+    <div class="state-loading" id="reviewLoading"><div class="spinner"></div>Buscando avaliações…</div>
+    <div class="state-empty" id="reviewEmpty">Ainda não há avaliações neste período.</div>
+</section>
 
-      // Highlight active nav button
-      const targetNav = document.getElementById('nav-' + tabId);
-      if (targetNav) {
-        targetNav.classList.add('bg-sky-500/15', 'border-sky-500/30', 'text-white');
-        targetNav.classList.remove('text-slate-300');
-      }
-
-      // Update titles
-      const titles = {
-        'dashboard': { title: 'Visão Geral & Dashboard em Tempo Real', sub: 'Hoje, 27 de Agosto de 2026' },
-        'agenda': { title: 'Agenda de Cortes & Atendimentos', sub: 'Sincronizado com Agendamento Online' },
-        'site-cms': { title: 'Gerenciador do Site Web (Landing Page)', sub: 'Edição ao vivo dos textos, fotos e horários' },
-        'barbeiros': { title: 'Equipe, Cadeiras & Comissões', sub: '4 Profissionais em Atividade' },
-        'servicos': { title: 'Tabela de Serviços & Preços', sub: 'Valores visíveis na Landing Page' },
-        'financeiro': { title: 'Caixa & Fechamento Financeiro', sub: 'Controle de Entradas e Relatórios' }
-      };
-
-      if (titles[tabId]) {
-        document.getElementById('pageTitle').textContent = titles[tabId].title;
-        document.getElementById('pageSubTitle').textContent = titles[tabId].sub;
-      }
-    }
-
-    // Live Clock simulation
-    setInterval(() => {
-      const now = new Date();
-      const timeStr = now.toTimeString().split(' ')[0];
-      const clockEl = document.getElementById('liveClock');
-      if (clockEl) clockEl.textContent = timeStr;
-    }, 1000);
-
-    // Modal helpers
-    function openModal(id) {
-      document.getElementById(id).classList.remove('hidden');
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
-    }
-
-    // Toast notifications
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toastMsg');
-      toastMsg.textContent = message;
-      toast.classList.remove('translate-y-20', 'opacity-0');
-      toast.classList.add('translate-y-0', 'opacity-100');
-
-      setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3500);
-    }
-
-    // Save and Publish CMS
-    function saveAndPublishCMS() {
-      showToast('🚀 Alterações enviadas! Landing page atualizada com sucesso.');
-    }
-
-    // Sync with website
-    function syncWithWebsite() {
-      const icon = document.getElementById('syncIcon');
-      icon.classList.add('animate-spin');
-      showToast('Sincronizando agendamentos da Landing Page...');
-      setTimeout(() => {
-        icon.classList.remove('animate-spin');
-        showToast('✅ Sincronização concluída! Todos os dados estão atualizados.');
-      }, 1200);
-    }
-
-    // Quick Search Trigger
-    function triggerQuickSearch() {
-      showToast('Dica: Use Ctrl+K no teclado para busca rápida em qualquer tela');
-    }
-
-    function salvarNovoAgendamento() {
-      closeModal('modalNovoAgendamento');
-      showToast('✅ Novo agendamento cadastrado com sucesso e bloqueado no site!');
-    }
-  </script>
-</body>
-</html>
+<!-- gaps needed note -->
+<section class="panel" style="border-style:dashed;">
+    <div class="section-head">
+        <div><h2>Observação de dados</h2><p style="max-width:640px;">Este protótipo usa dados de exemplo para ilustrar cada seção. Em produção, cada número acima precisa vir de uma consulta real aos agendamentos, vendas, pagamentos, estoque e avaliações do período — sem valores fixos como padrão.</p></div>
+    </div>
+</section>
