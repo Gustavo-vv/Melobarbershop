@@ -73,6 +73,7 @@ public partial class UcUsuarios : UserControl
 
             TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAlternarStatus);
             TemaMelobarbershop.EstilizarGunaButtonSecundario(btnHistoricoCliente);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnEditarUsuario);
             TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAtualizar);
 
             TemaMelobarbershop.EstilizarGunaComboBox(cmbFiltroRole);
@@ -239,7 +240,7 @@ public partial class UcUsuarios : UserControl
                 return;
             }
 
-            AbrirHistoricoCliente(usuario.Id, usuario.Nome);
+            AbrirHistoricoCliente(usuario);
         }
 
         private void dgvUsuarios_CellContentClick(object? sender, DataGridViewCellEventArgs e)
@@ -251,17 +252,38 @@ public partial class UcUsuarios : UserControl
                 var idObj = dgvUsuarios.Rows[e.RowIndex].Cells["Id"]?.Value;
                 var nomeObj = dgvUsuarios.Rows[e.RowIndex].Cells["Nome"]?.Value;
 
-                if (idObj is string id && nomeObj is string nome)
+                if (idObj is string id)
                 {
-                    AbrirHistoricoCliente(id, nome);
+                    var usuarioEncontrado = _listaUsuarios.FirstOrDefault(u => u.Id == id);
+                    if (usuarioEncontrado != null)
+                        AbrirHistoricoCliente(usuarioEncontrado);
                 }
             }
         }
 
-        private void AbrirHistoricoCliente(string clienteId, string nomeCliente)
+        private void AbrirHistoricoCliente(UsuarioDto usuario)
         {
-            using var form = new FormHistoricoCliente(clienteId, nomeCliente);
+            using var form = new FormHistoricoCliente(usuario);
             form.ShowDialog(this);
+        }
+
+        private async void btnEditarUsuario_Click(object? sender, EventArgs e)
+        {
+            var usuario = ObterUsuarioSelecionado();
+            if (usuario == null)
+            {
+                MessageBox.Show("Selecione um usuário na lista para editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using var form = new FormEditarCliente(usuario);
+            var resultado = form.ShowDialog(this);
+
+            if (resultado == DialogResult.OK)
+            {
+                // Recarrega a lista para refletir as alterações
+                await CarregarUsuariosAsync();
+            }
         }
 
         private async void btnAtualizar_Click(object sender, EventArgs e)
@@ -279,4 +301,4 @@ public partial class UcUsuarios : UserControl
             AtualizarGrid();
         }
     }
-}
+

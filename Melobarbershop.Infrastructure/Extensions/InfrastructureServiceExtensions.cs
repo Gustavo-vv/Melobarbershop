@@ -53,6 +53,7 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IAvaliacaoRepository, AvaliacaoRepository>();
         services.AddScoped<ITemplateMensagemRepository, TemplateMensagemRepository>();
         services.AddScoped<INotificacaoLogRepository, NotificacaoLogRepository>();
+        services.AddScoped<IHorarioFuncionamentoRepository, HorarioFuncionamentoRepository>();
 
         return services;
     }

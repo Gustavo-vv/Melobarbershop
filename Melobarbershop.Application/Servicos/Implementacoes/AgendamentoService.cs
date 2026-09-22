@@ -27,6 +27,7 @@ public class AgendamentoService : IAgendamentoService
     private readonly IAgendamentoRepository _agendamentoRepository;
     private readonly IServicoRepository _servicoRepository;
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IHorarioFuncionamentoRepository _horarioRepo;
     private readonly IMapper _mapper;
 
     // Fuso horário fixo da barbearia (Brasil/Brasília = UTC-3).
@@ -51,11 +52,13 @@ public class AgendamentoService : IAgendamentoService
         IAgendamentoRepository agendamentoRepository,
         IServicoRepository servicoRepository,
         IUsuarioRepository usuarioRepository,
+        IHorarioFuncionamentoRepository horarioRepo,
         IMapper mapper)
     {
         _agendamentoRepository = agendamentoRepository;
         _servicoRepository = servicoRepository;
         _usuarioRepository = usuarioRepository;
+        _horarioRepo = horarioRepo;
         _mapper = mapper;
     }
 
@@ -162,6 +165,16 @@ public class AgendamentoService : IAgendamentoService
             // Calcula término baseado na soma das durações dos serviços
             var duracaoTotalMinutos = servicos.Sum(s => s.DuracaoMinutos);
             var dataHoraFim = dto.DataHoraInicio.AddMinutes(duracaoTotalMinutos);
+
+            // Valida se a barbearia está aberta no horário solicitado
+            var expediente = await ObterHorarioExpedienteDataAsync(dto.DataHoraInicio);
+            if (expediente == null)
+                return ApiResposta<AgendamentoDto>.Falha("A barbearia encontra-se fechada na data selecionada.");
+
+            var inicioExpediente = dto.DataHoraInicio.Date.Add(expediente.Value.Abertura);
+            var fimExpediente = dto.DataHoraInicio.Date.Add(expediente.Value.Fechamento);
+            if (dto.DataHoraInicio < inicioExpediente || dataHoraFim > fimExpediente)
+                return ApiResposta<AgendamentoDto>.Falha($"O horário solicitado extrapola o expediente da barbearia ({expediente.Value.Abertura:hh\\:mm} às {expediente.Value.Fechamento:hh\\:mm}).");
 
             // Verifica se o barbeiro possui folga/bloqueio no período
             var possuiBloqueio = await _usuarioRepository.ExisteBloqueioNoPeriodoAsync(dto.BarbeiroId, dto.DataHoraInicio, dataHoraFim);
@@ -382,12 +395,56 @@ public class AgendamentoService : IAgendamentoService
     }
 
     /// <summary>
-    /// Gera teoreticamente os slots de horários com base no expediente da barbearia (08:00 às 19:00).
+    /// Consulta o banco de dados (HorarioEspecial com prioridade, e HorarioFuncionamento semanal como padrão)
+    /// para obter o início e o fim de expediente da barbearia na data especificada.
+    /// Retorna null caso a barbearia esteja fechada na data.
     /// </summary>
-    private static List<DateTime> GerarSlotsTeoricos(DateTime data, int duracaoTotalMinutos)
+    private async Task<(TimeSpan Abertura, TimeSpan Fechamento)?> ObterHorarioExpedienteDataAsync(DateTime data)
     {
-        var inicioExpediente = data.Date.AddHours(8);
-        var fimExpediente = data.Date.AddHours(19);
+        var dataApenas = data.Date;
+
+        // 1. Verifica se existe HorarioEspecial para a data exata
+        var especial = await _horarioRepo.ObterEspecialPorDataAsync(dataApenas);
+
+        if (especial != null)
+        {
+            if (!especial.Aberto || !especial.HoraAbertura.HasValue || !especial.HoraFechamento.HasValue)
+                return null;
+
+            return (especial.HoraAbertura.Value, especial.HoraFechamento.Value);
+        }
+
+        // 2. Não há especial: busca o HorarioFuncionamento padrão do dia da semana
+        var diaSemana = data.DayOfWeek;
+        var padrao = await _horarioRepo.ObterPorDiaSemanaAsync(diaSemana);
+
+        if (padrao != null)
+        {
+            if (!padrao.Aberto)
+                return null;
+
+            return (padrao.HoraAbertura, padrao.HoraFechamento);
+        }
+
+        // 3. Fallback de segurança (comportamento original: seg-sáb 08:00 às 19:00, dom fechado)
+        if (diaSemana == DayOfWeek.Sunday)
+            return null;
+
+        return (new TimeSpan(8, 0, 0), new TimeSpan(19, 0, 0));
+    }
+
+
+    /// <summary>
+    /// Gera os slots teóricos de horários com base no expediente da barbearia configurado no banco para o dia.
+    /// </summary>
+    private async Task<(List<DateTime> Slots, TimeSpan Fechamento)> GerarSlotsTeoricosAsync(DateTime data, int duracaoTotalMinutos)
+    {
+        var expediente = await ObterHorarioExpedienteDataAsync(data);
+        if (expediente == null)
+            return (new List<DateTime>(), TimeSpan.Zero);
+
+        var inicioExpediente = data.Date.Add(expediente.Value.Abertura);
+        var fimExpediente = data.Date.Add(expediente.Value.Fechamento);
         var slots = new List<DateTime>();
 
         // Intervalo de grade padrão de 45 minutos entre horários de início
@@ -396,7 +453,7 @@ public class AgendamentoService : IAgendamentoService
             slots.Add(horario);
         }
 
-        return slots;
+        return (slots, expediente.Value.Fechamento);
     }
 
     /// <summary>
@@ -432,7 +489,7 @@ public class AgendamentoService : IAgendamentoService
             var bloqueios = (await _usuarioRepository.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicioDia, fimDia))
                 .ToList();
 
-            var slotsTeoricos = GerarSlotsTeoricos(data, duracaoTotalMinutos);
+            var (slotsTeoricos, _) = await GerarSlotsTeoricosAsync(data, duracaoTotalMinutos);
             var horariosDisponiveis = new List<DateTime>();
 
             foreach (var horario in slotsTeoricos)
@@ -483,9 +540,10 @@ public class AgendamentoService : IAgendamentoService
             var bloqueios = (await _usuarioRepository.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicioDia, fimDia))
                 .ToList();
 
-            var slotsTeoricos = GerarSlotsTeoricos(data, duracaoTotalMinutos);
+            var (slotsTeoricos, horaFechamento) = await GerarSlotsTeoricosAsync(data, duracaoTotalMinutos);
             var todosHorarios = new List<HorarioSlotDto>();
             var agoraBrt = AgoraBrt(); // hora local BRT — fonte única de verdade
+            var limiteFimExpediente = data.Date.Add(horaFechamento);
 
             foreach (var horario in slotsTeoricos)
             {
@@ -497,7 +555,7 @@ public class AgendamentoService : IAgendamentoService
                 }
 
                 var terminoEstimado = horario.AddMinutes(duracaoTotalMinutos);
-                var estrapolaExpediente = terminoEstimado > fimDia.Date.AddHours(19);
+                var estrapolaExpediente = terminoEstimado > limiteFimExpediente;
                 var temConflito = agendamentosExistentes.Any(a => a.DataHoraInicio < terminoEstimado && a.DataHoraFim > horario);
                 var temBloqueio = bloqueios.Any(b => b.DataHoraInicio < terminoEstimado && b.DataHoraFim > horario);
 
@@ -516,3 +574,4 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 }
+

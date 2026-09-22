@@ -1,7 +1,8 @@
-namespace Melobarbershop.Desktop.Forms.Usuarios
+namespace Melobarbershop.Desktop.Forms.Usuarios;
+
+partial class UcUsuarios
 {
-    partial class UcUsuarios
-    {
+
         private System.ComponentModel.IContainer components = null;
 
         private Label lblTitulo;
@@ -10,6 +11,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
         private Panel panelBarraAcoes;
         private Guna.UI2.WinForms.Guna2Button btnAlternarStatus;
         private Guna.UI2.WinForms.Guna2Button btnHistoricoCliente;
+        private Guna.UI2.WinForms.Guna2Button btnEditarUsuario;
         private Guna.UI2.WinForms.Guna2Button btnAtualizar;
 
         private Label lblFiltro;
@@ -38,6 +40,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             panelBarraAcoes = new Panel();
             btnAlternarStatus = new Guna.UI2.WinForms.Guna2Button();
             btnHistoricoCliente = new Guna.UI2.WinForms.Guna2Button();
+            btnEditarUsuario = new Guna.UI2.WinForms.Guna2Button();
             btnAtualizar = new Guna.UI2.WinForms.Guna2Button();
 
             lblFiltro = new Label();
@@ -69,6 +72,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             panelBarraAcoes.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panelBarraAcoes.Controls.Add(btnAlternarStatus);
             panelBarraAcoes.Controls.Add(btnHistoricoCliente);
+            panelBarraAcoes.Controls.Add(btnEditarUsuario);
             panelBarraAcoes.Controls.Add(lblFiltro);
             panelBarraAcoes.Controls.Add(cmbFiltroRole);
             panelBarraAcoes.Controls.Add(btnAtualizar);
@@ -85,14 +89,20 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             btnHistoricoCliente.Text = "📋 Ver Histórico";
             btnHistoricoCliente.Click += btnHistoricoCliente_Click;
 
+            // btnEditarUsuario
+            btnEditarUsuario.Location = new Point(350, 3);
+            btnEditarUsuario.Size = new Size(130, 36);
+            btnEditarUsuario.Text = "✏️ Editar Dados";
+            btnEditarUsuario.Click += btnEditarUsuario_Click;
+
             // lblFiltro
-            lblFiltro.Location = new Point(355, 10);
+            lblFiltro.Location = new Point(495, 10);
             lblFiltro.Size = new Size(90, 22);
             lblFiltro.Text = "Filtrar perfil:";
             lblFiltro.ForeColor = Color.FromArgb(160, 163, 175);
 
             // cmbFiltroRole
-            cmbFiltroRole.Location = new Point(450, 7);
+            cmbFiltroRole.Location = new Point(590, 7);
             cmbFiltroRole.Size = new Size(170, 28);
             cmbFiltroRole.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbFiltroRole.SelectedIndexChanged += cmbFiltroRole_SelectedIndexChanged;
@@ -147,4 +157,4 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             PerformLayout();
         }
     }
-}
+

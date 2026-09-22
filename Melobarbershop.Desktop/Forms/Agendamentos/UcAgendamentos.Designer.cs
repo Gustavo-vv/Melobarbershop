@@ -1,7 +1,8 @@
-namespace Melobarbershop.Desktop.Forms.Agendamentos
+namespace Melobarbershop.Desktop.Forms.Agendamentos;
+
+partial class UcAgendamentos
 {
-    partial class UcAgendamentos
-    {
+
         private System.ComponentModel.IContainer components = null;
 
         private Label lblTitulo;
@@ -200,4 +201,4 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             ResumeLayout(false);
         }
     }
-}
+

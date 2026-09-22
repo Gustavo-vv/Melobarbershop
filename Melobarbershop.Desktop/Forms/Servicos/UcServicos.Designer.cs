@@ -1,7 +1,8 @@
-namespace Melobarbershop.Desktop.Forms.Servicos
+namespace Melobarbershop.Desktop.Forms.Servicos;
+
+partial class UcServicos
 {
-    partial class UcServicos
-    {
+
         private System.ComponentModel.IContainer components = null;
 
         private Label lblTitulo;
@@ -144,4 +145,4 @@ namespace Melobarbershop.Desktop.Forms.Servicos
             PerformLayout();
         }
     }
-}
+

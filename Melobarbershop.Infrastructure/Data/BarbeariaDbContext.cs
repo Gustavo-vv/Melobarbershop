@@ -70,6 +70,12 @@ public class BarbeariaDbContext : IdentityDbContext<ApplicationUser>
     /// <summary>Logs de disparo e entrega de notificações.</summary>
     public DbSet<NotificacaoLog> NotificacoesLog => Set<NotificacaoLog>();
 
+    /// <summary>Configuração de horários de funcionamento padrão por dia da semana.</summary>
+    public DbSet<HorarioFuncionamento> HorariosFuncionamento => Set<HorarioFuncionamento>();
+
+    /// <summary>Exceções e horários de funcionamento especiais/feriados por data.</summary>
+    public DbSet<HorarioEspecial> HorariosEspeciais => Set<HorarioEspecial>();
+
     /// <summary>
     /// Configurações avançadas do modelo relacional, nomes de tabelas Identity e carregamento de configurações de entidades.
     /// </summary>

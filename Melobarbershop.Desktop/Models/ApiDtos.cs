@@ -148,6 +148,30 @@ namespace Melobarbershop.Desktop.Models
         public string RolesFormatadas => Roles != null && Roles.Count > 0 ? string.Join(", ", Roles) : "Sem perfil";
     }
 
+    public class AtualizarUsuarioDto
+    {
+        [JsonPropertyName("nome")]
+        public string Nome { get; set; } = string.Empty;
+
+        [JsonPropertyName("telefoneWhatsApp")]
+        public string? TelefoneWhatsApp { get; set; }
+
+        [JsonPropertyName("dataNascimento")]
+        public DateTime? DataNascimento { get; set; }
+
+        [JsonPropertyName("preferenciasNotas")]
+        public string? PreferenciasNotas { get; set; }
+
+        [JsonPropertyName("fotoUrl")]
+        public string? FotoUrl { get; set; }
+
+        [JsonPropertyName("percentualComissao")]
+        public decimal? PercentualComissao { get; set; }
+
+        [JsonPropertyName("ativo")]
+        public bool Ativo { get; set; } = true;
+    }
+
     public enum StatusAgendamentoDto
     {
         Pendente = 1,
@@ -228,5 +252,85 @@ namespace Melobarbershop.Desktop.Models
         public string ServicosFormatados => Itens != null && Itens.Count > 0
             ? string.Join(", ", Itens.Select(i => i.NomeServico))
             : "-";
+    }
+
+    // ──────────────────────────────────────────────────────────────────────
+    // Horários de Funcionamento
+    // ──────────────────────────────────────────────────────────────────────
+
+    public class HorarioFuncionamentoDto
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("diaSemana")]
+        public int DiaSemana { get; set; }
+
+        [JsonPropertyName("nomeDiaSemana")]
+        public string NomeDiaSemana { get; set; } = string.Empty;
+
+        [JsonPropertyName("aberto")]
+        public bool Aberto { get; set; }
+
+        [JsonPropertyName("horaAbertura")]
+        public string HoraAbertura { get; set; } = "08:00:00";
+
+        [JsonPropertyName("horaFechamento")]
+        public string HoraFechamento { get; set; } = "19:00:00";
+
+        /// <summary>Converte "HH:mm:ss" para exibição "HH:mm".</summary>
+        public string HoraAberturaFormatada => HoraAbertura.Length >= 5 ? HoraAbertura[..5] : HoraAbertura;
+        public string HoraFechamentoFormatada => HoraFechamento.Length >= 5 ? HoraFechamento[..5] : HoraFechamento;
+    }
+
+    public class AtualizarHorarioFuncionamentoDto
+    {
+        [JsonPropertyName("aberto")]
+        public bool Aberto { get; set; }
+
+        [JsonPropertyName("horaAbertura")]
+        public string HoraAbertura { get; set; } = "08:00:00";
+
+        [JsonPropertyName("horaFechamento")]
+        public string HoraFechamento { get; set; } = "19:00:00";
+    }
+
+    public class HorarioEspecialDto
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("data")]
+        public DateTime Data { get; set; }
+
+        [JsonPropertyName("aberto")]
+        public bool Aberto { get; set; }
+
+        [JsonPropertyName("horaAbertura")]
+        public string? HoraAbertura { get; set; }
+
+        [JsonPropertyName("horaFechamento")]
+        public string? HoraFechamento { get; set; }
+
+        [JsonPropertyName("descricao")]
+        public string Descricao { get; set; } = string.Empty;
+    }
+
+    public class CriarHorarioEspecialDto
+    {
+        [JsonPropertyName("data")]
+        public DateTime Data { get; set; }
+
+        [JsonPropertyName("aberto")]
+        public bool Aberto { get; set; }
+
+        [JsonPropertyName("horaAbertura")]
+        public string? HoraAbertura { get; set; }
+
+        [JsonPropertyName("horaFechamento")]
+        public string? HoraFechamento { get; set; }
+
+        [JsonPropertyName("descricao")]
+        public string Descricao { get; set; } = string.Empty;
     }
 }

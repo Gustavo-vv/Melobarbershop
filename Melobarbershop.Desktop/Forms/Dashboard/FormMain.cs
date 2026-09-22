@@ -3,7 +3,7 @@
 // Camada: Melobarbershop.Desktop (Forms / Dashboard)
 // Objetivo: Janela principal do sistema Desktop contendo o menu lateral, alternância de temas e navegação modular.
 // Papel na Arquitetura:
-//   - Atua como container Shell para os controles de usuário (UcDashboard, UcAgendamentos, UcServicos, UcUsuarios).
+//   - Atua como container Shell para os controles de usuário (UcDashboard, UcAgendamentos, UcServicos, UcUsuarios, UcHorarios).
 //   - Controla o timer de atualização em segundo plano (AutoRefresh a cada 30 segundos).
 //   - Dispara eventos de tema (Modo Claro / Modo Escuro) propagando para todas as sub-telas.
 // ============================================================================
@@ -15,6 +15,7 @@ using Melobarbershop.Desktop.Forms.Login;
 using Melobarbershop.Desktop.Forms.Agendamentos;
 using Melobarbershop.Desktop.Forms.Servicos;
 using Melobarbershop.Desktop.Forms.Usuarios;
+using Melobarbershop.Desktop.Forms.Horarios;
 
 namespace Melobarbershop.Desktop.Forms.Dashboard;
 
@@ -27,6 +28,7 @@ public partial class FormMain : Form
     private UcAgendamentos? _ucAgendamentos;
     private UcServicos? _ucServicos;
     private UcUsuarios? _ucUsuarios;
+    private UcHorarios? _ucHorarios;
 
     private System.Windows.Forms.Timer? _timerAutoRefresh;
     private bool _atualizandoEmSegundoPlano = false;
@@ -56,6 +58,7 @@ public partial class FormMain : Form
         _ucAgendamentos?.AplicarTema();
         _ucServicos?.AplicarTema();
         _ucUsuarios?.AplicarTema();
+        _ucHorarios?.AplicarTema();
     }
 
     /// <summary>
@@ -74,6 +77,7 @@ public partial class FormMain : Form
         EstilizarBotaoMenu(btnMenuAgendamentos);
         EstilizarBotaoMenu(btnMenuServicos);
         EstilizarBotaoMenu(btnMenuUsuarios);
+        EstilizarBotaoMenu(btnMenuHorarios);
         EstilizarBotaoMenu(btnMenuSair);
 
         btnAlternarTema.FillColor = Color.Transparent;
@@ -157,7 +161,7 @@ public partial class FormMain : Form
     private void DestacarBotaoAtivo(Guna.UI2.WinForms.Guna2Button btnAtivo)
     {
         _botaoMenuAtual = btnAtivo;
-        var botoes = new[] { btnMenuDashboard, btnMenuAgendamentos, btnMenuServicos, btnMenuUsuarios };
+        var botoes = new[] { btnMenuDashboard, btnMenuAgendamentos, btnMenuServicos, btnMenuUsuarios, btnMenuHorarios };
         foreach (var b in botoes)
         {
             if (b == btnAtivo)
@@ -191,11 +195,13 @@ public partial class FormMain : Form
         _ucAgendamentos = new UcAgendamentos { Dock = DockStyle.Fill };
         _ucServicos = new UcServicos { Dock = DockStyle.Fill };
         _ucUsuarios = new UcUsuarios { Dock = DockStyle.Fill };
+        _ucHorarios = new UcHorarios { Dock = DockStyle.Fill };
 
         panelConteudo.Controls.Add(_ucDashboard);
         panelConteudo.Controls.Add(_ucAgendamentos);
         panelConteudo.Controls.Add(_ucServicos);
         panelConteudo.Controls.Add(_ucUsuarios);
+        panelConteudo.Controls.Add(_ucHorarios);
 
         ExibirTela(_ucDashboard, btnMenuDashboard);
     }
@@ -209,6 +215,7 @@ public partial class FormMain : Form
         if (_ucAgendamentos != null) _ucAgendamentos.Visible = false;
         if (_ucServicos != null) _ucServicos.Visible = false;
         if (_ucUsuarios != null) _ucUsuarios.Visible = false;
+        if (_ucHorarios != null) _ucHorarios.Visible = false;
 
         tela.Visible = true;
         tela.BringToFront();
@@ -229,6 +236,10 @@ public partial class FormMain : Form
         else if (tela == _ucUsuarios)
         {
             await _ucUsuarios.CarregarUsuariosAsync();
+        }
+        else if (tela == _ucHorarios)
+        {
+            await _ucHorarios.CarregarHorariosAsync();
         }
     }
 
@@ -281,6 +292,11 @@ public partial class FormMain : Form
     private void btnMenuUsuarios_Click(object sender, EventArgs e)
     {
         if (_ucUsuarios != null) ExibirTela(_ucUsuarios, btnMenuUsuarios);
+    }
+
+    private void btnMenuHorarios_Click(object sender, EventArgs e)
+    {
+        if (_ucHorarios != null) ExibirTela(_ucHorarios, btnMenuHorarios);
     }
 
     /// <summary>

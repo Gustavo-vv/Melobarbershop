@@ -506,8 +506,30 @@ namespace Melobarbershop.Infrastructure.Data
                 logger.LogInformation("Seed: 2 vendas, {QtdItens} itens de venda e {QtdPag} pagamentos criados.", vendaItens.Count, pagamentos.Count);
             }
 
+            // ================================================================
+            // 11) HORÁRIOS DE FUNCIONAMENTO PADRÃO DA SEMANA
+            // ================================================================
+            if (!context.HorariosFuncionamento.Any())
+            {
+                var horariosPadrao = new List<HorarioFuncionamento>
+                {
+                    new HorarioFuncionamento { DiaSemana = DayOfWeek.Sunday, Aberto = false, HoraAbertura = new TimeSpan(8, 0, 0), HoraFechamento = new TimeSpan(19, 0, 0) },
+                    new HorarioFuncionamento { DiaSemana = DayOfWeek.Monday, Aberto = true, HoraAbertura = new TimeSpan(8, 0, 0), HoraFechamento = new TimeSpan(19, 0, 0) },
+                    new HorarioFuncionamento { DiaSemana = DayOfWeek.Tuesday, Aberto = true, HoraAbertura = new TimeSpan(8, 0, 0), HoraFechamento = new TimeSpan(19, 0, 0) },
+                    new HorarioFuncionamento { DiaSemana = DayOfWeek.Wednesday, Aberto = true, HoraAbertura = new TimeSpan(8, 0, 0), HoraFechamento = new TimeSpan(19, 0, 0) },
+                    new HorarioFuncionamento { DiaSemana = DayOfWeek.Thursday, Aberto = true, HoraAbertura = new TimeSpan(8, 0, 0), HoraFechamento = new TimeSpan(19, 0, 0) },
+                    new HorarioFuncionamento { DiaSemana = DayOfWeek.Friday, Aberto = true, HoraAbertura = new TimeSpan(8, 0, 0), HoraFechamento = new TimeSpan(19, 0, 0) },
+                    new HorarioFuncionamento { DiaSemana = DayOfWeek.Saturday, Aberto = true, HoraAbertura = new TimeSpan(8, 0, 0), HoraFechamento = new TimeSpan(19, 0, 0) },
+                };
+
+                context.HorariosFuncionamento.AddRange(horariosPadrao);
+                context.SaveChanges();
+                logger.LogInformation("Seed: Horários de funcionamento padrão configurados (Seg-Sáb 08h-19h, Dom fechado).");
+            }
+
             logger.LogInformation("Seed de dados da barbearia concluído com sucesso.");
         }
+
 
         // ================================================================
         // METODO AUXILIAR: cria barbeiros e clientes padrão via Identity

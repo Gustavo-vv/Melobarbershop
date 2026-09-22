@@ -1,15 +1,16 @@
 // ============================================================================
 // Arquivo: UsuariosController.cs
 // Camada: Melobarbershop.API (Controllers)
-// Objetivo: Expor endpoints REST para gerenciamento de contas de usuários (listagem, ativação e desativação).
+// Objetivo: Expor endpoints REST para gerenciamento de contas de usuários (listagem, ativação, desativação e edição).
 // Papel na Arquitetura:
 //   - Permite à administração listar todos os usuários com seus respectivos perfis (Roles).
 //   - Controla o acesso via ativação e bloqueio lógico da conta do usuário.
+//   - Permite ao admin editar os dados cadastrais de qualquer usuário (nome, telefone, data nascimento, etc).
 // ============================================================================
 
 using Melobarbershop.Application.DTOs;
+using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,13 +25,15 @@ namespace Melobarbershop.API.Controllers;
 public class UsuariosController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IUsuarioService _usuarioService;
 
     /// <summary>
-    /// Construtor com injeção do gerenciador de usuários do ASP.NET Identity.
+    /// Construtor com injeção do gerenciador de usuários do ASP.NET Identity e do serviço de domínio.
     /// </summary>
-    public UsuariosController(UserManager<ApplicationUser> userManager)
+    public UsuariosController(UserManager<ApplicationUser> userManager, IUsuarioService usuarioService)
     {
         _userManager = userManager;
+        _usuarioService = usuarioService;
     }
 
     /// <summary>
@@ -53,12 +56,35 @@ public class UsuariosController : ControllerBase
                 PhoneNumber = user.PhoneNumber,
                 DataNascimento = user.DataNascimento,
                 PreferenciasNotas = user.PreferenciasNotas,
+                FotoUrl = user.FotoUrl,
+                PercentualComissao = user.PercentualComissao,
                 DataCadastro = user.DataCadastro,
                 Ativo = user.Ativo,
                 Roles = roles.ToList()
             });
         }
         return Ok(ApiResposta<IEnumerable<UsuarioDto>>.Ok(dtos));
+    }
+
+    /// <summary>
+    /// Atualiza os dados cadastrais de um usuário (nome, telefone, data nascimento, observações, foto, comissão, status).
+    /// </summary>
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Atualizar(string id, [FromBody] AtualizarUsuarioDto dto)
+    {
+        try
+        {
+            var resultado = await _usuarioService.AtualizarAsync(id, dto);
+            return Ok(ApiResposta<UsuarioDto>.Ok(resultado, "Usuário atualizado com sucesso!"));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ApiResposta<UsuarioDto>.Falha(ex.Message));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ApiResposta<UsuarioDto>.Falha(ex.Message));
+        }
     }
 
     /// <summary>
@@ -91,3 +117,4 @@ public class UsuariosController : ControllerBase
         return Ok(ApiResposta<bool>.Ok(true, "Usuário ativado com sucesso!"));
     }
 }
+

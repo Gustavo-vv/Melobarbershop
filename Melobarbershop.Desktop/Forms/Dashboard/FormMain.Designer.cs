@@ -12,6 +12,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
         private Guna.UI2.WinForms.Guna2Button btnMenuAgendamentos;
         private Guna.UI2.WinForms.Guna2Button btnMenuServicos;
         private Guna.UI2.WinForms.Guna2Button btnMenuUsuarios;
+        private Guna.UI2.WinForms.Guna2Button btnMenuHorarios;
         private Guna.UI2.WinForms.Guna2Button btnAlternarTema;
         private Guna.UI2.WinForms.Guna2Button btnMenuSair;
 
@@ -40,6 +41,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             btnMenuAgendamentos = new Guna.UI2.WinForms.Guna2Button();
             btnMenuServicos = new Guna.UI2.WinForms.Guna2Button();
             btnMenuUsuarios = new Guna.UI2.WinForms.Guna2Button();
+            btnMenuHorarios = new Guna.UI2.WinForms.Guna2Button();
             btnAlternarTema = new Guna.UI2.WinForms.Guna2Button();
             btnMenuSair = new Guna.UI2.WinForms.Guna2Button();
 
@@ -64,6 +66,7 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             panelSidebar.Controls.Add(btnMenuAgendamentos);
             panelSidebar.Controls.Add(btnMenuServicos);
             panelSidebar.Controls.Add(btnMenuUsuarios);
+            panelSidebar.Controls.Add(btnMenuHorarios);
             panelSidebar.Controls.Add(btnAlternarTema);
             panelSidebar.Controls.Add(btnMenuSair);
 
@@ -106,6 +109,12 @@ namespace Melobarbershop.Desktop.Forms.Dashboard
             btnMenuUsuarios.Size = new Size(240, 50);
             btnMenuUsuarios.Text = "👥  Usuários & Barbeiros";
             btnMenuUsuarios.Click += btnMenuUsuarios_Click;
+
+            // btnMenuHorarios
+            btnMenuHorarios.Location = new Point(0, 330);
+            btnMenuHorarios.Size = new Size(240, 50);
+            btnMenuHorarios.Text = "🕐  Horários";
+            btnMenuHorarios.Click += btnMenuHorarios_Click;
 
             // btnAlternarTema
             btnAlternarTema.Dock = DockStyle.Bottom;

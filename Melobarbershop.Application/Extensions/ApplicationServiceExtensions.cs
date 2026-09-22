@@ -60,6 +60,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IUsuarioService, UsuarioService>();
         services.AddScoped<IPacoteService, PacoteService>();
         services.AddScoped<IAvaliacaoService, AvaliacaoService>();
+        services.AddScoped<IHorarioFuncionamentoService, HorarioFuncionamentoService>();
 
         return services;
     }

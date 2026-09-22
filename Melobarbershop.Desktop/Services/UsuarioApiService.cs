@@ -5,6 +5,7 @@
 // Papel na Arquitetura:
 //   - Obtém a listagem completa de usuários do sistema para as telas de administração do Desktop.
 //   - Permite ativar e desativar contas de usuários diretamente pelo aplicativo Desktop.
+//   - Permite editar os dados cadastrais de um usuário (nome, telefone, data nascimento, etc).
 // ============================================================================
 
 using Melobarbershop.Desktop.Models;
@@ -22,6 +23,14 @@ public class UsuarioApiService
     public async Task<ApiResposta<List<UsuarioDto>>> ObterTodosAsync()
     {
         return await ApiClient.GetAsync<List<UsuarioDto>>("/api/usuarios");
+    }
+
+    /// <summary>
+    /// Atualiza os dados cadastrais de um usuário (nome, telefone, data de nascimento, observações, foto, comissão, status).
+    /// </summary>
+    public async Task<ApiResposta<UsuarioDto>> AtualizarAsync(string id, AtualizarUsuarioDto dto)
+    {
+        return await ApiClient.PutAsync<AtualizarUsuarioDto, UsuarioDto>($"/api/usuarios/{id}", dto);
     }
 
     /// <summary>

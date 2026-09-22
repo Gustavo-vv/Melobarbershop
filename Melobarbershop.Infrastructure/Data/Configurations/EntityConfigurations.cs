@@ -397,3 +397,37 @@ public class NotificacaoLogConfiguration : IEntityTypeConfiguration<NotificacaoL
             .OnDelete(DeleteBehavior.SetNull);
     }
 }
+
+/// <summary>
+/// Mapeamento relacional da entidade HorarioFuncionamento.
+/// </summary>
+public class HorarioFuncionamentoConfiguration : IEntityTypeConfiguration<HorarioFuncionamento>
+{
+    public void Configure(EntityTypeBuilder<HorarioFuncionamento> builder)
+    {
+        builder.ToTable("HorariosFuncionamento");
+        builder.HasKey(h => h.Id);
+        builder.HasIndex(h => h.DiaSemana).IsUnique();
+        builder.Property(h => h.DiaSemana).IsRequired();
+        builder.Property(h => h.Aberto).IsRequired();
+        builder.Property(h => h.HoraAbertura).IsRequired();
+        builder.Property(h => h.HoraFechamento).IsRequired();
+    }
+}
+
+/// <summary>
+/// Mapeamento relacional da entidade HorarioEspecial.
+/// </summary>
+public class HorarioEspecialConfiguration : IEntityTypeConfiguration<HorarioEspecial>
+{
+    public void Configure(EntityTypeBuilder<HorarioEspecial> builder)
+    {
+        builder.ToTable("HorariosEspeciais");
+        builder.HasKey(h => h.Id);
+        builder.HasIndex(h => h.Data).IsUnique();
+        builder.Property(h => h.Data).HasColumnType("date").IsRequired();
+        builder.Property(h => h.Aberto).IsRequired();
+        builder.Property(h => h.Descricao).HasMaxLength(200);
+    }
+}
+

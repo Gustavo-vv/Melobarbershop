@@ -1,8 +1,8 @@
-namespace Melobarbershop.Desktop.Forms.Servicos
+namespace Melobarbershop.Desktop.Forms.Servicos;
+
+partial class FormEditarServico
 {
-    partial class FormEditarServico
-    {
-        private System.ComponentModel.IContainer components = null;
+    private System.ComponentModel.IContainer components = null;
 
         private Label lblTitulo;
         private Label lblNome;
@@ -137,4 +137,4 @@ namespace Melobarbershop.Desktop.Forms.Servicos
             PerformLayout();
         }
     }
-}
+
