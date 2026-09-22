@@ -50,6 +50,9 @@ public interface IUsuarioService
     /// <summary>Lista os períodos bloqueados de um barbeiro dentro de um intervalo de datas.</summary>
     Task<IEnumerable<BloqueioAgendaDto>> ListarBloqueiosBarbeiroAsync(string barbeiroId, DateTime inicio, DateTime fim);
 
+    /// <summary>Lista todos os períodos bloqueados de todos os barbeiros ou opcionalmente filtrado por barbeiro.</summary>
+    Task<IEnumerable<BloqueioAgendaDto>> ListarBloqueiosAsync(string? barbeiroId, DateTime inicio, DateTime fim);
+
     /// <summary>Verifica se o barbeiro está livre (sem bloqueios nem agendamentos concomitantes) no intervalo solicitado.</summary>
     Task<bool> VerificarDisponibilidadeBarbeiroAsync(string barbeiroId, DateTime inicio, DateTime fim);
 }

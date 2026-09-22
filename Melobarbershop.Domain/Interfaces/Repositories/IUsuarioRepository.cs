@@ -68,6 +68,11 @@ public interface IUsuarioRepository
     Task<IEnumerable<BloqueioAgenda>> ObterBloqueiosPorPeriodoAsync(string barbeiroId, DateTime inicio, DateTime fim);
 
     /// <summary>
+    /// Lista todos os bloqueios de horário de todos os barbeiros dentro do período especificado.
+    /// </summary>
+    Task<IEnumerable<BloqueioAgenda>> ObterBloqueiosGeraisPorPeriodoAsync(DateTime inicio, DateTime fim);
+
+    /// <summary>
     /// Validação rápida: verifica se existe qualquer bloqueio ativo para o barbeiro que colida com [inicio, fim].
     /// </summary>
     Task<bool> ExisteBloqueioNoPeriodoAsync(string barbeiroId, DateTime inicio, DateTime fim);

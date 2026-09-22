@@ -116,5 +116,62 @@ public class UsuariosController : ControllerBase
 
         return Ok(ApiResposta<bool>.Ok(true, "Usuário ativado com sucesso!"));
     }
+
+    /// <summary>
+    /// Lista os bloqueios de agenda registrados dentro de um intervalo de datas.
+    /// </summary>
+    [HttpGet("bloqueios")]
+    public async Task<IActionResult> ListarBloqueios([FromQuery] string? barbeiroId, [FromQuery] DateTime? inicio, [FromQuery] DateTime? fim)
+    {
+        try
+        {
+            var dataInicio = inicio ?? DateTime.Today.AddDays(-7);
+            var dataFim = fim ?? DateTime.Today.AddDays(60);
+
+            var bloqueios = await _usuarioService.ListarBloqueiosAsync(barbeiroId, dataInicio, dataFim);
+            return Ok(ApiResposta<IEnumerable<BloqueioAgendaDto>>.Ok(bloqueios));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ApiResposta<string>.Falha($"Erro ao listar bloqueios: {ex.Message}"));
+        }
+    }
+
+    /// <summary>
+    /// Cadastra um novo bloqueio na agenda de um barbeiro ou da equipe.
+    /// </summary>
+    [HttpPost("bloqueios")]
+    public async Task<IActionResult> AdicionarBloqueio([FromBody] CriarBloqueioAgendaDto dto)
+    {
+        try
+        {
+            if (dto.DataHoraFim <= dto.DataHoraInicio)
+                return BadRequest(ApiResposta<string>.Falha("O horário final deve ser posterior ao horário inicial."));
+
+            var resultado = await _usuarioService.AdicionarBloqueioAgendaAsync(dto);
+            return StatusCode(201, ApiResposta<BloqueioAgendaDto>.Ok(resultado, "Bloqueio criado com sucesso!"));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ApiResposta<string>.Falha($"Erro ao cadastrar bloqueio: {ex.Message}"));
+        }
+    }
+
+    /// <summary>
+    /// Remove um bloqueio de agenda liberando os horários correspondentes.
+    /// </summary>
+    [HttpDelete("bloqueios/{id}")]
+    public async Task<IActionResult> RemoverBloqueio(int id)
+    {
+        try
+        {
+            await _usuarioService.RemoverBloqueioAgendaAsync(id);
+            return Ok(ApiResposta<bool>.Ok(true, "Bloqueio removido com sucesso!"));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ApiResposta<string>.Falha($"Erro ao remover bloqueio: {ex.Message}"));
+        }
+    }
 }
 

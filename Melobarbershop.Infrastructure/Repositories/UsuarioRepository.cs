@@ -123,7 +123,21 @@ public class UsuarioRepository : IUsuarioRepository
     public async Task<IEnumerable<BloqueioAgenda>> ObterBloqueiosPorPeriodoAsync(string barbeiroId, DateTime inicio, DateTime fim)
     {
         return await _context.BloqueiosAgenda
+            .Include(b => b.Barbeiro)
             .Where(b => b.BarbeiroId == barbeiroId && b.DataHoraInicio < fim && b.DataHoraFim > inicio)
+            .OrderBy(b => b.DataHoraInicio)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Retorna todos os bloqueios de agenda registrados de todos os barbeiros dentro do intervalo informado.
+    /// </summary>
+    public async Task<IEnumerable<BloqueioAgenda>> ObterBloqueiosGeraisPorPeriodoAsync(DateTime inicio, DateTime fim)
+    {
+        return await _context.BloqueiosAgenda
+            .Include(b => b.Barbeiro)
+            .Where(b => b.DataHoraInicio < fim && b.DataHoraFim > inicio)
+            .OrderBy(b => b.DataHoraInicio)
             .ToListAsync();
     }
 

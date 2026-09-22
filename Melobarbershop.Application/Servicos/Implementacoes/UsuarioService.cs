@@ -334,6 +334,40 @@ public class UsuarioService : IUsuarioService
     }
 
     /// <summary>
+    /// Lista os bloqueios de agenda cadastrados no período, opcionalmente filtrando por um barbeiro.
+    /// </summary>
+    public async Task<IEnumerable<BloqueioAgendaDto>> ListarBloqueiosAsync(string? barbeiroId, DateTime inicio, DateTime fim)
+    {
+        try
+        {
+            IEnumerable<Melobarbershop.Domain.Entidades.BloqueioAgenda> bloqueios;
+
+            if (!string.IsNullOrWhiteSpace(barbeiroId))
+            {
+                bloqueios = await _usuarioRepo.ObterBloqueiosPorPeriodoAsync(barbeiroId, inicio, fim);
+            }
+            else
+            {
+                bloqueios = await _usuarioRepo.ObterBloqueiosGeraisPorPeriodoAsync(inicio, fim);
+            }
+
+            return bloqueios.Select(b => new BloqueioAgendaDto
+            {
+                Id = b.Id,
+                BarbeiroId = b.BarbeiroId,
+                NomeBarbeiro = b.Barbeiro?.Nome ?? "Barbeiro",
+                DataHoraInicio = b.DataHoraInicio,
+                DataHoraFim = b.DataHoraFim,
+                Motivo = b.Motivo
+            });
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Erro ao listar bloqueios de agenda.", ex);
+        }
+    }
+
+    /// <summary>
     /// Checa se o barbeiro está livre (sem bloqueios de agenda) em um determinado intervalo.
     /// </summary>
     public async Task<bool> VerificarDisponibilidadeBarbeiroAsync(string barbeiroId, DateTime inicio, DateTime fim)

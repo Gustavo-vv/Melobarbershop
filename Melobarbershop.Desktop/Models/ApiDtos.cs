@@ -333,4 +333,41 @@ namespace Melobarbershop.Desktop.Models
         [JsonPropertyName("descricao")]
         public string Descricao { get; set; } = string.Empty;
     }
+
+    public class CriarBloqueioAgendaDto
+    {
+        [JsonPropertyName("barbeiroId")]
+        public string BarbeiroId { get; set; } = string.Empty;
+
+        [JsonPropertyName("dataHoraInicio")]
+        public DateTime DataHoraInicio { get; set; }
+
+        [JsonPropertyName("dataHoraFim")]
+        public DateTime DataHoraFim { get; set; }
+
+        [JsonPropertyName("motivo")]
+        public string Motivo { get; set; } = string.Empty;
+    }
+
+    public class BloqueioAgendaDto
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("barbeiroId")]
+        public string BarbeiroId { get; set; } = string.Empty;
+
+        [JsonPropertyName("nomeBarbeiro")]
+        public string NomeBarbeiro { get; set; } = string.Empty;
+
+        [JsonPropertyName("dataHoraInicio")]
+        public DateTime DataHoraInicio { get; set; }
+
+        [JsonPropertyName("dataHoraFim")]
+        public DateTime DataHoraFim { get; set; }
+
+        [JsonPropertyName("motivo")]
+        public string Motivo { get; set; } = string.Empty;
+    }
 }
+
