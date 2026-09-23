@@ -40,7 +40,8 @@ public static class InfrastructureServiceExtensions
             options.Lockout.MaxFailedAccessAttempts = 5;
         })
         .AddEntityFrameworkStores<BarbeariaDbContext>()
-        .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders()
+        .AddErrorDescriber<Melobarbershop.Infrastructure.Identity.IdentityErrorDescriberPtBr>();
 
         // 3. Repositories
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
