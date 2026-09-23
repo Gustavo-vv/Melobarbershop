@@ -14,7 +14,7 @@ namespace Melobarbershop.UI.ViewModels
         public List<AdminUsuarioViewModel> Barbeiros { get; set; } = new();
         public List<AdminAgendamentoItemViewModel> AgendamentosFila { get; set; } = new();
         
-        // Métricas do Dashboard
+        // Métricas do Dashboardd
         public decimal FaturamentoHoje { get; set; } = 2450.00m;
         public int AtendimentosHoje { get; set; } = 28;
         public int AgendamentosWeb { get; set; } = 20;
