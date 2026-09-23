@@ -1,3 +1,4 @@
+using Melobarbershop.UI.Areas.Admin.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,9 @@ builder.Services.AddHttpClient("ApiClient", client =>
     var baseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5223";
     client.BaseAddress = new Uri(baseUrl);
 });
+
+// Registrando o servico do painel administrativo
+builder.Services.AddScoped<IPainelDadosService, PainelDadosService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -36,10 +40,16 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
+// Rota de Area do ASP.NET Core
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}");
+
+// Rota de compatibilidade do Dashboard
 app.MapControllerRoute(
     name: "dashboard",
     pattern: "Dashboard",
-    defaults: new { controller = "Admin", action = "Index" });
+    defaults: new { area = "Admin", controller = "Admin", action = "Index" });
 
 app.MapControllerRoute(
     name: "default",
@@ -47,4 +57,3 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.Run();
-

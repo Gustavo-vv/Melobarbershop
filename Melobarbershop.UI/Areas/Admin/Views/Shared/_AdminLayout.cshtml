@@ -1,0 +1,82 @@
+@{
+    var activeNav = ViewData["ActiveNav"] as string ?? "visao-geral";
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Painel Melo Barber Shop</title>
+    <meta name="theme-color" content="#05070c" />
+    <link href="~/img/logo.png" rel="icon" type="image/png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="~/css/admin-dashboard.css" rel="stylesheet" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+<div class="shell">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" />
+                    <path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12" />
+                </svg>
+            </div>
+            <div class="brand-text"><strong>Painel Barbearia</strong><span>Gestão operacional</span></div>
+        </div>
+
+        <div class="nav-group-label">Visão geral</div>
+        <nav class="nav">
+            <a class="nav-item @(activeNav == "visao-geral" ? "active" : "")" asp-area="Admin" asp-controller="Admin" asp-action="Index">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /></svg>
+                <span>Visão geral</span>
+            </a>
+            <a class="nav-item @(activeNav == "agenda" ? "active" : "")" asp-area="Admin" asp-controller="Admin" asp-action="Agenda">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M8 3v3M16 3v3M3 10h18" /></svg>
+                <span>Agenda</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-foot">
+            <a class="nav-item" style="justify-content:center;" href="/" title="Voltar para o site">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5" /><path d="M5 10v9.5a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" /></svg>
+                <span>Voltar ao site</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="themeIcon"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" /></svg>
+                <span id="themeLabel">Tema escuro</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <div class="main">
+
+        <div class="topbar">
+            <div class="topbar-title">
+                <h1>@ViewData["PageTitle"]</h1>
+                <p>@ViewData["PageSubtitle"]</p>
+            </div>
+            @await RenderSectionAsync("TopbarActions", required: false)
+        </div>
+
+        <div class="content">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+<div id="toast"><span class="dot"></span><span id="toastMsg"></span></div>
+
+<script src="~/js/admin-dashboard.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

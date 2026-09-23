@@ -34,7 +34,7 @@ namespace Melobarbershop.API.Controllers
                     PhoneNumber = user.PhoneNumber,
                     DataNascimento = user.DataNascimento,
                     PreferenciasNotas = user.PreferenciasNotas,
-                    //PercentualComissao = user.PercentualComissao,
+                    PercentualComissao = user.PercentualComissao,
                     DataCadastro = user.DataCadastro,
                     Ativo = user.Ativo,
                     Roles = roles.ToList()

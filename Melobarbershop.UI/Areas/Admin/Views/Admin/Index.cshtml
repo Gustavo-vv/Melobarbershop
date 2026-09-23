@@ -1,0 +1,103 @@
+@{
+    ViewData["Title"] = "Painel Administrativo";
+    ViewData["ActiveNav"] = "visao-geral";
+    ViewData["PageTitle"] = "Visão geral do dia";
+    ViewData["PageSubtitle"] = DateTime.Now.ToString("dddd, dd 'de' MMMM", new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API";
+    Layout = "_AdminLayout";
+}
+
+@section TopbarActions {
+    <div class="filters">
+        <div class="seg" id="periodSeg">
+            <button data-period="hoje" class="active">Hoje</button>
+            <button data-period="semana">Semana</button>
+            <button data-period="mes">Mês</button>
+        </div>
+        <select class="select-filter" id="filterProf">
+            <option value="todos">Todos os profissionais</option>
+        </select>
+        <select class="select-filter" id="filterOrigin">
+            <option value="todas">Todas as origens</option>
+            <option value="site">Site</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="app">Aplicativo</option>
+            <option value="balcao">Balcão</option>
+        </select>
+        <button class="btn-ghost" onclick="carregarDados()">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIcon"><path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" /></svg>
+            Atualizar
+        </button>
+    </div>
+}
+
+<!-- error banner -->
+<div class="banner hidden" id="errorBanner">
+    <span id="errorBannerText">Não foi possível carregar os dados mais recentes da API.</span>
+    <button onclick="carregarDados()">Tentar novamente</button>
+</div>
+
+<!-- ================= KPIs ================= -->
+<section>
+    <div class="section-head">
+        <div>
+            <h2>Indicadores do período</h2>
+            <p>Calculados em tempo real diretamente a partir dos agendamentos da API.</p>
+        </div>
+    </div>
+    <div class="kpi-grid" id="kpiGrid">
+        <!-- Renderizado dinamicamente via JS a partir da API -->
+    </div>
+</section>
+
+<!-- ================= AGENDA KANBAN ================= -->
+<section class="panel">
+    <div class="section-head">
+        <div>
+            <h2>Agenda de agendamentos</h2>
+            <p>Agrupada por status. As ações abaixo alteram o status real do agendamento na API.</p>
+        </div>
+        <span class="tag" id="agendaCountTag">0 agendamentos</span>
+    </div>
+    <div class="real-content" id="agendaBlock">
+        <div class="kanban" id="kanban">
+            <!-- Kanban renderizado com dados diretos da API -->
+        </div>
+    </div>
+    <div class="state-loading" id="agendaLoading">
+        <div class="spinner"></div>Carregando agenda da API…
+    </div>
+    <div class="state-empty" id="agendaEmpty">
+        Nenhum agendamento encontrado para os filtros selecionados.
+    </div>
+</section>
+
+<!-- ================= ORIGEM + CANCELAMENTOS ================= -->
+<div class="grid-2">
+    <section class="panel">
+        <div class="section-head">
+            <div>
+                <h2>Origem dos agendamentos</h2>
+                <p>Canais de captação dos agendamentos do período.</p>
+            </div>
+        </div>
+        <div class="real-content" id="originBlock" style="margin-top:8px;">
+            <div id="originList"></div>
+        </div>
+        <div class="state-loading" id="originLoading"><div class="spinner"></div>Carregando origens…</div>
+        <div class="state-empty" id="originEmpty">Sem agendamentos no período para calcular origem.</div>
+    </section>
+
+    <section class="panel">
+        <div class="section-head">
+            <div>
+                <h2>Cancelamentos e faltas</h2>
+                <p>Taxas calculadas sobre o total de agendamentos do período.</p>
+            </div>
+        </div>
+        <div class="real-content" id="cancelBlock">
+            <div id="cancelStats"></div>
+        </div>
+        <div class="state-loading" id="cancelLoading"><div class="spinner"></div>Calculando taxas…</div>
+        <div class="state-empty" id="cancelEmpty">Nenhum cancelamento ou falta registrada no período.</div>
+    </section>
+</div>
