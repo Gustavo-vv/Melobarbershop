@@ -4,15 +4,19 @@
     var isServicos = secao == "servicos";
     var isUsuarios = secao == "usuarios";
 
-    var usuarioLogadoEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
-                          ?? User.FindFirst("email")?.Value 
-                          ?? User.Identity?.Name 
+    var usuarioLogadoEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                          ?? User.FindFirst("email")?.Value
+                          ?? User.Identity?.Name
                           ?? "";
 
-    ViewData["Title"] = isUsuarios ? "Gestão de Usuários e Equipe" : (isServicos ? "Gestão de Serviços" : (isAgenda ? "Agenda de Atendimentos" : "Painel Administrativo"));
+    ViewData["Title"] = isUsuarios ? "Gestão de Usuários e Equipe" : (isServicos ? "Gestão de Serviços" : (isAgenda ?
+"Agenda de Atendimentos" : "Painel Administrativo"));
     ViewData["ActiveNav"] = isUsuarios ? "usuarios" : (isServicos ? "servicos" : (isAgenda ? "agenda" : "visao-geral"));
-    ViewData["PageTitle"] = isUsuarios ? "Gestão de Usuários e Equipe" : (isServicos ? "Gestão de Serviços" : (isAgenda ? "Agenda de Atendimentos" : "Visão geral do dia"));
-    ViewData["PageSubtitle"] = isUsuarios ? "Consulta e controle de status de barbeiros, clientes e administradores" : (isServicos ? "Cadastro, edição, precificação e visibilidade no catálogo" : (DateTime.Now.ToString("dddd, dd 'de' MMMM", new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"));
+    ViewData["PageTitle"] = isUsuarios ? "Gestão de Usuários e Equipe" : (isServicos ? "Gestão de Serviços" : (isAgenda ?
+"Agenda de Atendimentos" : "Visão geral do dia"));
+    ViewData["PageSubtitle"] = isUsuarios ? "Consulta e controle de status de barbeiros, clientes e administradores" :
+(isServicos ? "Cadastro, edição, precificação e visibilidade no catálogo" : (DateTime.Now.ToString("dddd, dd 'de' MMMM",
+new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"));
     Layout = "_AdminLayout";
 }
 
@@ -36,7 +40,10 @@
                 <option value="balcao">Balcão</option>
             </select>
             <button class="btn-ghost" onclick="carregarDados()">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIcon"><path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" /></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     id="refreshIcon">
+                    <path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" />
+                </svg>
                 Atualizar
             </button>
         </div>
@@ -53,16 +60,26 @@
 {
     <!-- ================= SEÇÃO USUÁRIOS E EQUIPE (REPRODUÇÃO UCUSUARIOS DO DESKTOP) ================= -->
     <div class="panel usuarios-section-panel" data-secao="usuarios" data-usuario-logado="@usuarioLogadoEmail">
-        
+
         <!-- Barra de Ações Superior -->
         <div class="servicos-toolbar">
             <div class="servicos-actions-left">
-                <button class="btn-ghost btn-action-item" id="btnAlternarStatusUsuario" onclick="alternarStatusUsuario()" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect><circle cx="16" cy="12" r="3"></circle></svg>
+                <button class="btn-ghost btn-action-item" id="btnAlternarStatusUsuario" onclick="alternarStatusUsuario()"
+                        disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         style="width:15px;height:15px;">
+                        <rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect>
+                        <circle cx="16" cy="12" r="3"></circle>
+                    </svg>
                     Ativar / Desativar
                 </button>
-                <button class="btn-ghost btn-action-item" id="btnVerHistoricoUsuario" onclick="abrirHistoricoUsuarioSelecionado()" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <button class="btn-ghost btn-action-item" id="btnVerHistoricoUsuario"
+                        onclick="abrirHistoricoUsuarioSelecionado()" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         style="width:15px;height:15px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
                     Ver Histórico
                 </button>
                 <div class="filter-field" style="margin-left: 8px;">
@@ -76,8 +93,10 @@
                 </div>
             </div>
 
-            <button class="btn-ghost" id="btnRecarregarUsuarios" onclick="carregarUsuarios()" title="Recarregar usuários da API">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIconUsuarios" style="width:16px;height:16px;">
+            <button class="btn-ghost" id="btnRecarregarUsuarios" onclick="carregarUsuarios()"
+                    title="Recarregar usuários da API">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     id="refreshIconUsuarios" style="width:16px;height:16px;">
                     <path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" />
                 </svg>
                 Recarregar
@@ -89,11 +108,13 @@
             <div class="servicos-search-wrap">
                 <label for="usuariosBusca">Buscar por nome:</label>
                 <div class="agenda-search-field" style="min-width: 320px;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="search-icon">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" id="usuariosBusca" class="input-search" placeholder="Buscar por nome ou e-mail..." autocomplete="off" />
+                    <input type="text" id="usuariosBusca" class="input-search" placeholder="Buscar por nome ou e-mail..."
+                           autocomplete="off" />
                 </div>
             </div>
             <div class="servicos-counter" id="usuariosContador">0 usuário(s) encontrado(s).</div>
@@ -140,7 +161,7 @@
                 </div>
                 <button class="modal-close" onclick="fecharModalHistorico()">✕</button>
             </div>
-            
+
             <div class="modal-historico-body">
                 <!-- Bloco DADOS DO CLIENTE com badge no canto -->
                 <div class="cliente-perfil-card">
@@ -152,7 +173,8 @@
                         <div class="perfil-info-item"><strong>Nome:</strong> <span id="perfilNome">—</span></div>
                         <div class="perfil-info-item"><strong>E-mail:</strong> <span id="perfilEmail">—</span></div>
                         <div class="perfil-info-item"><strong>Telefone:</strong> <span id="perfilTelefone">—</span></div>
-                        <div class="perfil-info-item"><strong>Nascimento:</strong> <span id="perfilNascimento">—</span></div>
+                        <div class="perfil-info-item"><strong>Nascimento:</strong> <span id="perfilNascimento">—</span>
+                        </div>
                         <div class="perfil-info-item"><strong>Cadastro:</strong> <span id="perfilCadastro">—</span></div>
                     </div>
                     <div class="perfil-info-obs">
@@ -206,32 +228,34 @@ else if (isServicos)
 {
     <!-- ================= SEÇÃO SERVIÇOS (REPRODUÇÃO UCSERVICOS DO DESKTOP) ================= -->
     <div class="panel servicos-section-panel" data-secao="servicos">
-        
+
         <!-- Barra de Ações Superior -->
         <div class="servicos-toolbar">
             <div class="servicos-actions-left">
                 <button class="btn-primary" id="btnNovoServico" onclick="abrirModalServico('novo')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span class="material-symbols-outlined">add</span>
                     Novo Serviço
                 </button>
-                <button class="btn-ghost btn-action-item" id="btnEditarServico" onclick="editarServicoSelecionado()" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                <button class="btn-ghost btn-action-item" id="btnEditarServico" onclick="editarServicoSelecionado()"
+                        disabled>
+                    <span class="material-symbols-outlined">edit</span>
                     Editar
                 </button>
-                <button class="btn-ghost btn-action-item" id="btnAlternarStatusServico" onclick="alternarStatusServico()" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect><circle cx="16" cy="12" r="3"></circle></svg>
-                    Ativar / Desativar
+                <button class="btn-ghost btn-action-item" id="btnAlternarStatusServico" onclick="alternarStatusServico()"
+                        disabled>
+                    <span class="material-symbols-outlined">check</span>
+                    Ativar
                 </button>
-                <button class="btn-ghost btn-action-item btn-danger-action" id="btnExcluirServico" onclick="excluirServicoPermanente()" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <button class="btn-ghost btn-action-item btn-danger-action" id="btnExcluirServico"
+                        onclick="excluirServicoPermanente()" disabled>
+                    <span class="material-symbols-outlined">delete</span>
                     Excluir
                 </button>
             </div>
 
-            <button class="btn-ghost" id="btnRecarregarServicos" onclick="carregarServicos()" title="Recarregar serviços da API">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIconServicos" style="width:16px;height:16px;">
-                    <path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" />
-                </svg>
+            <button class="btn-ghost" id="btnRecarregarServicos" onclick="carregarServicos()"
+                    title="Recarregar serviços da API">
+                <span style="font-size: 16px!important;" class="material-symbols-outlined">refresh</span>
                 Recarregar
             </button>
         </div>
@@ -241,11 +265,13 @@ else if (isServicos)
             <div class="servicos-search-wrap">
                 <label for="servicosBusca">Buscar serviço:</label>
                 <div class="agenda-search-field" style="min-width: 320px;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="search-icon">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" id="servicosBusca" class="input-search" placeholder="Digite para filtrar por nome ou descrição..." autocomplete="off" />
+                    <input type="text" id="servicosBusca" class="input-search"
+                           placeholder="Digite para filtrar por nome ou descrição..." autocomplete="off" />
                 </div>
             </div>
             <div class="servicos-counter" id="servicosContador">0 serviço(s) carregado(s).</div>
@@ -291,25 +317,29 @@ else if (isServicos)
             </div>
             <form id="formServico" onsubmit="salvarServico(event)">
                 <input type="hidden" id="servicoId" />
-                
+
                 <div class="form-group">
                     <label for="servicoNome">Nome do Serviço *</label>
-                    <input type="text" id="servicoNome" class="input-form" placeholder="Ex: Corte Degradê, Barba Terapia..." required />
+                    <input type="text" id="servicoNome" class="input-form" placeholder="Ex: Corte Degradê, Barba Terapia..."
+                           required />
                 </div>
 
                 <div class="form-group">
                     <label for="servicoDescricao">Descrição</label>
-                    <textarea id="servicoDescricao" class="input-form textarea-form" rows="3" placeholder="Breve descrição dos detalhes e técnicas do serviço..."></textarea>
+                    <textarea id="servicoDescricao" class="input-form textarea-form" rows="3"
+                              placeholder="Breve descrição dos detalhes e técnicas do serviço..."></textarea>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="servicoPreco">Preço (R$) *</label>
-                        <input type="number" id="servicoPreco" class="input-form" step="0.01" min="0" placeholder="0.00" required />
+                        <input type="number" id="servicoPreco" class="input-form" step="0.01" min="0" placeholder="0.00"
+                               required />
                     </div>
                     <div class="form-group">
                         <label for="servicoDuracao">Duração (minutos) *</label>
-                        <input type="number" id="servicoDuracao" class="input-form" step="5" min="5" placeholder="30" required />
+                        <input type="number" id="servicoDuracao" class="input-form" step="5" min="5" placeholder="30"
+                               required />
                     </div>
                 </div>
 
@@ -386,7 +416,9 @@ else if (!isAgenda)
             <div class="real-content" id="originBlock" style="margin-top:8px;">
                 <div id="originList"></div>
             </div>
-            <div class="state-loading" id="originLoading"><div class="spinner"></div>Carregando origens…</div>
+            <div class="state-loading" id="originLoading">
+                <div class="spinner"></div>Carregando origens…
+            </div>
             <div class="state-empty" id="originEmpty">Sem agendamentos no período para calcular origem.</div>
         </section>
 
@@ -400,7 +432,9 @@ else if (!isAgenda)
             <div class="real-content" id="cancelBlock">
                 <div id="cancelStats"></div>
             </div>
-            <div class="state-loading" id="cancelLoading"><div class="spinner"></div>Calculando taxas…</div>
+            <div class="state-loading" id="cancelLoading">
+                <div class="spinner"></div>Calculando taxas…
+            </div>
             <div class="state-empty" id="cancelEmpty">Nenhum cancelamento ou falta registrada no período.</div>
         </section>
     </div>
@@ -409,7 +443,7 @@ else
 {
     <!-- ================= SEÇÃO AGENDA (TABELA ESTILO DESKTOP) ================= -->
     <div class="panel agenda-section-panel" data-secao="agenda">
-        
+
         <!-- Barra Superior de Filtros e Busca -->
         <div class="agenda-toolbar">
             <div class="agenda-toolbar-filters">
@@ -432,16 +466,20 @@ else
                 </div>
 
                 <div class="filter-field agenda-search-field">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="search-icon">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" id="agendaBusca" class="input-search" placeholder="Buscar por cliente, barbeiro ou serviço..." autocomplete="off" />
+                    <input type="text" id="agendaBusca" class="input-search"
+                           placeholder="Buscar por cliente, barbeiro ou serviço..." autocomplete="off" />
                 </div>
             </div>
 
-            <button class="btn-ghost" id="btnRecarregarAgenda" onclick="carregarDados()" title="Recarregar agendamentos da API">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIcon">
+            <button class="btn-ghost" id="btnRecarregarAgenda" onclick="carregarDados()"
+                    title="Recarregar agendamentos da API">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     id="refreshIcon">
                     <path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" />
                 </svg>
                 Recarregar

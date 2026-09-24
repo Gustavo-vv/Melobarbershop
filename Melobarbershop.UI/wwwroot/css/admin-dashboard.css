@@ -1298,11 +1298,11 @@ a {
     border-radius: 99px;
 }
 
-.nav-item{
-  text-decoration:none;
+.nav-item {
+    text-decoration: none;
 }
 /* ===================================================================
-   SEÇÃO AGENDA (REPRODUÇÃO DESKTOP: TOOLBAR, CHIPS, TABELA, BADGES)
+   SEï¿½ï¿½O AGENDA (REPRODUï¿½ï¿½O DESKTOP: TOOLBAR, CHIPS, TABELA, BADGES)
    =================================================================== */
 
 .agenda-section-panel {
@@ -1364,6 +1364,8 @@ a {
 .agenda-search-field {
     position: relative;
     min-width: 280px;
+    display: flex;
+    align-items: center;
 }
 
 .agenda-search-field .search-icon {
@@ -1380,7 +1382,7 @@ a {
     border: 1px solid var(--border-strong);
     color: var(--text);
     padding: 7px 12px 7px 34px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-s);
     font-family: inherit;
     font-size: 13px;
     width: 100%;
@@ -1520,7 +1522,7 @@ a {
     border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-/* Ações na Tabela */
+/* Aï¿½ï¿½es na Tabela */
 .table-action-group {
     display: inline-flex;
     align-items: center;
@@ -1592,7 +1594,7 @@ a {
 }
 
 /* ===================================================================
-   SEÇÃO SERVIÇOS (BARRA DE AÇÕES, SUBBAR, TABELA SELECIONÁVEL, MODAL)
+   SEï¿½ï¿½O SERVIï¿½OS (BARRA DE Aï¿½ï¿½ES, SUBBAR, TABELA SELECIONï¿½VEL, MODAL)
    =================================================================== */
 
 .servicos-section-panel {
@@ -1615,6 +1617,24 @@ a {
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
+
+    span {
+        font-size: 16px;
+    }
+
+    .btn-primary {
+        font-size: 13px;
+        border-radius: var(--radius-s);
+        border: none;
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #5a5a5a;
+        }
+    }
 }
 
 .btn-action-item {
@@ -1643,7 +1663,7 @@ a {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding-bottom: 4px;
+    padding-bottom: 16px;
     border-bottom: 1px solid var(--border);
 }
 
@@ -1663,7 +1683,9 @@ a {
 
 .table-selectable tbody tr {
     cursor: pointer;
-    transition: background var(--transition-fast), border-color var(--transition-fast);
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast);
 }
 
 .table-selectable tbody tr.row-selected td {
@@ -1679,7 +1701,7 @@ a {
     color: var(--text-dim);
 }
 
-/* Modal de Serviços */
+/* Modal de Serviï¿½os */
 .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -1754,6 +1776,10 @@ a {
     display: flex;
     flex-direction: column;
     gap: 14px;
+
+    input, .textarea-form {
+        border-radius: var(--radius-s);
+    }
 }
 
 .form-group {
@@ -1792,8 +1818,8 @@ a {
 }
 
 .textarea-form {
-    resize: vertical;
-    min-height: 70px;
+    resize: none;
+    min-height: 80px;
 }
 
 .form-checkbox-group {
@@ -1827,10 +1853,26 @@ a {
     padding-top: 10px;
     border-top: 1px solid var(--border);
     margin-top: 4px;
+
+    .btn-primary {
+        background-color: #097e5f;
+        font-size: 13px;
+        border-radius: var(--radius-s);
+        border: none;
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #045840;
+            border-color: #10b981;
+        }
+    }
 }
 
 /* ===================================================================
-   SEÇÃO USUÁRIOS E EQUIPE + MODAL PERFIL E HISTÓRICO
+   SEï¿½ï¿½O USUï¿½RIOS E EQUIPE + MODAL PERFIL E HISTï¿½RICO
    =================================================================== */
 
 .usuarios-section-panel {
@@ -1853,7 +1895,7 @@ a {
     opacity: 0.8;
 }
 
-/* Modal Perfil e Histórico Grande */
+/* Modal Perfil e Histï¿½rico Grande */
 .modal-historico-card {
     max-width: 760px;
     display: flex;

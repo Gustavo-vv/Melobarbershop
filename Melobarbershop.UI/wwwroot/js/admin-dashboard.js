@@ -658,8 +658,8 @@ function atualizarBotoesAcaoServico() {
         const servico = state.servicos.lista.find(s => s.id === state.servicos.selecionadoId);
         if (servico) {
             btnStatus.innerHTML = servico.ativo
-                ? `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg> Desativar`
-                : `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Reativar`;
+                ? `<span class="material-symbols-outlined">block</span>Desativar`
+                : `<span class="material-symbols-outlined">check</span>Reativar`;
         }
     }
 }
