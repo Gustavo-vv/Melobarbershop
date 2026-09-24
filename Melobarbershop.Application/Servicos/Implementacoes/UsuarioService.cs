@@ -168,6 +168,36 @@ public class UsuarioService : IUsuarioService
         }
     }
 
+    public async Task<UsuarioDto> AtualizarDadosClienteAsync(string id, AtualizarDadosClienteDto dto)
+    {
+        try
+        {
+            var usuario = await _usuarioRepo.ObterPorIdAsync(id);
+            if (usuario == null)
+                throw new KeyNotFoundException($"Usuario '{id}' nao encontrado.");
+
+            if (!string.IsNullOrWhiteSpace(dto.Telefone) && await _usuarioRepo.ExisteTelefoneAsync(dto.Telefone, id))
+                throw new InvalidOperationException($"Ja existe outro usuario com o telefone '{dto.Telefone}'.");
+
+            usuario.Nome = dto.Nome;
+            usuario.PhoneNumber = dto.Telefone;
+            usuario.DataNascimento = dto.DataNascimento;
+            usuario.PreferenciasNotas = dto.PreferenciasNotas;
+
+            await _usuarioRepo.AtualizarAsync(usuario);
+
+            var resultDto = _mapper.Map<UsuarioDto>(usuario);
+            resultDto.Roles = (await _userManager.GetRolesAsync(usuario)).ToList();
+            return resultDto;
+        }
+        catch (KeyNotFoundException) { throw; }
+        catch (InvalidOperationException) { throw; }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Erro ao atualizar dados do cliente '{id}'.", ex);
+        }
+    }
+
     public async Task DesativarAsync(string id)
     {
         try

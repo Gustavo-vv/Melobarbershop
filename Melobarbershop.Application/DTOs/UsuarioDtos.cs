@@ -78,3 +78,15 @@ public class BloqueioAgendaDto
     public DateTime DataHoraFim { get; set; }
     public string Motivo { get; set; } = string.Empty;
 }
+
+public class AtualizarDadosClienteDto
+{
+    [Required(ErrorMessage = "O nome é obrigatório.")]
+    public string Nome { get; set; } = string.Empty;
+
+    public string? Telefone { get; set; }
+
+    public DateTime? DataNascimento { get; set; }
+
+    public string? PreferenciasNotas { get; set; }
+}

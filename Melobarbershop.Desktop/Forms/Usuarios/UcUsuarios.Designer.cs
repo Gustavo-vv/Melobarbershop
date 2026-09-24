@@ -10,6 +10,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
         private Panel panelBarraAcoes;
         private Guna.UI2.WinForms.Guna2Button btnAlternarStatus;
         private Guna.UI2.WinForms.Guna2Button btnHistoricoCliente;
+        private Guna.UI2.WinForms.Guna2Button btnEditarCliente;
         private Guna.UI2.WinForms.Guna2Button btnAtualizar;
 
         private Label lblFiltro;
@@ -38,6 +39,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             panelBarraAcoes = new Panel();
             btnAlternarStatus = new Guna.UI2.WinForms.Guna2Button();
             btnHistoricoCliente = new Guna.UI2.WinForms.Guna2Button();
+            btnEditarCliente = new Guna.UI2.WinForms.Guna2Button();
             btnAtualizar = new Guna.UI2.WinForms.Guna2Button();
 
             lblFiltro = new Label();
@@ -69,6 +71,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             panelBarraAcoes.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panelBarraAcoes.Controls.Add(btnAlternarStatus);
             panelBarraAcoes.Controls.Add(btnHistoricoCliente);
+            panelBarraAcoes.Controls.Add(btnEditarCliente);
             panelBarraAcoes.Controls.Add(lblFiltro);
             panelBarraAcoes.Controls.Add(cmbFiltroRole);
             panelBarraAcoes.Controls.Add(btnAtualizar);
@@ -85,14 +88,20 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             btnHistoricoCliente.Text = "Ver Histórico";
             btnHistoricoCliente.Click += btnHistoricoCliente_Click;
 
+            // btnEditarCliente
+            btnEditarCliente.Location = new Point(296, 3);
+            btnEditarCliente.Size = new Size(136, 36);
+            btnEditarCliente.Text = "Editar Dados";
+            btnEditarCliente.Click += btnEditarCliente_Click;
+
             // lblFiltro
-            lblFiltro.Location = new Point(300, 10);
+            lblFiltro.Location = new Point(440, 10);
             lblFiltro.Size = new Size(85, 22);
             lblFiltro.Text = "Filtrar perfil:";
             lblFiltro.ForeColor = Color.FromArgb(160, 163, 175);
 
             // cmbFiltroRole
-            cmbFiltroRole.Location = new Point(388, 7);
+            cmbFiltroRole.Location = new Point(528, 7);
             cmbFiltroRole.Size = new Size(175, 28);
             cmbFiltroRole.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbFiltroRole.SelectedIndexChanged += cmbFiltroRole_SelectedIndexChanged;
@@ -129,6 +138,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             dgvUsuarios.AllowUserToAddRows = false;
             dgvUsuarios.AllowUserToDeleteRows = false;
             dgvUsuarios.CellContentClick += dgvUsuarios_CellContentClick;
+            dgvUsuarios.CellDoubleClick += dgvUsuarios_CellDoubleClick;
 
             // UserControl
             Controls.Add(lblTitulo);

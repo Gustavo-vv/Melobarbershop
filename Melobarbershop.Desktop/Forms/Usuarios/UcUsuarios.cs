@@ -57,6 +57,7 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
 
             TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAlternarStatus);
             TemaMelobarbershop.EstilizarGunaButtonSecundario(btnHistoricoCliente);
+            TemaMelobarbershop.EstilizarGunaButtonSecundario(btnEditarCliente);
             TemaMelobarbershop.EstilizarGunaButtonSecundario(btnAtualizar);
 
             TemaMelobarbershop.EstilizarGunaComboBox(cmbFiltroRole);
@@ -224,6 +225,60 @@ namespace Melobarbershop.Desktop.Forms.Usuarios
             }
 
             AbrirHistoricoCliente(usuario.Id, usuario.Nome, usuario);
+        }
+
+        private async void btnEditarCliente_Click(object? sender, EventArgs e)
+        {
+            var usuario = ObterUsuarioSelecionado();
+            if (usuario == null)
+            {
+                MessageBox.Show("Selecione um cliente na lista para editar os dados.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            await AbrirEdicaoClienteAsync(usuario);
+        }
+
+        private async void dgvUsuarios_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            var usuario = ObterUsuarioSelecionado();
+            if (usuario != null)
+            {
+                await AbrirEdicaoClienteAsync(usuario);
+            }
+        }
+
+        private async Task AbrirEdicaoClienteAsync(UsuarioDto usuario)
+        {
+            using var form = new FormEditarCliente(usuario);
+            if (form.ShowDialog(this) == DialogResult.OK && form.Salvo && form.UsuarioAtualizado != null)
+            {
+                try
+                {
+                    lblStatus.Text = "Salvando alterações do cliente...";
+                    lblStatus.ForeColor = AppTheme.GoldPrimary;
+
+                    var resp = await _usuarioService.AtualizarAsync(usuario.Id, form.UsuarioAtualizado);
+                    if (resp.Sucesso)
+                    {
+                        MessageBox.Show("Dados do cliente atualizados com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        await CarregarUsuariosAsync();
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Falha ao atualizar dados: {resp.Mensagem}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        lblStatus.Text = $"Falha: {resp.Mensagem}";
+                        lblStatus.ForeColor = AppTheme.DangerColor;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro inesperado: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    lblStatus.Text = $"Erro: {ex.Message}";
+                    lblStatus.ForeColor = AppTheme.DangerColor;
+                }
+            }
         }
 
         private void dgvUsuarios_CellContentClick(object? sender, DataGridViewCellEventArgs e)

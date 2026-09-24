@@ -37,7 +37,7 @@ const KANBAN_ORDER = ["confirmado", "concluido", "cancelado"];
 
 const STATUS_META = {
     pendente: { label: "Pendente", col: "var(--amber)", badgeCls: "badge-status-pendente", acao: "Confirmar", proximaAcao: "confirmar" },
-    confirmado: { label: "Confirmado", col: "var(--blue)", badgeCls: "badge-status-confirmado", acao: "Check-in", proximaAcao: "iniciar-atendimento" },
+    confirmado: { label: "Confirmado", col: "var(--blue)", badgeCls: "badge-status-confirmado", acao: "Concluir", proximaAcao: "concluir" },
     em_atendimento: { label: "Em Atendimento", col: "var(--purple)", badgeCls: "badge-status-em-atendimento", acao: "Concluir", proximaAcao: "concluir" },
     concluido: { label: "Concluído", col: "var(--green)", badgeCls: "badge-status-concluido", acao: null, proximaAcao: null },
     cancelado: { label: "Cancelado", col: "var(--red)", badgeCls: "badge-status-cancelado", acao: null, proximaAcao: null },
@@ -273,10 +273,6 @@ function renderKcard(a) {
         actions = `
           <button class="kbtn primary" onclick="alterarStatus(${a.id}, 'concluir')">Concluir</button>
           <button class="kbtn danger" onclick="alterarStatus(${a.id}, 'cancelar')">Cancelar</button>
-        `;
-    } else if (a.status === "em_atendimento") {
-        actions = `
-          <button class="kbtn primary" onclick="alterarStatus(${a.id}, 'concluir')">Concluir</button>
           <button class="kbtn danger" onclick="alterarStatus(${a.id}, 'nao-comparecimento')">Faltou</button>
         `;
     } else if (a.status === "concluido") {
@@ -389,9 +385,7 @@ function renderAgendaTabela() {
 function atualizarContadoresChips(lista) {
     const contadores = {
         todos: lista.length,
-        pendente: 0,
         confirmado: 0,
-        em_atendimento: 0,
         concluido: 0,
         cancelado: 0,
         nao_compareceu: 0

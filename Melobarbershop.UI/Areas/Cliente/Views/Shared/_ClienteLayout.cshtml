@@ -1,0 +1,57 @@
+@{
+    var userName = User.Identity?.Name ?? "Cliente";
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] != null ? $"{ViewData["Title"]} - " : "")Melo Barber Shop</title>
+    <meta name="theme-color" content="#05070c" />
+    <link href="~/img/logo.png" rel="icon" type="image/png" />
+
+    <!-- Fontes do Dashboard Admin -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS base do Admin + CSS específico da Área do Cliente -->
+    <link href="~/css/admin-dashboard.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/cliente-area.css" rel="stylesheet" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="cliente-shell">
+
+    <!-- Header Próprio e Enxuto -->
+    <header class="cliente-header">
+        <div class="cliente-header-inner">
+            <a href="/" class="cliente-brand" title="Ir para a página inicial">
+                <img src="~/img/logo.png" alt="Melo Barber Shop" class="cliente-logo" />
+                <span class="cliente-brand-title">Melo Barber Shop</span>
+            </a>
+            <div class="cliente-user-nav">
+                <a href="/" class="cliente-btn-voltar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Voltar ao site
+                </a>
+                <span class="cliente-user-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span id="clienteNomeHeader">@userName</span>
+                </span>
+                <a href="/Auth/Logout" class="cliente-btn-sair" title="Encerrar sessão">Sair</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="cliente-container">
+        @RenderBody()
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast"><span class="dot"></span><span id="toastMsg"></span></div>
+
+    <script src="~/js/cliente-area.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

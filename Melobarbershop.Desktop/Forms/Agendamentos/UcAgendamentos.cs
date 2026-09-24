@@ -93,9 +93,7 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             var statusOpcoes = new (string Titulo, StatusAgendamentoDto? Status)[]
             {
                 ("Todos", null),
-                ("Pendentes", StatusAgendamentoDto.Pendente),
                 ("Confirmados", StatusAgendamentoDto.Confirmado),
-                ("Em Atendimento", StatusAgendamentoDto.EmAtendimento),
                 ("Concluídos", StatusAgendamentoDto.Concluido),
                 ("Cancelados", StatusAgendamentoDto.Cancelado),
                 ("Não Compareceu", StatusAgendamentoDto.NaoCompareceu)
@@ -312,7 +310,7 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
             return status switch
             {
                 StatusAgendamentoDto.Pendente => "Confirmar",
-                StatusAgendamentoDto.Confirmado => "Check-in",
+                StatusAgendamentoDto.Confirmado => "Concluir",
                 StatusAgendamentoDto.EmAtendimento => "Concluir",
                 _ => string.Empty
             };
@@ -430,7 +428,7 @@ namespace Melobarbershop.Desktop.Forms.Agendamentos
                         await ConfirmarAgendamentoAsync(ag);
                         break;
                     case StatusAgendamentoDto.Confirmado:
-                        await IniciarCheckinAsync(ag);
+                        await ConcluirAgendamentoAsync(ag);
                         break;
                     case StatusAgendamentoDto.EmAtendimento:
                         await ConcluirAgendamentoAsync(ag);

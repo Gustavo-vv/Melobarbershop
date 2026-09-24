@@ -10,6 +10,7 @@ public interface IUsuarioService
     Task<IEnumerable<UsuarioDto>> ListarPorRoleAsync(string roleName, bool apenasAtivos = true);
     Task<UsuarioDto> CriarAsync(CriarUsuarioDto dto);
     Task<UsuarioDto> AtualizarAsync(string id, AtualizarUsuarioDto dto);
+    Task<UsuarioDto> AtualizarDadosClienteAsync(string id, AtualizarDadosClienteDto dto);
     Task DesativarAsync(string id);
     Task AtivarAsync(string id);
     Task<BloqueioAgendaDto> AdicionarBloqueioAgendaAsync(CriarBloqueioAgendaDto dto);

@@ -51,6 +51,12 @@ app.MapControllerRoute(
     pattern: "Dashboard",
     defaults: new { area = "Admin", controller = "Admin", action = "Index" });
 
+// Rota de compatibilidade da Área do Cliente
+app.MapControllerRoute(
+    name: "areaCliente",
+    pattern: "Cliente/{action=Perfil}/{id?}",
+    defaults: new { area = "Cliente", controller = "Cliente" });
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")

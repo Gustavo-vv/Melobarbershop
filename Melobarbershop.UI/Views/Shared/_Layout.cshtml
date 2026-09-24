@@ -50,10 +50,10 @@
                     }
                     else
                     {
-                        <span class="user-name-badge" title="Usuário autenticado">
+                        <a href="/Cliente" class="user-name-badge" title="Acessar Minha Conta">
                             <img src="~/img/icons/user.png" alt="">
                             <span>@(User.Identity.Name ?? "Minha Conta")</span>
-                        </span>
+                        </a>
                     }
                     <a href="/Auth/Logout" class="user-logout-btn" title="Sair da conta">Sair</a>
                 </div>
@@ -90,6 +90,10 @@
                         if (User.IsInRole("Admin"))
                         {
                             <li><a href="/Dashboard">Painel Admin</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/Cliente">Minha Conta</a></li>
                         }
                         <li><a href="/Auth/Logout">Sair (@User.Identity.Name)</a></li>
                     }
