@@ -569,7 +569,7 @@ input {
 /* Kanban / agenda */
 .kanban {
     display: grid;
-    grid-template-columns: repeat(4, minmax(210px, 1fr));
+    grid-template-columns: repeat(3, minmax(240px, 1fr));
     gap: 12px;
     overflow-x: auto;
     padding-bottom: 4px;
@@ -1300,4 +1300,531 @@ a {
 
 .nav-item{
   text-decoration:none;
+}
+/* ===================================================================
+   SEÇÃO AGENDA (REPRODUÇÃO DESKTOP: TOOLBAR, CHIPS, TABELA, BADGES)
+   =================================================================== */
+
+.agenda-section-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+}
+
+.agenda-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.agenda-toolbar-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.filter-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.filter-field label {
+    font-weight: 500;
+}
+
+.custom-date-range {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.input-date {
+    background: var(--panel-2);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 7px 10px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.input-date:focus {
+    border-color: var(--blue);
+}
+
+.agenda-search-field {
+    position: relative;
+    min-width: 280px;
+}
+
+.agenda-search-field .search-icon {
+    position: absolute;
+    left: 10px;
+    width: 16px;
+    height: 16px;
+    stroke: var(--text-faint);
+    pointer-events: none;
+}
+
+.input-search {
+    background: var(--panel-2);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 7px 12px 7px 34px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13px;
+    width: 100%;
+    outline: none;
+    transition: all var(--transition-fast);
+}
+
+.input-search:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px var(--blue-soft);
+}
+
+/* Chips de Status */
+.agenda-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+}
+
+.agenda-chips .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 12px;
+    border-radius: 99px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.agenda-chips .chip:hover {
+    background: var(--panel-3);
+    color: var(--text);
+    border-color: var(--border-strong);
+}
+
+.agenda-chips .chip.active {
+    background: var(--blue);
+    border-color: var(--blue-bright);
+    color: #fff;
+    box-shadow: 0 2px 8px var(--blue-glow);
+}
+
+.chip-count {
+    background: rgba(255, 255, 255, 0.14);
+    padding: 1px 6px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.agenda-chips .chip:not(.active) .chip-count {
+    background: var(--panel-3);
+    color: var(--text-dim);
+}
+
+/* Tabela de Agendamentos */
+.table-agenda {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-agenda th {
+    background: var(--panel-2);
+    color: var(--text-dim);
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.table-agenda td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text);
+    vertical-align: middle;
+}
+
+.table-agenda tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Badges de Status (mesmas cores/estilo do Desktop) */
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-status-pendente {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--amber);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-status-confirmado {
+    background: rgba(37, 99, 235, 0.15);
+    color: var(--blue-bright);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+.badge-status-em-atendimento {
+    background: rgba(168, 85, 247, 0.15);
+    color: var(--purple);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.badge-status-concluido {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--green);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-status-cancelado {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--red);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-status-falta {
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--text-faint);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* Ações na Tabela */
+.table-action-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+}
+
+.table-action-btn {
+    padding: 5px 11px;
+    border-radius: var(--radius-sm);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all var(--transition-fast);
+}
+
+.table-btn-primary {
+    background: var(--blue);
+    color: #fff;
+}
+
+.table-btn-primary:hover {
+    background: var(--blue-bright);
+    box-shadow: 0 2px 6px var(--blue-glow);
+}
+
+.table-btn-accent {
+    background: rgba(37, 99, 235, 0.15);
+    color: var(--blue-bright);
+    border-color: rgba(37, 99, 235, 0.35);
+}
+
+.table-btn-accent:hover {
+    background: var(--blue);
+    color: #fff;
+}
+
+.table-btn-success {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--green);
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+.table-btn-success:hover {
+    background: var(--green);
+    color: #fff;
+}
+
+.table-action-icon-btn {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.table-action-icon-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--red);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* ===================================================================
+   SEÇÃO SERVIÇOS (BARRA DE AÇÕES, SUBBAR, TABELA SELECIONÁVEL, MODAL)
+   =================================================================== */
+
+.servicos-section-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+}
+
+.servicos-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.servicos-actions-left {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-action-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.btn-action-item:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn-danger-action:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--red);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.servicos-subbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+}
+
+.servicos-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.servicos-counter {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    font-weight: 500;
+}
+
+.table-selectable tbody tr {
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.table-selectable tbody tr.row-selected td {
+    background: rgba(37, 99, 235, 0.14) !important;
+    border-color: rgba(37, 99, 235, 0.35);
+}
+
+.cell-desc {
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-dim);
+}
+
+/* Modal de Serviços */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 7, 12, 0.75);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    transition: opacity var(--transition-fast);
+}
+
+.modal-backdrop.hidden {
+    display: none;
+}
+
+.modal-card {
+    background: var(--panel);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-m);
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+    animation: modalPop 0.22s ease-out;
+}
+
+@keyframes modalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-head h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast);
+}
+
+.modal-close:hover {
+    color: var(--text);
+}
+
+#formServico {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-dim);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.input-form {
+    background: var(--panel-2);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.input-form:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px var(--blue-soft);
+}
+
+.textarea-form {
+    resize: vertical;
+    min-height: 70px;
+}
+
+.form-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 4px;
+}
+
+.custom-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.custom-checkbox input[type="checkbox"] {
+    accent-color: var(--blue);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.modal-foot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
 }

@@ -17,14 +17,19 @@ public class PainelDadosService : IPainelDadosService
         _logger = logger;
     }
 
-    public async Task<PainelDadosPayloadViewModel> ObterDadosPainelAsync(string periodo, string profissionalId, string origem)
+    public async Task<PainelDadosPayloadViewModel> ObterDadosPainelAsync(
+        string periodo, 
+        string profissionalId, 
+        string origem, 
+        DateTime? inicioPersonalizado = null, 
+        DateTime? fimPersonalizado = null)
     {
         var payload = new PainelDadosPayloadViewModel();
         var client = _httpClientFactory.CreateClient("ApiClient");
 
         try
         {
-            var agora = DateTime.Now;
+            var hoje = DateTime.Today;
             DateTime dataInicioAtual;
             DateTime dataFimAtual;
             DateTime dataInicioAnterior;
@@ -32,25 +37,51 @@ public class PainelDadosService : IPainelDadosService
 
             switch (periodo?.ToLowerInvariant())
             {
+                case "amanha":
+                    // Amanhã
+                    dataInicioAtual = hoje.AddDays(1);
+                    dataFimAtual = hoje.AddDays(2).AddTicks(-1);
+                    dataInicioAnterior = hoje;
+                    dataFimAnterior = hoje.AddDays(1).AddTicks(-1);
+                    break;
+
                 case "semana":
-                    // Últimos 7 dias
-                    dataInicioAtual = agora.Date.AddDays(-6);
-                    dataFimAtual = agora.Date.AddDays(1).AddTicks(-1);
+                    // Últimos 7 dias (replicando desktop)
+                    dataInicioAtual = hoje.AddDays(-7);
+                    dataFimAtual = hoje.AddDays(1).AddTicks(-1);
                     dataInicioAnterior = dataInicioAtual.AddDays(-7);
                     dataFimAnterior = dataInicioAtual.AddTicks(-1);
                     break;
+
                 case "mes":
-                    // Primeiro ao último momento do mês atual
-                    dataInicioAtual = new DateTime(agora.Year, agora.Month, 1);
-                    dataFimAtual = dataInicioAtual.AddMonths(1).AddTicks(-1);
+                    // Este Mês (primeiro ao último dia do mês)
+                    dataInicioAtual = new DateTime(hoje.Year, hoje.Month, 1);
+                    dataFimAtual = new DateTime(hoje.Year, hoje.Month, DateTime.DaysInMonth(hoje.Year, hoje.Month)).AddDays(1).AddTicks(-1);
                     var mesAnterior = dataInicioAtual.AddMonths(-1);
                     dataInicioAnterior = mesAnterior;
                     dataFimAnterior = dataInicioAtual.AddTicks(-1);
                     break;
+
+                case "personalizado":
+                    if (inicioPersonalizado.HasValue && fimPersonalizado.HasValue)
+                    {
+                        dataInicioAtual = inicioPersonalizado.Value.Date;
+                        dataFimAtual = fimPersonalizado.Value.Date.AddDays(1).AddTicks(-1);
+                    }
+                    else
+                    {
+                        dataInicioAtual = hoje;
+                        dataFimAtual = hoje.AddDays(1).AddTicks(-1);
+                    }
+                    var diasDiff = (int)Math.Max(1, (dataFimAtual - dataInicioAtual).TotalDays);
+                    dataInicioAnterior = dataInicioAtual.AddDays(-diasDiff);
+                    dataFimAnterior = dataInicioAtual.AddTicks(-1);
+                    break;
+
                 case "hoje":
                 default:
-                    dataInicioAtual = agora.Date;
-                    dataFimAtual = agora.Date.AddDays(1).AddTicks(-1);
+                    dataInicioAtual = hoje;
+                    dataFimAtual = hoje.AddDays(1).AddTicks(-1);
                     dataInicioAnterior = dataInicioAtual.AddDays(-1);
                     dataFimAnterior = dataInicioAtual.AddTicks(-1);
                     break;
@@ -144,14 +175,17 @@ public class PainelDadosService : IPainelDadosService
 
             var listaFiltrada = agendamentosFiltrados.ToList();
 
-            // 5. Montar Itens da Agenda (Kanban)
+            // 5. Montar Itens da Agenda (Tabela e Kanban)
             payload.Agenda = listaFiltrada
                 .OrderBy(a => a.DataHoraInicio)
                 .Select(a => new PainelAgendaItemViewModel
                 {
                     Id = a.Id,
                     Cliente = !string.IsNullOrWhiteSpace(a.NomeCliente) ? a.NomeCliente : "Cliente",
+                    Telefone = a.TelefoneCliente,
+                    Data = a.DataHoraInicio.ToString("dd/MM/yyyy"),
                     Hora = a.DataHoraInicio.ToString("HH:mm"),
+                    HoraFim = a.DataHoraFim.ToString("HH:mm"),
                     DataHoraIso = a.DataHoraInicio.ToString("yyyy-MM-ddTHH:mm:ss"),
                     Servico = a.Itens.Any() ? string.Join(", ", a.Itens.Select(i => i.NomeServico)) : "Serviço",
                     ProfId = a.BarbeiroId,
@@ -178,7 +212,6 @@ public class PainelDadosService : IPainelDadosService
             int totalWeb = listaFiltrada.Count(a => a.Origem == OrigemAgendamento.Site);
             decimal ticket = concluidosAtual.Count > 0 ? Math.Round(fatAtual / concluidosAtual.Count, 0) : 0;
 
-            // Ocupação estimada: baseado em 10 slots diários por barbeiro ativo
             int totalBarbeiros = listaProfissionais.Count > 0 ? listaProfissionais.Count : 1;
             int diasPeriodo = Math.Max(1, (int)(dataFimAtual - dataInicioAtual).TotalDays);
             int capacidadeEstimada = totalBarbeiros * 10 * diasPeriodo;
@@ -267,7 +300,7 @@ public class PainelDadosService : IPainelDadosService
         StatusAgendamento.EmAtendimento => "em_atendimento",
         StatusAgendamento.Concluido => "concluido",
         StatusAgendamento.Cancelado => "cancelado",
-        StatusAgendamento.NaoCompareceu => "cancelado",
+        StatusAgendamento.NaoCompareceu => "nao_compareceu",
         _ => "pendente"
     };
 

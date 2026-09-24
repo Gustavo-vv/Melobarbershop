@@ -28,14 +28,17 @@ public class PainelAgendaItemViewModel
 {
     public int Id { get; set; }
     public string Cliente { get; set; } = string.Empty;
+    public string? Telefone { get; set; }
+    public string Data { get; set; } = string.Empty;
     public string Hora { get; set; } = string.Empty;
+    public string HoraFim { get; set; } = string.Empty;
     public string DataHoraIso { get; set; } = string.Empty;
     public string Servico { get; set; } = string.Empty;
     public string ProfId { get; set; } = string.Empty;
     public string ProfNome { get; set; } = string.Empty;
     public decimal Valor { get; set; }
     public string Origem { get; set; } = string.Empty;
-    public string Status { get; set; } = string.Empty; // pendente, confirmado, em_atendimento, concluido, cancelado, nao_compareceu
+    public string Status { get; set; } = string.Empty;
 }
 
 public class PainelProfissionalOpcaoViewModel
@@ -63,6 +66,7 @@ public class PainelCancelamentosViewModel
 public class AlterarStatusRequest
 {
     public int Id { get; set; }
-    public string Acao { get; set; } = string.Empty; // confirmar, iniciar-atendimento, concluir, cancelar, nao-comparecimento
+    public string Acao { get; set; } = string.Empty;
     public string? Motivo { get; set; }
+    public bool? Ativar { get; set; }
 }

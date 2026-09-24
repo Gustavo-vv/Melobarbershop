@@ -1,30 +1,50 @@
 /**
  * admin-dashboard.js
- * Painel Administrativo integrado diretamente à API via fetch.
- * Sem dados mockados no JS.
+ * Painel Administrativo, Agenda e Gestão de Serviços integrados à API.
+ * Sem dados mockados. Zero chamadas de rede extras para filtros client-side.
  */
 
 const state = {
+    secao: "visao-geral", // "visao-geral", "agenda" ou "servicos"
     period: "hoje",
     prof: "todos",
     origin: "todas",
+    inicioCustom: null,
+    fimCustom: null,
+    agendaFiltroStatus: "todos",
+    agendaBuscaTermo: "",
     payload: null,
-    carregando: false
+    carregando: false,
+
+    // Estado da Seção Serviços
+    servicos: {
+        lista: [],
+        selecionadoId: null,
+        buscaTermo: "",
+        modoModal: "novo" // "novo" ou "editar"
+    }
 };
 
-const KANBAN_ORDER = ["pendente", "confirmado", "em_atendimento", "concluido", "cancelado"];
+const KANBAN_ORDER = ["confirmado", "concluido", "cancelado"];
 
 const STATUS_META = {
-    pendente: { label: "Pendente", col: "var(--amber)" },
-    confirmado: { label: "Confirmado", col: "var(--blue)" },
-    em_atendimento: { label: "Em atendimento", col: "var(--purple)" },
-    concluido: { label: "Concluído", col: "var(--green)" },
-    cancelado: { label: "Cancelado / Falta", col: "var(--red)" }
+    pendente: { label: "Pendente", col: "var(--amber)", badgeCls: "badge-status-pendente", acao: "Confirmar", proximaAcao: "confirmar" },
+    confirmado: { label: "Confirmado", col: "var(--blue)", badgeCls: "badge-status-confirmado", acao: "Check-in", proximaAcao: "iniciar-atendimento" },
+    em_atendimento: { label: "Em Atendimento", col: "var(--purple)", badgeCls: "badge-status-em-atendimento", acao: "Concluir", proximaAcao: "concluir" },
+    concluido: { label: "Concluído", col: "var(--green)", badgeCls: "badge-status-concluido", acao: null, proximaAcao: null },
+    cancelado: { label: "Cancelado", col: "var(--red)", badgeCls: "badge-status-cancelado", acao: null, proximaAcao: null },
+    nao_compareceu: { label: "Não Compareceu", col: "var(--text-faint)", badgeCls: "badge-status-falta", acao: null, proximaAcao: null }
 };
 
-const PERIOD_LABEL = { hoje: "do dia", semana: "da semana", mes: "do mês" };
+const PERIOD_LABEL = {
+    hoje: "do dia",
+    amanha: "de amanhã",
+    semana: "dos últimos 7 dias",
+    mes: "deste mês",
+    personalizado: "personalizado"
+};
 
-/* ---------------- BUSCAR DADOS NA API ---------------- */
+/* ---------------- BUSCAR DADOS DA AGENDA / VISÃO GERAL NA API ---------------- */
 async function carregarDados() {
     state.carregando = true;
     definirEstadoCarregamento(true);
@@ -37,7 +57,11 @@ async function carregarDados() {
     }
 
     try {
-        const url = `/Admin/Admin/Dados?periodo=${encodeURIComponent(state.period)}&profissionalId=${encodeURIComponent(state.prof)}&origem=${encodeURIComponent(state.origin)}`;
+        let url = `/Admin/Admin/Dados?periodo=${encodeURIComponent(state.period)}&profissionalId=${encodeURIComponent(state.prof)}&origem=${encodeURIComponent(state.origin)}`;
+        if (state.period === "personalizado" && state.inicioCustom && state.fimCustom) {
+            url += `&inicioPersonalizado=${encodeURIComponent(state.inicioCustom)}&fimPersonalizado=${encodeURIComponent(state.fimCustom)}`;
+        }
+
         const resp = await fetch(url, {
             method: "GET",
             headers: {
@@ -56,10 +80,15 @@ async function carregarDados() {
 
         state.payload = data;
         ocultarErro();
-        atualizarSelectProfissionais(data.profissionais || []);
-        renderizarTudo();
+
+        if (state.secao === "agenda" || document.getElementById("agendaTabela")) {
+            renderAgendaTabela();
+        } else {
+            atualizarSelectProfissionais(data.profissionais || []);
+            renderizarTudo();
+        }
     } catch (err) {
-        console.error("Erro ao carregar dados do painel:", err);
+        console.error("Erro ao carregar dados da API:", err);
         exibirErro("Não foi possível carregar os dados da API. Verifique a conexão com o servidor.");
         definirEstadoVazioOuErro(true);
     } finally {
@@ -68,28 +97,9 @@ async function carregarDados() {
     }
 }
 
-/* ---------------- ATUALIZAR SELECT DE PROFISSIONAIS ---------------- */
-function atualizarSelectProfissionais(profissionais) {
-    const select = document.getElementById("filterProf");
-    if (!select) return;
-
-    const valorSelecionado = select.value;
-    select.innerHTML = '<option value="todos">Todos os profissionais</option>';
-
-    profissionais.forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = p.id;
-        opt.textContent = p.nome;
-        if (p.id === valorSelecionado || p.nome === valorSelecionado) {
-            opt.selected = true;
-        }
-        select.appendChild(opt);
-    });
-}
-
-/* ---------------- CONTROLE DE ESTADOS VISUAIS ---------------- */
+/* ---------------- CONTROLE DE ESTADOS VISUAIS DA AGENDA / VISÃO GERAL ---------------- */
 function definirEstadoCarregamento(estaCarregando) {
-    const agendaBlock = document.getElementById("agendaBlock");
+    const agendaBlock = document.getElementById("agendaBlock") || document.getElementById("agendaTableWrap");
     const agendaLoading = document.getElementById("agendaLoading");
     const agendaEmpty = document.getElementById("agendaEmpty");
 
@@ -99,7 +109,7 @@ function definirEstadoCarregamento(estaCarregando) {
 }
 
 function definirEstadoVazioOuErro(comErro) {
-    const agendaBlock = document.getElementById("agendaBlock");
+    const agendaBlock = document.getElementById("agendaBlock") || document.getElementById("agendaTableWrap");
     const agendaEmpty = document.getElementById("agendaEmpty");
     const agendaLoading = document.getElementById("agendaLoading");
 
@@ -125,12 +135,29 @@ function ocultarErro() {
     if (banner) banner.classList.add("hidden");
 }
 
-/* ---------------- RENDER: GERAL ---------------- */
+function atualizarSelectProfissionais(profissionais) {
+    const select = document.getElementById("filterProf");
+    if (!select) return;
+
+    const valorSelecionado = select.value;
+    select.innerHTML = '<option value="todos">Todos os profissionais</option>';
+
+    profissionais.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.nome;
+        if (p.id === valorSelecionado || p.nome === valorSelecionado) {
+            opt.selected = true;
+        }
+        select.appendChild(opt);
+    });
+}
+
 function renderizarTudo() {
     if (!state.payload) return;
 
     const titleH1 = document.querySelector(".topbar-title h1");
-    if (titleH1) {
+    if (titleH1 && state.secao !== "agenda" && state.secao !== "servicos") {
         titleH1.textContent = "Visão geral " + (PERIOD_LABEL[state.period] || "do período");
     }
 
@@ -140,7 +167,6 @@ function renderizarTudo() {
     renderCancel();
 }
 
-/* ---------------- RENDER: KPIS ---------------- */
 function renderKPIs() {
     const grid = document.getElementById("kpiGrid");
     if (!grid || !state.payload || !state.payload.kpis) return;
@@ -182,7 +208,6 @@ function renderKPIs() {
     `;
 }
 
-/* ---------------- RENDER: KANBAN DE AGENDA ---------------- */
 function renderAgenda() {
     const kanban = document.getElementById("kanban");
     const countTag = document.getElementById("agendaCountTag");
@@ -213,7 +238,7 @@ function renderAgenda() {
     if (agendaEmpty) agendaEmpty.classList.remove("show");
 
     kanban.innerHTML = KANBAN_ORDER.map(statusKey => {
-        const meta = STATUS_META[statusKey];
+        const meta = STATUS_META[statusKey] || { label: statusKey, col: "var(--text-faint)" };
         const itens = lista.filter(a => a.status === statusKey);
 
         return `
@@ -238,7 +263,7 @@ function renderKcard(a) {
         `;
     } else if (a.status === "confirmado") {
         actions = `
-          <button class="kbtn primary" onclick="alterarStatus(${a.id}, 'iniciar-atendimento')">Iniciar</button>
+          <button class="kbtn primary" onclick="alterarStatus(${a.id}, 'concluir')">Concluir</button>
           <button class="kbtn danger" onclick="alterarStatus(${a.id}, 'cancelar')">Cancelar</button>
         `;
     } else if (a.status === "em_atendimento") {
@@ -248,8 +273,8 @@ function renderKcard(a) {
         `;
     } else if (a.status === "concluido") {
         actions = `<span style="font-size:10.5px;color:var(--text-faint)">Atendimento finalizado</span>`;
-    } else if (a.status === "cancelado") {
-        actions = `<span style="font-size:10.5px;color:var(--text-faint)">Cancelado / Sem ações</span>`;
+    } else if (a.status === "cancelado" || a.status === "nao_compareceu") {
+        actions = `<span style="font-size:10.5px;color:var(--text-faint)">Sem ações disponíveis</span>`;
     }
 
     const valorFmt = Number(a.valor || 0).toLocaleString("pt-BR", { minimumFractionDigits: 0 });
@@ -268,9 +293,125 @@ function renderKcard(a) {
     </div>`;
 }
 
-/* ---------------- TRANSIÇÃO DE STATUS DO KANBAN ---------------- */
+function renderAgendaTabela() {
+    const tabelaBody = document.getElementById("agendaTabelaBody");
+    const tableWrap = document.getElementById("agendaTableWrap");
+    const emptyEl = document.getElementById("agendaEmpty");
+    const loadingEl = document.getElementById("agendaLoading");
+
+    if (!tabelaBody) return;
+    if (loadingEl) loadingEl.classList.remove("show");
+
+    const todosAgendamentos = state.payload?.agenda || [];
+    atualizarContadoresChips(todosAgendamentos);
+
+    const termo = (state.agendaBuscaTermo || "").trim().toLowerCase();
+    const filtroStatus = state.agendaFiltroStatus;
+
+    const filtrados = todosAgendamentos.filter(a => {
+        const atendeStatus = (filtroStatus === "todos") || (a.status === filtroStatus);
+        if (!atendeStatus) return false;
+
+        if (!termo) return true;
+
+        const clienteMatch = a.cliente && a.cliente.toLowerCase().includes(termo);
+        const profMatch = a.profNome && a.profNome.toLowerCase().includes(termo);
+        const servMatch = a.servico && a.servico.toLowerCase().includes(termo);
+        const idMatch = a.id && String(a.id).includes(termo);
+        const telMatch = a.telefone && a.telefone.toLowerCase().includes(termo);
+
+        return clienteMatch || profMatch || servMatch || idMatch || telMatch;
+    });
+
+    if (filtrados.length === 0) {
+        if (tableWrap) tableWrap.classList.add("hide");
+        if (emptyEl) {
+            emptyEl.classList.add("show");
+            emptyEl.textContent = termo 
+                ? `Nenhum agendamento encontrado para o termo "${escaparHtml(termo)}".`
+                : "Nenhum agendamento encontrado para os filtros selecionados.";
+        }
+        tabelaBody.innerHTML = "";
+        return;
+    }
+
+    if (tableWrap) tableWrap.classList.remove("hide");
+    if (emptyEl) emptyEl.classList.remove("show");
+
+    tabelaBody.innerHTML = filtrados.map(a => {
+        const meta = STATUS_META[a.status] || { label: a.status, badgeCls: "badge-status-falta", acao: null, proximaAcao: null };
+        const valorFmt = "R$ " + Number(a.valor || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+        const horarioFmt = a.horaFim ? `${escaparHtml(a.hora)} - ${escaparHtml(a.HoraFim || a.horaFim)}` : escaparHtml(a.hora);
+        const telFmt = a.telefone ? escaparHtml(a.telefone) : '<span style="color:var(--text-faint)">—</span>';
+
+        let botaoAcaoHtml = '<span style="color:var(--text-faint);font-size:12px;">—</span>';
+        if (meta.acao && meta.proximaAcao) {
+            const btnCls = a.status === "pendente" ? "table-btn-primary" : (a.status === "confirmado" ? "table-btn-accent" : "table-btn-success");
+            botaoAcaoHtml = `
+                <div class="table-action-group">
+                    <button class="table-action-btn ${btnCls}" onclick="alterarStatus(${a.id}, '${meta.proximaAcao}')" title="${meta.acao}">
+                        ${meta.acao}
+                    </button>
+                    ${(a.status === "pendente" || a.status === "confirmado") ? `
+                        <button class="table-action-icon-btn" onclick="alterarStatus(${a.id}, 'cancelar')" title="Cancelar agendamento">
+                            ✕
+                        </button>
+                    ` : ""}
+                </div>
+            `;
+        }
+
+        return `
+        <tr>
+            <td class="tabular" style="font-weight:600;color:var(--text-dim);">#${a.id}</td>
+            <td style="font-weight:600;color:var(--text);">${escaparHtml(a.cliente)}</td>
+            <td class="tabular">${telFmt}</td>
+            <td>${escaparHtml(a.profNome)}</td>
+            <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escaparHtml(a.servico)}">${escaparHtml(a.servico)}</td>
+            <td class="tabular">${escaparHtml(a.data || "—")}</td>
+            <td class="tabular font-bold">${horarioFmt}</td>
+            <td class="money tabular">${valorFmt}</td>
+            <td><span class="badge-status ${meta.badgeCls}">${meta.label}</span></td>
+            <td style="text-align:center;">${botaoAcaoHtml}</td>
+        </tr>
+        `;
+    }).join("");
+}
+
+function atualizarContadoresChips(lista) {
+    const contadores = {
+        todos: lista.length,
+        pendente: 0,
+        confirmado: 0,
+        em_atendimento: 0,
+        concluido: 0,
+        cancelado: 0,
+        nao_compareceu: 0
+    };
+
+    lista.forEach(a => {
+        if (contadores[a.status] !== undefined) {
+            contadores[a.status]++;
+        }
+    });
+
+    Object.keys(contadores).forEach(key => {
+        const el = document.getElementById(`count-${key}`);
+        if (el) el.textContent = contadores[key];
+    });
+}
+
 async function alterarStatus(id, acao) {
-    if (!confirm(`Deseja realmente aplicar a ação "${acao}" neste agendamento?`)) {
+    const acoesRotulos = {
+        "confirmar": "confirmar este agendamento",
+        "iniciar-atendimento": "iniciar o atendimento (check-in)",
+        "concluir": "concluir este atendimento",
+        "cancelar": "cancelar este agendamento",
+        "nao-comparecimento": "registrar não comparecimento (falta)"
+    };
+
+    const confirmMsg = acoesRotulos[acao] || `aplicar a ação "${acao}"`;
+    if (!confirm(`Deseja realmente ${confirmMsg}?`)) {
         return;
     }
 
@@ -286,7 +427,7 @@ async function alterarStatus(id, acao) {
         const res = await resp.json();
         if (resp.ok && res.sucesso) {
             showToast("Status atualizado na API com sucesso!");
-            await carregarDados(); // Re-busca os dados frescos da API
+            await carregarDados();
         } else {
             showToast(res.mensagem || "Erro ao atualizar status na API.");
         }
@@ -296,7 +437,6 @@ async function alterarStatus(id, acao) {
     }
 }
 
-/* ---------------- RENDER: ORIGEM ---------------- */
 function renderOrigin() {
     const listEl = document.getElementById("originList");
     const emptyEl = document.getElementById("originEmpty");
@@ -325,7 +465,6 @@ function renderOrigin() {
     `).join("");
 }
 
-/* ---------------- RENDER: CANCELAMENTOS ---------------- */
 function renderCancel() {
     const statsEl = document.getElementById("cancelStats");
     const emptyEl = document.getElementById("cancelEmpty");
@@ -357,6 +496,369 @@ function renderCancel() {
       <div class="cancel-stat"><span class="lab">Taxa de não comparecimento</span><span class="val amber">${c.taxaNaoComparecimento}%</span></div>
       <div class="cancel-stat"><span class="lab">Faltas no período</span><span class="val">${c.totalNaoCompareceu}</span></div>
     `;
+}
+
+/* ===================================================================
+   SEÇÃO SERVIÇOS (GESTÃO DE SERVIÇOS - REPRODUÇÃO UCSERVICOS)
+   =================================================================== */
+
+async function carregarServicos() {
+    const loadingEl = document.getElementById("servicosLoading");
+    const tableWrap = document.getElementById("servicosTableWrap");
+    const emptyEl = document.getElementById("servicosEmpty");
+    const refreshIcon = document.getElementById("refreshIconServicos");
+
+    if (refreshIcon) {
+        refreshIcon.style.transition = "transform .6s ease";
+        refreshIcon.style.transform = "rotate(360deg)";
+        setTimeout(() => { refreshIcon.style.transform = "rotate(0deg)"; }, 600);
+    }
+
+    if (loadingEl) loadingEl.classList.add("show");
+    if (tableWrap) tableWrap.classList.add("hide");
+    if (emptyEl) emptyEl.classList.remove("show");
+
+    try {
+        const resp = await fetch("/Admin/Admin/ServicosDados", {
+            method: "GET",
+            headers: { "Accept": "application/json" }
+        });
+
+        if (!resp.ok) {
+            throw new Error(`HTTP error! status: ${resp.status}`);
+        }
+
+        const res = await resp.json();
+        if (!res || res.sucesso === false) {
+            throw new Error(res ? res.mensagem : "Erro ao carregar serviços da API.");
+        }
+
+        state.servicos.lista = res.dados || [];
+        renderServicosTabela();
+    } catch (err) {
+        console.error("Erro ao carregar serviços:", err);
+        showToast("Erro ao carregar lista de serviços da API.");
+        if (loadingEl) loadingEl.classList.remove("show");
+        if (emptyEl) {
+            emptyEl.classList.add("show");
+            emptyEl.textContent = "Erro ao carregar serviços da API. Verifique a conexão.";
+        }
+    }
+}
+
+function renderServicosTabela() {
+    const tabelaBody = document.getElementById("servicosTabelaBody");
+    const tableWrap = document.getElementById("servicosTableWrap");
+    const emptyEl = document.getElementById("servicosEmpty");
+    const loadingEl = document.getElementById("servicosLoading");
+    const contadorEl = document.getElementById("servicosContador");
+
+    if (!tabelaBody) return;
+    if (loadingEl) loadingEl.classList.remove("show");
+
+    const todos = state.servicos.lista || [];
+    const termo = (state.servicos.buscaTermo || "").trim().toLowerCase();
+
+    const filtrados = todos.filter(s => {
+        if (!termo) return true;
+        const nomeMatch = s.nome && s.nome.toLowerCase().includes(termo);
+        const descMatch = s.descricao && s.descricao.toLowerCase().includes(termo);
+        const idMatch = s.id && String(s.id).includes(termo);
+        return nomeMatch || descMatch || idMatch;
+    });
+
+    if (contadorEl) {
+        contadorEl.textContent = `${filtrados.length} serviço(s) carregado(s).`;
+    }
+
+    if (filtrados.length === 0) {
+        if (tableWrap) tableWrap.classList.add("hide");
+        if (emptyEl) {
+            emptyEl.classList.add("show");
+            emptyEl.textContent = termo 
+                ? `Nenhum serviço encontrado para o termo "${escaparHtml(termo)}".`
+                : "Nenhum serviço cadastrado até o momento.";
+        }
+        tabelaBody.innerHTML = "";
+        deselecionarServico();
+        return;
+    }
+
+    if (tableWrap) tableWrap.classList.remove("hide");
+    if (emptyEl) emptyEl.classList.remove("show");
+
+    tabelaBody.innerHTML = filtrados.map(s => {
+        const precoFmt = "R$ " + Number(s.preco || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+        const duracaoFmt = `${s.duracaoMinutos || 0} min`;
+        const statusBadge = s.ativo 
+            ? '<span class="badge-status badge-status-concluido">Ativo</span>'
+            : '<span class="badge-status badge-status-falta">Inativo</span>';
+        const noSiteBadge = s.exibirNoSite
+            ? '<span style="color:var(--blue-bright);font-weight:600;">Sim</span>'
+            : '<span style="color:var(--text-faint);">Não</span>';
+        const isSelected = state.servicos.selecionadoId === s.id;
+
+        return `
+        <tr data-id="${s.id}" class="${isSelected ? "row-selected" : ""}" onclick="selecionarServico(${s.id})">
+            <td class="tabular" style="font-weight:600;color:var(--text-dim);">#${s.id}</td>
+            <td style="font-weight:600;color:var(--text);">${escaparHtml(s.nome)}</td>
+            <td class="cell-desc" title="${escaparHtml(s.descricao || "—")}">${escaparHtml(s.descricao || "—")}</td>
+            <td class="money tabular">${precoFmt}</td>
+            <td class="tabular">${duracaoFmt}</td>
+            <td>${statusBadge}</td>
+            <td>${noSiteBadge}</td>
+        </tr>
+        `;
+    }).join("");
+
+    atualizarBotoesAcaoServico();
+}
+
+function selecionarServico(id) {
+    if (state.servicos.selecionadoId === id) {
+        // Se clicar no mesmo, desseleciona
+        state.servicos.selecionadoId = null;
+    } else {
+        state.servicos.selecionadoId = id;
+    }
+
+    // Atualiza classes visualmente na tabela
+    document.querySelectorAll("#servicosTabelaBody tr").forEach(tr => {
+        const rowId = Number(tr.dataset.id);
+        tr.classList.toggle("row-selected", rowId === state.servicos.selecionadoId);
+    });
+
+    atualizarBotoesAcaoServico();
+}
+
+function deselecionarServico() {
+    state.servicos.selecionadoId = null;
+    atualizarBotoesAcaoServico();
+}
+
+function atualizarBotoesAcaoServico() {
+    const temSelecao = state.servicos.selecionadoId !== null;
+    const btnEditar = document.getElementById("btnEditarServico");
+    const btnStatus = document.getElementById("btnAlternarStatusServico");
+    const btnExcluir = document.getElementById("btnExcluirServico");
+
+    if (btnEditar) btnEditar.disabled = !temSelecao;
+    if (btnStatus) btnStatus.disabled = !temSelecao;
+    if (btnExcluir) btnExcluir.disabled = !temSelecao;
+
+    if (temSelecao && btnStatus) {
+        const servico = state.servicos.lista.find(s => s.id === state.servicos.selecionadoId);
+        if (servico) {
+            btnStatus.innerHTML = servico.ativo
+                ? `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg> Desativar`
+                : `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Reativar`;
+        }
+    }
+}
+
+function abrirModalServico(modo, servico = null) {
+    state.servicos.modoModal = modo;
+    const modalBackdrop = document.getElementById("modalServicoBackdrop");
+    const tituloEl = document.getElementById("modalServicoTitulo");
+    const wrapAtivo = document.getElementById("wrapServicoAtivo");
+    const btnSalvar = document.getElementById("btnSalvarServico");
+
+    const idInput = document.getElementById("servicoId");
+    const nomeInput = document.getElementById("servicoNome");
+    const descInput = document.getElementById("servicoDescricao");
+    const precoInput = document.getElementById("servicoPreco");
+    const duracaoInput = document.getElementById("servicoDuracao");
+    const ativoInput = document.getElementById("servicoAtivo");
+    const siteInput = document.getElementById("servicoExibirNoSite");
+
+    if (modo === "novo") {
+        tituloEl.textContent = "Novo Serviço";
+        btnSalvar.textContent = "Cadastrar Serviço";
+        if (wrapAtivo) wrapAtivo.classList.add("hidden");
+
+        idInput.value = "";
+        nomeInput.value = "";
+        descInput.value = "";
+        precoInput.value = "";
+        duracaoInput.value = "30";
+        ativoInput.checked = true;
+        siteInput.checked = true;
+    } else {
+        if (!servico) {
+            servico = state.servicos.lista.find(s => s.id === state.servicos.selecionadoId);
+        }
+        if (!servico) {
+            showToast("Nenhum serviço selecionado.");
+            return;
+        }
+
+        tituloEl.textContent = `Editar Serviço #${servico.id}`;
+        btnSalvar.textContent = "Salvar Alterações";
+        if (wrapAtivo) wrapAtivo.classList.remove("hidden");
+
+        idInput.value = servico.id;
+        nomeInput.value = servico.nome || "";
+        descInput.value = servico.descricao || "";
+        precoInput.value = servico.preco || "";
+        duracaoInput.value = servico.duracaoMinutos || "30";
+        ativoInput.checked = !!servico.ativo;
+        siteInput.checked = !!servico.exibirNoSite;
+    }
+
+    if (modalBackdrop) modalBackdrop.classList.remove("hidden");
+    nomeInput.focus();
+}
+
+function fecharModalServico() {
+    const modalBackdrop = document.getElementById("modalServicoBackdrop");
+    if (modalBackdrop) modalBackdrop.classList.add("hidden");
+}
+
+function editarServicoSelecionado() {
+    if (!state.servicos.selecionadoId) return;
+    const servico = state.servicos.lista.find(s => s.id === state.servicos.selecionadoId);
+    if (servico) {
+        abrirModalServico("editar", servico);
+    }
+}
+
+async function salvarServico(e) {
+    e.preventDefault();
+
+    const id = document.getElementById("servicoId").value;
+    const nome = document.getElementById("servicoNome").value.trim();
+    const descricao = document.getElementById("servicoDescricao").value.trim();
+    const preco = parseFloat(document.getElementById("servicoPreco").value);
+    const duracaoMinutos = parseInt(document.getElementById("servicoDuracao").value, 10);
+    const ativo = document.getElementById("servicoAtivo").checked;
+    const exibirNoSite = document.getElementById("servicoExibirNoSite").checked;
+
+    if (!nome) {
+        showToast("O nome do serviço é obrigatório.");
+        return;
+    }
+    if (isNaN(preco) || preco < 0) {
+        showToast("Informe um preço válido.");
+        return;
+    }
+    if (isNaN(duracaoMinutos) || duracaoMinutos <= 0) {
+        showToast("Informe uma duração válida em minutos.");
+        return;
+    }
+
+    const btnSalvar = document.getElementById("btnSalvarServico");
+    const textoOriginal = btnSalvar.textContent;
+    btnSalvar.disabled = true;
+    btnSalvar.textContent = "Salvando...";
+
+    try {
+        let resp;
+        if (state.servicos.modoModal === "novo") {
+            const dto = {
+                nome: nome,
+                descricao: descricao || null,
+                preco: preco,
+                duracaoMinutos: duracaoMinutos,
+                exibirNoSite: exibirNoSite
+            };
+            resp = await fetch("/Admin/Admin/ServicosCriar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dto)
+            });
+        } else {
+            const dto = {
+                nome: nome,
+                descricao: descricao || null,
+                preco: preco,
+                duracaoMinutos: duracaoMinutos,
+                ativo: ativo,
+                exibirNoSite: exibirNoSite
+            };
+            resp = await fetch(`/Admin/Admin/ServicosAtualizar?id=${id}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dto)
+            });
+        }
+
+        const res = await resp.json();
+        if (resp.ok && res.sucesso) {
+            showToast(state.servicos.modoModal === "novo" ? "Serviço cadastrado com sucesso!" : "Serviço atualizado com sucesso!");
+            fecharModalServico();
+            await carregarServicos();
+        } else {
+            showToast(res.mensagem || "Erro ao salvar serviço na API.");
+        }
+    } catch (err) {
+        console.error("Erro ao salvar serviço:", err);
+        showToast("Erro de comunicação ao salvar serviço.");
+    } finally {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = textoOriginal;
+    }
+}
+
+async function alternarStatusServico() {
+    if (!state.servicos.selecionadoId) return;
+    const servico = state.servicos.lista.find(s => s.id === state.servicos.selecionadoId);
+    if (!servico) return;
+
+    const novaAcao = servico.ativo ? "desativar" : "reativar";
+    const confirmMsg = servico.ativo
+        ? `Deseja realmente desativar o serviço "${servico.nome}"? Ele não aparecerá para novos agendamentos.`
+        : `Deseja reativar o serviço "${servico.nome}"?`;
+
+    if (!confirm(confirmMsg)) return;
+
+    try {
+        const resp = await fetch("/Admin/Admin/ServicosAlternarStatus", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: servico.id,
+                ativar: !servico.ativo
+            })
+        });
+
+        const res = await resp.json();
+        if (resp.ok && res.sucesso) {
+            showToast(`Serviço ${novaAcao === "desativar" ? "desativado" : "reativado"} com sucesso!`);
+            await carregarServicos();
+        } else {
+            showToast(res.mensagem || "Erro ao alterar status do serviço.");
+        }
+    } catch (err) {
+        console.error("Erro ao alternar status do serviço:", err);
+        showToast("Erro de comunicação ao atualizar status.");
+    }
+}
+
+async function excluirServicoPermanente() {
+    if (!state.servicos.selecionadoId) return;
+    const servico = state.servicos.lista.find(s => s.id === state.servicos.selecionadoId);
+    if (!servico) return;
+
+    const confirmMsg = `ATENÇÃO: Deseja realmente excluir o serviço "${servico.nome}" (ID #${servico.id})?\n\nEsta ação removerá o serviço definitivamente do banco de dados e não poderá ser desfeita.`;
+    if (!confirm(confirmMsg)) return;
+
+    try {
+        const resp = await fetch(`/Admin/Admin/ServicosExcluir?id=${servico.id}`, {
+            method: "POST"
+        });
+
+        const res = await resp.json();
+        if (resp.ok && res.sucesso) {
+            showToast("Serviço excluído permanentemente com sucesso!");
+            deselecionarServico();
+            await carregarServicos();
+        } else {
+            showToast(res.mensagem || "Não foi possível excluir o serviço. Verifique se há vínculos.");
+        }
+    } catch (err) {
+        console.error("Erro ao excluir serviço:", err);
+        showToast("Erro de comunicação ao excluir serviço.");
+    }
 }
 
 /* ---------------- UTILITÁRIOS ---------------- */
@@ -394,37 +896,123 @@ function toggleTheme() {
 
 /* ---------------- EVENTOS DE INICIALIZAÇÃO ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
-    // Filtro de Período (Hoje / Semana / Mês)
-    const periodSeg = document.getElementById("periodSeg");
-    if (periodSeg) {
-        periodSeg.addEventListener("click", (e) => {
-            const btn = e.target.closest("button");
-            if (!btn) return;
-            document.querySelectorAll("#periodSeg button").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            state.period = btn.dataset.period;
-            carregarDados();
-        });
+    // Detectar seção ativa: "servicos", "agenda" ou "visao-geral"
+    const secaoServicosEl = document.querySelector(".servicos-section-panel");
+    const secaoAgendaEl = document.querySelector(".agenda-section-panel");
+
+    if (secaoServicosEl || document.getElementById("servicosTabela")) {
+        state.secao = "servicos";
+    } else if (secaoAgendaEl || document.getElementById("agendaTabela")) {
+        state.secao = "agenda";
+    } else {
+        state.secao = "visao-geral";
     }
 
-    // Filtro de Profissional
-    const filterProf = document.getElementById("filterProf");
-    if (filterProf) {
-        filterProf.addEventListener("change", (e) => {
-            state.prof = e.target.value;
-            carregarDados();
-        });
-    }
+    if (state.secao === "servicos") {
+        // Inicialização da Seção Serviços
+        const buscaInput = document.getElementById("servicosBusca");
+        if (buscaInput) {
+            buscaInput.addEventListener("input", (e) => {
+                state.servicos.buscaTermo = e.target.value;
+                renderServicosTabela();
+            });
+        }
 
-    // Filtro de Origem
-    const filterOrigin = document.getElementById("filterOrigin");
-    if (filterOrigin) {
-        filterOrigin.addEventListener("change", (e) => {
-            state.origin = e.target.value;
-            carregarDados();
-        });
-    }
+        // Fechar modal ao clicar fora
+        const modalBackdrop = document.getElementById("modalServicoBackdrop");
+        if (modalBackdrop) {
+            modalBackdrop.addEventListener("click", (e) => {
+                if (e.target === modalBackdrop) {
+                    fecharModalServico();
+                }
+            });
+        }
 
-    // Disparo inicial da busca na API
-    carregarDados();
+        // Carregamento inicial de serviços
+        carregarServicos();
+    } else if (state.secao === "agenda") {
+        // Inicialização da Seção Agenda
+        const agendaPeriodo = document.getElementById("agendaPeriodo");
+        const agendaCustomWrap = document.getElementById("agendaCustomDateWrap");
+        const agendaDataInicio = document.getElementById("agendaDataInicio");
+        const agendaDataFim = document.getElementById("agendaDataFim");
+        const btnAplicarDataCustom = document.getElementById("btnAplicarDataCustom");
+        const agendaBusca = document.getElementById("agendaBusca");
+
+        if (agendaPeriodo) {
+            agendaPeriodo.addEventListener("change", (e) => {
+                state.period = e.target.value;
+                if (state.period === "personalizado") {
+                    if (agendaCustomWrap) agendaCustomWrap.classList.remove("hidden");
+                } else {
+                    if (agendaCustomWrap) agendaCustomWrap.classList.add("hidden");
+                    carregarDados();
+                }
+            });
+        }
+
+        if (btnAplicarDataCustom) {
+            btnAplicarDataCustom.addEventListener("click", () => {
+                if (agendaDataInicio?.value && agendaDataFim?.value) {
+                    state.inicioCustom = agendaDataInicio.value;
+                    state.fimCustom = agendaDataFim.value;
+                    carregarDados();
+                } else {
+                    showToast("Selecione a data inicial e final.");
+                }
+            });
+        }
+
+        if (agendaBusca) {
+            agendaBusca.addEventListener("input", (e) => {
+                state.agendaBuscaTermo = e.target.value;
+                renderAgendaTabela();
+            });
+        }
+
+        const statusChipsWrap = document.getElementById("agendaStatusChips");
+        if (statusChipsWrap) {
+            statusChipsWrap.addEventListener("click", (e) => {
+                const btn = e.target.closest("button.chip");
+                if (!btn) return;
+                statusChipsWrap.querySelectorAll("button.chip").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                state.agendaFiltroStatus = btn.dataset.status;
+                renderAgendaTabela();
+            });
+        }
+
+        carregarDados();
+    } else {
+        // Inicialização da Seção Visão Geral
+        const periodSeg = document.getElementById("periodSeg");
+        if (periodSeg) {
+            periodSeg.addEventListener("click", (e) => {
+                const btn = e.target.closest("button");
+                if (!btn) return;
+                document.querySelectorAll("#periodSeg button").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                state.period = btn.dataset.period;
+                carregarDados();
+            });
+        }
+
+        const filterProf = document.getElementById("filterProf");
+        if (filterProf) {
+            filterProf.addEventListener("change", (e) => {
+                state.prof = e.target.value;
+                carregarDados();
+            });
+        }
+
+        const filterOrigin = document.getElementById("filterOrigin");
+        if (filterOrigin) {
+            filterOrigin.addEventListener("change", (e) => {
+                state.origin = e.target.value;
+                carregarDados();
+            });
+        }
+
+        carregarDados();
+    }
 });

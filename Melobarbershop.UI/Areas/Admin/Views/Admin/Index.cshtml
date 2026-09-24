@@ -1,33 +1,40 @@
 @{
-    ViewData["Title"] = "Painel Administrativo";
-    ViewData["ActiveNav"] = "visao-geral";
-    ViewData["PageTitle"] = "Visão geral do dia";
-    ViewData["PageSubtitle"] = DateTime.Now.ToString("dddd, dd 'de' MMMM", new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API";
+    var secao = ViewData["Secao"] as string ?? "visao-geral";
+    var isAgenda = secao == "agenda";
+    var isServicos = secao == "servicos";
+
+    ViewData["Title"] = isServicos ? "Gestão de Serviços" : (isAgenda ? "Agenda de Atendimentos" : "Painel Administrativo");
+    ViewData["ActiveNav"] = isServicos ? "servicos" : (isAgenda ? "agenda" : "visao-geral");
+    ViewData["PageTitle"] = isServicos ? "Gestão de Serviços" : (isAgenda ? "Agenda de Atendimentos" : "Visão geral do dia");
+    ViewData["PageSubtitle"] = isServicos ? "Cadastro, edição, precificação e visibilidade no catálogo" : (DateTime.Now.ToString("dddd, dd 'de' MMMM", new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API");
     Layout = "_AdminLayout";
 }
 
 @section TopbarActions {
-    <div class="filters">
-        <div class="seg" id="periodSeg">
-            <button data-period="hoje" class="active">Hoje</button>
-            <button data-period="semana">Semana</button>
-            <button data-period="mes">Mês</button>
+    @if (!isAgenda && !isServicos)
+    {
+        <div class="filters">
+            <div class="seg" id="periodSeg">
+                <button data-period="hoje" class="active">Hoje</button>
+                <button data-period="semana">Semana</button>
+                <button data-period="mes">Mês</button>
+            </div>
+            <select class="select-filter" id="filterProf">
+                <option value="todos">Todos os profissionais</option>
+            </select>
+            <select class="select-filter" id="filterOrigin">
+                <option value="todas">Todas as origens</option>
+                <option value="site">Site</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="app">Aplicativo</option>
+                <option value="balcao">Balcão</option>
+            </select>
+            <button class="btn-ghost" onclick="carregarDados()">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIcon"><path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" /></svg>
+                Atualizar
+            </button>
         </div>
-        <select class="select-filter" id="filterProf">
-            <option value="todos">Todos os profissionais</option>
-        </select>
-        <select class="select-filter" id="filterOrigin">
-            <option value="todas">Todas as origens</option>
-            <option value="site">Site</option>
-            <option value="whatsapp">WhatsApp</option>
-            <option value="app">Aplicativo</option>
-            <option value="balcao">Balcão</option>
-        </select>
-        <button class="btn-ghost" onclick="carregarDados()">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIcon"><path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" /></svg>
-            Atualizar
-        </button>
-    </div>
+    }
 }
 
 <!-- error banner -->
@@ -36,68 +43,308 @@
     <button onclick="carregarDados()">Tentar novamente</button>
 </div>
 
-<!-- ================= KPIs ================= -->
-<section>
-    <div class="section-head">
-        <div>
-            <h2>Indicadores do período</h2>
-            <p>Calculados em tempo real diretamente a partir dos agendamentos da API.</p>
-        </div>
-    </div>
-    <div class="kpi-grid" id="kpiGrid">
-        <!-- Renderizado dinamicamente via JS a partir da API -->
-    </div>
-</section>
+@if (isServicos)
+{
+    <!-- ================= SEÇÃO SERVIÇOS (REPRODUÇÃO UCSERVICOS DO DESKTOP) ================= -->
+    <div class="panel servicos-section-panel" data-secao="servicos">
+        
+        <!-- Barra de Ações Superior -->
+        <div class="servicos-toolbar">
+            <div class="servicos-actions-left">
+                <button class="btn-primary" id="btnNovoServico" onclick="abrirModalServico('novo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Novo Serviço
+                </button>
+                <button class="btn-ghost btn-action-item" id="btnEditarServico" onclick="editarServicoSelecionado()" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    Editar
+                </button>
+                <button class="btn-ghost btn-action-item" id="btnAlternarStatusServico" onclick="alternarStatusServico()" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect><circle cx="16" cy="12" r="3"></circle></svg>
+                    Ativar / Desativar
+                </button>
+                <button class="btn-ghost btn-action-item btn-danger-action" id="btnExcluirServico" onclick="excluirServicoPermanente()" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Excluir
+                </button>
+            </div>
 
-<!-- ================= AGENDA KANBAN ================= -->
-<section class="panel">
-    <div class="section-head">
-        <div>
-            <h2>Agenda de agendamentos</h2>
-            <p>Agrupada por status. As ações abaixo alteram o status real do agendamento na API.</p>
+            <button class="btn-ghost" id="btnRecarregarServicos" onclick="carregarServicos()" title="Recarregar serviços da API">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIconServicos" style="width:16px;height:16px;">
+                    <path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" />
+                </svg>
+                Recarregar
+            </button>
         </div>
-        <span class="tag" id="agendaCountTag">0 agendamentos</span>
-    </div>
-    <div class="real-content" id="agendaBlock">
-        <div class="kanban" id="kanban">
-            <!-- Kanban renderizado com dados diretos da API -->
-        </div>
-    </div>
-    <div class="state-loading" id="agendaLoading">
-        <div class="spinner"></div>Carregando agenda da API…
-    </div>
-    <div class="state-empty" id="agendaEmpty">
-        Nenhum agendamento encontrado para os filtros selecionados.
-    </div>
-</section>
 
-<!-- ================= ORIGEM + CANCELAMENTOS ================= -->
-<div class="grid-2">
+        <!-- Filtro de Busca e Contador -->
+        <div class="servicos-subbar">
+            <div class="servicos-search-wrap">
+                <label for="servicosBusca">Buscar serviço:</label>
+                <div class="agenda-search-field" style="min-width: 320px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="servicosBusca" class="input-search" placeholder="Digite para filtrar por nome ou descrição..." autocomplete="off" />
+                </div>
+            </div>
+            <div class="servicos-counter" id="servicosContador">0 serviço(s) carregado(s).</div>
+        </div>
+
+        <!-- Feedback de Carregamento e Tabela -->
+        <div class="state-loading" id="servicosLoading">
+            <div class="spinner"></div>Carregando serviços da API…
+        </div>
+
+        <div class="real-content" id="servicosTableWrap">
+            <div class="table-wrap">
+                <table class="table-agenda table-selectable" id="servicosTabela">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ID</th>
+                            <th>Nome</th>
+                            <th>Descrição</th>
+                            <th>Preço</th>
+                            <th>Duração</th>
+                            <th>Status</th>
+                            <th>No Site</th>
+                        </tr>
+                    </thead>
+                    <tbody id="servicosTabelaBody">
+                        <!-- Injetado dinamicamente via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="state-empty" id="servicosEmpty">
+            Nenhum serviço encontrado.
+        </div>
+    </div>
+
+    <!-- Modal Novo / Editar Serviço (FormEditarServico) -->
+    <div class="modal-backdrop hidden" id="modalServicoBackdrop">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3 id="modalServicoTitulo">Novo Serviço</h3>
+                <button class="modal-close" onclick="fecharModalServico()">✕</button>
+            </div>
+            <form id="formServico" onsubmit="salvarServico(event)">
+                <input type="hidden" id="servicoId" />
+                
+                <div class="form-group">
+                    <label for="servicoNome">Nome do Serviço *</label>
+                    <input type="text" id="servicoNome" class="input-form" placeholder="Ex: Corte Degradê, Barba Terapia..." required />
+                </div>
+
+                <div class="form-group">
+                    <label for="servicoDescricao">Descrição</label>
+                    <textarea id="servicoDescricao" class="input-form textarea-form" rows="3" placeholder="Breve descrição dos detalhes e técnicas do serviço..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="servicoPreco">Preço (R$) *</label>
+                        <input type="number" id="servicoPreco" class="input-form" step="0.01" min="0" placeholder="0.00" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="servicoDuracao">Duração (minutos) *</label>
+                        <input type="number" id="servicoDuracao" class="input-form" step="5" min="5" placeholder="30" required />
+                    </div>
+                </div>
+
+                <div class="form-checkbox-group">
+                    <div class="checkbox-field hidden" id="wrapServicoAtivo">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="servicoAtivo" checked />
+                            <span>Serviço ativo para agendamento</span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox-field">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="servicoExibirNoSite" checked />
+                            <span>Exibir serviço no catálogo do site</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-foot">
+                    <button type="button" class="btn-ghost" onclick="fecharModalServico()">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="btnSalvarServico">Salvar Serviço</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+else if (!isAgenda)
+{
+    <!-- ================= KPIs ================= -->
+    <section>
+        <div class="section-head">
+            <div>
+                <h2>Indicadores do período</h2>
+                <p>Calculados em tempo real diretamente a partir dos agendamentos da API.</p>
+            </div>
+        </div>
+        <div class="kpi-grid" id="kpiGrid">
+            <!-- Renderizado dinamicamente via JS a partir da API -->
+        </div>
+    </section>
+
+    <!-- ================= AGENDA KANBAN ================= -->
     <section class="panel">
         <div class="section-head">
             <div>
-                <h2>Origem dos agendamentos</h2>
-                <p>Canais de captação dos agendamentos do período.</p>
+                <h2>Agenda de agendamentos</h2>
+                <p>Agrupada por status. As ações abaixo alteram o status real do agendamento na API.</p>
+            </div>
+            <span class="tag" id="agendaCountTag">0 agendamentos</span>
+        </div>
+        <div class="real-content" id="agendaBlock">
+            <div class="kanban" id="kanban">
+                <!-- Kanban renderizado com dados diretos da API -->
             </div>
         </div>
-        <div class="real-content" id="originBlock" style="margin-top:8px;">
-            <div id="originList"></div>
+        <div class="state-loading" id="agendaLoading">
+            <div class="spinner"></div>Carregando agenda da API…
         </div>
-        <div class="state-loading" id="originLoading"><div class="spinner"></div>Carregando origens…</div>
-        <div class="state-empty" id="originEmpty">Sem agendamentos no período para calcular origem.</div>
+        <div class="state-empty" id="agendaEmpty">
+            Nenhum agendamento encontrado para os filtros selecionados.
+        </div>
     </section>
 
-    <section class="panel">
-        <div class="section-head">
-            <div>
-                <h2>Cancelamentos e faltas</h2>
-                <p>Taxas calculadas sobre o total de agendamentos do período.</p>
+    <!-- ================= ORIGEM + CANCELAMENTOS ================= -->
+    <div class="grid-2">
+        <section class="panel">
+            <div class="section-head">
+                <div>
+                    <h2>Origem dos agendamentos</h2>
+                    <p>Canais de captação dos agendamentos do período.</p>
+                </div>
+            </div>
+            <div class="real-content" id="originBlock" style="margin-top:8px;">
+                <div id="originList"></div>
+            </div>
+            <div class="state-loading" id="originLoading"><div class="spinner"></div>Carregando origens…</div>
+            <div class="state-empty" id="originEmpty">Sem agendamentos no período para calcular origem.</div>
+        </section>
+
+        <section class="panel">
+            <div class="section-head">
+                <div>
+                    <h2>Cancelamentos e faltas</h2>
+                    <p>Taxas calculadas sobre o total de agendamentos do período.</p>
+                </div>
+            </div>
+            <div class="real-content" id="cancelBlock">
+                <div id="cancelStats"></div>
+            </div>
+            <div class="state-loading" id="cancelLoading"><div class="spinner"></div>Calculando taxas…</div>
+            <div class="state-empty" id="cancelEmpty">Nenhum cancelamento ou falta registrada no período.</div>
+        </section>
+    </div>
+}
+else
+{
+    <!-- ================= SEÇÃO AGENDA (TABELA ESTILO DESKTOP) ================= -->
+    <div class="panel agenda-section-panel" data-secao="agenda">
+        
+        <!-- Barra Superior de Filtros e Busca -->
+        <div class="agenda-toolbar">
+            <div class="agenda-toolbar-filters">
+                <div class="filter-field">
+                    <label for="agendaPeriodo">Período:</label>
+                    <select id="agendaPeriodo" class="select-filter">
+                        <option value="hoje" selected>Hoje</option>
+                        <option value="amanha">Amanhã</option>
+                        <option value="semana">Últimos 7 dias</option>
+                        <option value="mes">Este mês</option>
+                        <option value="personalizado">Personalizado</option>
+                    </select>
+                </div>
+
+                <div class="filter-field custom-date-range hidden" id="agendaCustomDateWrap">
+                    <input type="date" id="agendaDataInicio" class="input-date" />
+                    <span>até</span>
+                    <input type="date" id="agendaDataFim" class="input-date" />
+                    <button class="btn-ghost" id="btnAplicarDataCustom" type="button">Aplicar</button>
+                </div>
+
+                <div class="filter-field agenda-search-field">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="agendaBusca" class="input-search" placeholder="Buscar por cliente, barbeiro ou serviço..." autocomplete="off" />
+                </div>
+            </div>
+
+            <button class="btn-ghost" id="btnRecarregarAgenda" onclick="carregarDados()" title="Recarregar agendamentos da API">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIcon">
+                    <path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" />
+                </svg>
+                Recarregar
+            </button>
+        </div>
+
+        <!-- Chips de Status com Contadores Dinâmicos -->
+        <div class="agenda-chips" id="agendaStatusChips">
+            <button class="chip active" data-status="todos">
+                <span>Todos</span> <span class="chip-count" id="count-todos">0</span>
+            </button>
+            <button class="chip" data-status="pendente">
+                <span>Pendentes</span> <span class="chip-count" id="count-pendente">0</span>
+            </button>
+            <button class="chip" data-status="confirmado">
+                <span>Confirmados</span> <span class="chip-count" id="count-confirmado">0</span>
+            </button>
+            <button class="chip" data-status="em_atendimento">
+                <span>Em Atendimento</span> <span class="chip-count" id="count-em_atendimento">0</span>
+            </button>
+            <button class="chip" data-status="concluido">
+                <span>Concluídos</span> <span class="chip-count" id="count-concluido">0</span>
+            </button>
+            <button class="chip" data-status="cancelado">
+                <span>Cancelados</span> <span class="chip-count" id="count-cancelado">0</span>
+            </button>
+            <button class="chip" data-status="nao_compareceu">
+                <span>Não Compareceu</span> <span class="chip-count" id="count-nao_compareceu">0</span>
+            </button>
+        </div>
+
+        <!-- Feedback de Carregamento e Tabela -->
+        <div class="state-loading" id="agendaLoading">
+            <div class="spinner"></div>Carregando agendamentos da API…
+        </div>
+
+        <div class="real-content" id="agendaTableWrap">
+            <div class="table-wrap">
+                <table class="table-agenda" id="agendaTabela">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ID</th>
+                            <th>Cliente</th>
+                            <th>Telefone</th>
+                            <th>Barbeiro</th>
+                            <th>Serviços</th>
+                            <th>Data</th>
+                            <th>Horário</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th style="width: 130px; text-align: center;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="agendaTabelaBody">
+                        <!-- Linhas injetadas dinamicamente via JS -->
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div class="real-content" id="cancelBlock">
-            <div id="cancelStats"></div>
+
+        <div class="state-empty" id="agendaEmpty">
+            Nenhum agendamento encontrado para os filtros selecionados.
         </div>
-        <div class="state-loading" id="cancelLoading"><div class="spinner"></div>Calculando taxas…</div>
-        <div class="state-empty" id="cancelEmpty">Nenhum cancelamento ou falta registrada no período.</div>
-    </section>
-</div>
+    </div>
+}
