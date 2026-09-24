@@ -6,8 +6,9 @@ using Melobarbershop.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Melobarbershop.UI.Controllers;
+namespace Melobarbershop.UI.Areas.Cliente.Controllers;
 
+[Area("Cliente")]
 [Authorize]
 public class ClienteController : Controller
 {
@@ -27,7 +28,7 @@ public class ClienteController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> ClientePerfilDados()
+    public async Task<IActionResult> PerfilDados()
     {
         var token = ObterTokenJwt();
         if (string.IsNullOrEmpty(token))
@@ -51,7 +52,7 @@ public class ClienteController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> ClienteAtualizarDados([FromBody] AtualizarDadosClienteDto dto)
+    public async Task<IActionResult> AtualizarDados([FromBody] AtualizarDadosClienteDto dto)
     {
         var token = ObterTokenJwt();
         if (string.IsNullOrEmpty(token))
@@ -81,7 +82,7 @@ public class ClienteController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> ClienteHistorico()
+    public async Task<IActionResult> Historico()
     {
         var token = ObterTokenJwt();
         if (string.IsNullOrEmpty(token))

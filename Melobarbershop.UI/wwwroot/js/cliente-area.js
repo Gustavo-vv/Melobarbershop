@@ -67,7 +67,7 @@ function mapearEnumStatus(status) {
 async function carregarPerfil() {
     clienteState.carregandoPerfil = true;
     try {
-        const resp = await fetch("/Cliente/ClientePerfilDados", {
+        const resp = await fetch("/Cliente/PerfilDados", {
             method: "GET",
             headers: { "Accept": "application/json" }
         });
@@ -152,7 +152,7 @@ async function carregarHistorico() {
     if (tabelaBody) tabelaBody.innerHTML = "";
 
     try {
-        const resp = await fetch("/Cliente/ClienteHistorico", {
+        const resp = await fetch("/Cliente/Historico", {
             method: "GET",
             headers: { "Accept": "application/json" }
         });
@@ -351,7 +351,7 @@ async function salvarPerfil(e) {
     };
 
     try {
-        const resp = await fetch("/Cliente/ClienteAtualizarDados", {
+        const resp = await fetch("/Cliente/AtualizarDados", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

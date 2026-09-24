@@ -50,7 +50,7 @@
                     }
                     else
                     {
-                        <a href="/Cliente/Perfil" class="user-name-badge" title="Acessar Minha Conta">
+                        <a href="/Cliente" class="user-name-badge" title="Acessar Minha Conta">
                             <img src="~/img/icons/user.png" alt="">
                             <span>@(User.Identity.Name ?? "Minha Conta")</span>
                         </a>
@@ -93,7 +93,7 @@
                         }
                         else
                         {
-                            <li><a href="/Cliente/Perfil">Minha Conta</a></li>
+                            <li><a href="/Cliente">Minha Conta</a></li>
                         }
                         <li><a href="/Auth/Logout">Sair (@User.Identity.Name)</a></li>
                     }
