@@ -1,0 +1,189 @@
+@{
+    Layout = null;
+    var userName = User.Identity?.Name ?? "Cliente";
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minha Conta - Melo Barber Shop</title>
+    <meta name="theme-color" content="#05070c" />
+    <link href="~/img/logo.png" rel="icon" type="image/png" />
+
+    <!-- Fontes do Dashboard Admin -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS base do Admin + CSS específico da Área do Cliente -->
+    <link href="~/css/admin-dashboard.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/cliente-area.css" rel="stylesheet" asp-append-version="true" />
+</head>
+<body class="cliente-shell">
+
+    <!-- Header Próprio e Enxuto -->
+    <header class="cliente-header">
+        <div class="cliente-header-inner">
+            <a href="/" class="cliente-brand" title="Ir para a página inicial">
+                <img src="~/img/logo.png" alt="Melo Barber Shop" class="cliente-logo" />
+                <span class="cliente-brand-title">Melo Barber Shop</span>
+            </a>
+            <div class="cliente-user-nav">
+                <a href="/" class="cliente-btn-voltar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Voltar ao site
+                </a>
+                <span class="cliente-user-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span id="clienteNomeHeader">@userName</span>
+                </span>
+                <a href="/Auth/Logout" class="cliente-btn-sair" title="Encerrar sessão">Sair</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="cliente-container">
+        
+        <!-- Linha de Cards de Resumo no Topo -->
+        <section class="cliente-kpi-grid">
+            <div class="cliente-kpi-card">
+                <span class="cliente-kpi-label">Cliente desde</span>
+                <span class="cliente-kpi-value" id="kpiClienteDesde">Carregando...</span>
+            </div>
+            <div class="cliente-kpi-card">
+                <span class="cliente-kpi-label">Total de agendamentos</span>
+                <span class="cliente-kpi-value" id="kpiTotalAgendamentos">0</span>
+            </div>
+            <div class="cliente-kpi-card">
+                <span class="cliente-kpi-label">Último atendimento</span>
+                <span class="cliente-kpi-value" id="kpiUltimoAtendimento">-</span>
+            </div>
+        </section>
+
+        <!-- Painel Meus Dados -->
+        <section class="panel cliente-dados-card">
+            <div class="cliente-section-head">
+                <h2 class="cliente-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Meus Dados
+                </h2>
+                <button type="button" class="btn-primary" onclick="abrirModalEditar()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;margin-right:6px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    Editar dados
+                </button>
+            </div>
+
+            <div class="cliente-dados-grid">
+                <div class="cliente-dado-item">
+                    <span class="cliente-dado-rotulo">Nome completo</span>
+                    <span class="cliente-dado-valor" id="perfilNome">Carregando...</span>
+                </div>
+                <div class="cliente-dado-item">
+                    <span class="cliente-dado-rotulo">E-mail</span>
+                    <span class="cliente-dado-valor" id="perfilEmail">Carregando...</span>
+                </div>
+                <div class="cliente-dado-item">
+                    <span class="cliente-dado-rotulo">Telefone / WhatsApp</span>
+                    <span class="cliente-dado-valor" id="perfilTelefone">Carregando...</span>
+                </div>
+                <div class="cliente-dado-item">
+                    <span class="cliente-dado-rotulo">Data de nascimento</span>
+                    <span class="cliente-dado-valor" id="perfilNascimento">Carregando...</span>
+                </div>
+            </div>
+
+            <div class="cliente-dado-item" style="margin-top: 4px;">
+                <span class="cliente-dado-rotulo">Preferências / Observações</span>
+                <div class="cliente-dado-obs-box" id="perfilObservacoes">Nenhuma observação registrada.</div>
+            </div>
+        </section>
+
+        <!-- Painel Meu Histórico -->
+        <section class="panel cliente-historico-card">
+            <div class="cliente-section-head">
+                <h2 class="cliente-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    Meu Histórico de Agendamentos
+                </h2>
+            </div>
+
+            <!-- Loading -->
+            <div class="state-loading show" id="historicoLoading">
+                <div class="spinner"></div>
+                <p>Buscando agendamentos...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div class="state-empty" id="historicoEmpty">
+                <p>Você ainda não possui nenhum agendamento registrado.</p>
+            </div>
+
+            <!-- Tabela de Histórico -->
+            <div class="cliente-table-wrap hide" id="historicoTableWrap">
+                <table class="table-agenda">
+                    <thead>
+                        <tr>
+                            <th>Data / Horário</th>
+                            <th>Barbeiro</th>
+                            <th>Serviço(s)</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historicoTabelaBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Editar Perfil -->
+    <div class="modal-backdrop hidden" id="modalEditarPerfilBackdrop">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3>Editar Meus Dados</h3>
+                <button type="button" class="modal-close" onclick="fecharModalEditar()" aria-label="Fechar modal">&times;</button>
+            </div>
+            <form id="formEditarPerfil">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="editNome">Nome Completo <span style="color:var(--red)">*</span></label>
+                        <input type="text" id="editNome" class="input-form" required placeholder="Seu nome completo" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editEmail">E-mail (somente leitura)</label>
+                        <input type="email" id="editEmail" class="input-form" readonly disabled style="opacity:0.65; cursor:not-allowed;" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editTelefone">Telefone / WhatsApp</label>
+                        <input type="tel" id="editTelefone" class="input-form" placeholder="(11) 99999-9999" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editDataNascimento">Data de Nascimento</label>
+                        <input type="date" id="editDataNascimento" class="input-form" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editPreferencias">Preferências / Observações</label>
+                        <textarea id="editPreferencias" class="input-form textarea-form" rows="3" placeholder="Ex: Prefere corte na tesoura, degradê navalhado, café sem açúcar..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-foot">
+                    <button type="button" class="btn-ghost" onclick="fecharModalEditar()">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="btnSalvarPerfil">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><span class="dot"></span><span id="toastMsg"></span></div>
+
+    <script src="~/js/cliente-area.js" asp-append-version="true"></script>
+</body>
+</html>

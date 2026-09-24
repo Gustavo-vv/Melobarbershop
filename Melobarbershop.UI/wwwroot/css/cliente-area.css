@@ -1,0 +1,269 @@
+/* ===================================================================
+   ÁREA DO CLIENTE - MELOBARBERSHOP
+   Estilos específicos de layout para o perfil e histórico do cliente
+   =================================================================== */
+
+.cliente-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+}
+
+.cliente-header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.cliente-header-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.cliente-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text);
+}
+
+.cliente-logo {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+}
+
+.cliente-brand-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.cliente-user-nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.cliente-user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: var(--radius-m);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.cliente-user-badge svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--blue);
+}
+
+.cliente-btn-voltar {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.18s ease;
+}
+
+.cliente-btn-voltar:hover {
+    color: var(--text);
+}
+
+.cliente-btn-sair {
+    color: var(--red);
+    background: var(--red-dim);
+    border: 1px solid rgba(242, 99, 122, 0.25);
+    padding: 6px 12px;
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 600;
+    transition: opacity 0.18s ease;
+}
+
+.cliente-btn-sair:hover {
+    opacity: 0.85;
+}
+
+.cliente-container {
+    max-width: 1140px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 20px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Cards de Métricas do Topo */
+.cliente-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.cliente-kpi-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-m);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cliente-kpi-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-dim);
+}
+
+.cliente-kpi-value {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+/* Seção Meus Dados */
+.cliente-dados-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-m);
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.cliente-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.cliente-section-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cliente-section-title svg {
+    stroke: var(--blue);
+    width: 20px;
+    height: 20px;
+}
+
+.cliente-dados-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px 24px;
+}
+
+.cliente-dado-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cliente-dado-rotulo {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.cliente-dado-valor {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.cliente-dado-obs-box {
+    margin-top: 6px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    padding: 12px 14px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text);
+    white-space: pre-wrap;
+}
+
+/* Tabela de Histórico */
+.cliente-historico-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-m);
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cliente-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+}
+
+.cliente-table-wrap.hide {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .cliente-header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .cliente-user-nav {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .cliente-container {
+        padding: 16px 14px 32px;
+        gap: 18px;
+    }
+
+    .cliente-dados-card,
+    .cliente-historico-card {
+        padding: 16px;
+    }
+}

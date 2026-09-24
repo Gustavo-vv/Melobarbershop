@@ -1,3 +1,5 @@
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
 using Microsoft.AspNetCore.Http;
@@ -35,6 +37,21 @@ namespace Melobarbershop.API.Controllers
         public async Task<IActionResult> ListarPorCliente(string clienteId)
         {
             var response = await _agendamentoService.ListarPorClienteAsync(clienteId);
+            if (!response.Sucesso) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpGet("meus")]
+        public async Task<IActionResult> ListarMeusAgendamentos()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(ApiResposta<IEnumerable<AgendamentoDto>>.Falha("Usuário não autenticado no token."));
+            }
+
+            var response = await _agendamentoService.ListarPorClienteAsync(userId);
             if (!response.Sucesso) return BadRequest(response);
             return Ok(response);
         }
