@@ -2,16 +2,22 @@
     var secao = ViewData["Secao"] as string ?? "visao-geral";
     var isAgenda = secao == "agenda";
     var isServicos = secao == "servicos";
+    var isUsuarios = secao == "usuarios";
 
-    ViewData["Title"] = isServicos ? "Gestão de Serviços" : (isAgenda ? "Agenda de Atendimentos" : "Painel Administrativo");
-    ViewData["ActiveNav"] = isServicos ? "servicos" : (isAgenda ? "agenda" : "visao-geral");
-    ViewData["PageTitle"] = isServicos ? "Gestão de Serviços" : (isAgenda ? "Agenda de Atendimentos" : "Visão geral do dia");
-    ViewData["PageSubtitle"] = isServicos ? "Cadastro, edição, precificação e visibilidade no catálogo" : (DateTime.Now.ToString("dddd, dd 'de' MMMM", new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API");
+    var usuarioLogadoEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value 
+                          ?? User.FindFirst("email")?.Value 
+                          ?? User.Identity?.Name 
+                          ?? "";
+
+    ViewData["Title"] = isUsuarios ? "Gestão de Usuários e Equipe" : (isServicos ? "Gestão de Serviços" : (isAgenda ? "Agenda de Atendimentos" : "Painel Administrativo"));
+    ViewData["ActiveNav"] = isUsuarios ? "usuarios" : (isServicos ? "servicos" : (isAgenda ? "agenda" : "visao-geral"));
+    ViewData["PageTitle"] = isUsuarios ? "Gestão de Usuários e Equipe" : (isServicos ? "Gestão de Serviços" : (isAgenda ? "Agenda de Atendimentos" : "Visão geral do dia"));
+    ViewData["PageSubtitle"] = isUsuarios ? "Consulta e controle de status de barbeiros, clientes e administradores" : (isServicos ? "Cadastro, edição, precificação e visibilidade no catálogo" : (DateTime.Now.ToString("dddd, dd 'de' MMMM", new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"));
     Layout = "_AdminLayout";
 }
 
 @section TopbarActions {
-    @if (!isAgenda && !isServicos)
+    @if (!isAgenda && !isServicos && !isUsuarios)
     {
         <div class="filters">
             <div class="seg" id="periodSeg">
@@ -43,7 +49,160 @@
     <button onclick="carregarDados()">Tentar novamente</button>
 </div>
 
-@if (isServicos)
+@if (isUsuarios)
+{
+    <!-- ================= SEÇÃO USUÁRIOS E EQUIPE (REPRODUÇÃO UCUSUARIOS DO DESKTOP) ================= -->
+    <div class="panel usuarios-section-panel" data-secao="usuarios" data-usuario-logado="@usuarioLogadoEmail">
+        
+        <!-- Barra de Ações Superior -->
+        <div class="servicos-toolbar">
+            <div class="servicos-actions-left">
+                <button class="btn-ghost btn-action-item" id="btnAlternarStatusUsuario" onclick="alternarStatusUsuario()" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect><circle cx="16" cy="12" r="3"></circle></svg>
+                    Ativar / Desativar
+                </button>
+                <button class="btn-ghost btn-action-item" id="btnVerHistoricoUsuario" onclick="abrirHistoricoUsuarioSelecionado()" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    Ver Histórico
+                </button>
+                <div class="filter-field" style="margin-left: 8px;">
+                    <label for="usuariosFiltroRole">Filtrar:</label>
+                    <select id="usuariosFiltroRole" class="select-filter">
+                        <option value="todos" selected>Todos os Usuários</option>
+                        <option value="barbeiro">Barbeiros</option>
+                        <option value="cliente">Clientes</option>
+                        <option value="admin">Administradores</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-ghost" id="btnRecarregarUsuarios" onclick="carregarUsuarios()" title="Recarregar usuários da API">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="refreshIconUsuarios" style="width:16px;height:16px;">
+                    <path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" />
+                </svg>
+                Recarregar
+            </button>
+        </div>
+
+        <!-- Filtro de Busca e Contador -->
+        <div class="servicos-subbar">
+            <div class="servicos-search-wrap">
+                <label for="usuariosBusca">Buscar por nome:</label>
+                <div class="agenda-search-field" style="min-width: 320px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="usuariosBusca" class="input-search" placeholder="Buscar por nome ou e-mail..." autocomplete="off" />
+                </div>
+            </div>
+            <div class="servicos-counter" id="usuariosContador">0 usuário(s) encontrado(s).</div>
+        </div>
+
+        <!-- Feedback de Carregamento e Tabela -->
+        <div class="state-loading" id="usuariosLoading">
+            <div class="spinner"></div>Carregando usuários da API…
+        </div>
+
+        <div class="real-content" id="usuariosTableWrap">
+            <div class="table-wrap">
+                <table class="table-agenda table-selectable" id="usuariosTabela">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Telefone</th>
+                            <th>Perfis</th>
+                            <th>Cadastro</th>
+                            <th>Status</th>
+                            <th style="width: 130px; text-align: center;">Histórico</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usuariosTabelaBody">
+                        <!-- Injetado dinamicamente via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="state-empty" id="usuariosEmpty">
+            Nenhum usuário encontrado.
+        </div>
+    </div>
+
+    <!-- Modal Perfil e Histórico do Cliente (FormHistoricoCliente) -->
+    <div class="modal-backdrop hidden" id="modalHistoricoBackdrop">
+        <div class="modal-card modal-historico-card">
+            <div class="modal-head">
+                <div>
+                    <h3 id="modalHistoricoTitulo">Perfil e Histórico do Cliente</h3>
+                    <p class="modal-subtitle">Dados cadastrais e histórico de agendamentos do cliente</p>
+                </div>
+                <button class="modal-close" onclick="fecharModalHistorico()">✕</button>
+            </div>
+            
+            <div class="modal-historico-body">
+                <!-- Bloco DADOS DO CLIENTE com badge no canto -->
+                <div class="cliente-perfil-card">
+                    <div class="perfil-card-header">
+                        <h4>DADOS DO CLIENTE</h4>
+                        <span id="perfilStatusBadge" class="badge-status badge-status-concluido">Ativo</span>
+                    </div>
+                    <div class="perfil-card-grid">
+                        <div class="perfil-info-item"><strong>Nome:</strong> <span id="perfilNome">—</span></div>
+                        <div class="perfil-info-item"><strong>E-mail:</strong> <span id="perfilEmail">—</span></div>
+                        <div class="perfil-info-item"><strong>Telefone:</strong> <span id="perfilTelefone">—</span></div>
+                        <div class="perfil-info-item"><strong>Nascimento:</strong> <span id="perfilNascimento">—</span></div>
+                        <div class="perfil-info-item"><strong>Cadastro:</strong> <span id="perfilCadastro">—</span></div>
+                    </div>
+                    <div class="perfil-info-obs">
+                        <strong>Preferências / Observações:</strong>
+                        <p id="perfilObservacoes">Nenhuma observação registrada.</p>
+                    </div>
+                </div>
+
+                <!-- Tabela de Histórico de Agendamentos -->
+                <div class="historico-agendamentos-wrap">
+                    <div class="historico-head-bar">
+                        <span class="historico-contador" id="historicoContador">0 agendamento(s) encontrado(s).</span>
+                    </div>
+
+                    <div class="state-loading" id="historicoLoading">
+                        <div class="spinner"></div>Carregando histórico do cliente…
+                    </div>
+
+                    <div class="real-content" id="historicoTableWrap">
+                        <div class="table-wrap" style="max-height: 280px; overflow-y: auto;">
+                            <table class="table-agenda" id="historicoTabela">
+                                <thead>
+                                    <tr>
+                                        <th>Data/Horário</th>
+                                        <th>Barbeiro</th>
+                                        <th>Serviço(s)</th>
+                                        <th>Valor</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historicoTabelaBody">
+                                    <!-- Linhas injetadas dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="state-empty" id="historicoEmpty">
+                        Nenhum agendamento encontrado para este cliente.
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-foot">
+                <button type="button" class="btn-ghost" onclick="fecharModalHistorico()">Fechar</button>
+            </div>
+        </div>
+    </div>
+}
+else if (isServicos)
 {
     <!-- ================= SEÇÃO SERVIÇOS (REPRODUÇÃO UCSERVICOS DO DESKTOP) ================= -->
     <div class="panel servicos-section-panel" data-secao="servicos">

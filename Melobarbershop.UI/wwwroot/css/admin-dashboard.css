@@ -1828,3 +1828,130 @@ a {
     border-top: 1px solid var(--border);
     margin-top: 4px;
 }
+
+/* ===================================================================
+   SEÇÃO USUÁRIOS E EQUIPE + MODAL PERFIL E HISTÓRICO
+   =================================================================== */
+
+.usuarios-section-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+}
+
+.table-action-link {
+    color: var(--blue-bright);
+    font-weight: 500;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12.5px;
+    transition: opacity var(--transition-fast);
+}
+
+.table-action-link:hover {
+    opacity: 0.8;
+}
+
+/* Modal Perfil e Histórico Grande */
+.modal-historico-card {
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.modal-subtitle {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin: 2px 0 0 0;
+}
+
+.modal-historico-body {
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.cliente-perfil-card {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-m);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.perfil-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.perfil-card-header h4 {
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--blue-bright);
+}
+
+.perfil-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px 16px;
+    font-size: 13px;
+}
+
+.perfil-info-item {
+    color: var(--text);
+}
+
+.perfil-info-item strong {
+    color: var(--text-dim);
+    font-weight: 500;
+    margin-right: 4px;
+}
+
+.perfil-info-obs {
+    font-size: 13px;
+    background: var(--panel-3);
+    padding: 10px 12px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--border);
+}
+
+.perfil-info-obs strong {
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.perfil-info-obs p {
+    margin: 0;
+    color: var(--text);
+    white-space: pre-wrap;
+}
+
+.historico-agendamentos-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.historico-head-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.historico-contador {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-dim);
+}

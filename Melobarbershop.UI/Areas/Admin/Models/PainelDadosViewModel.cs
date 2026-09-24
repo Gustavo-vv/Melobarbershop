@@ -70,3 +70,9 @@ public class AlterarStatusRequest
     public string? Motivo { get; set; }
     public bool? Ativar { get; set; }
 }
+
+public class AlternarStatusUsuarioRequest
+{
+    public string Id { get; set; } = string.Empty;
+    public bool Ativar { get; set; }
+}

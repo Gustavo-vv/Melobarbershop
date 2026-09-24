@@ -47,6 +47,16 @@ public class AdminController : Controller
         return View("Index");
     }
 
+    // Gestão de Usuários e Equipe
+    public IActionResult Usuarios()
+    {
+        ViewData["ActiveNav"] = "usuarios";
+        ViewData["Secao"] = "usuarios";
+        ViewData["PageTitle"] = "Gestão de Usuários e Equipe";
+        ViewData["PageSubtitle"] = "Consulta e controle de status de barbeiros, clientes e administradores";
+        return View("Index");
+    }
+
     // Endpoint JSON que alimenta o Dashboard e a Agenda via API
     [HttpGet]
     public async Task<IActionResult> Dados(
@@ -140,5 +150,55 @@ public class AdminController : Controller
         var resp = await client.DeleteAsync($"/api/Servicos/{id}/permanente");
         var content = await resp.Content.ReadAsStringAsync();
         return StatusCode((int)resp.StatusCode, content);
+    }
+
+    // ==========================================
+    // ENDPOINTS DE USUÁRIOS (PROXY DIRETO PRA API)
+    // ==========================================
+
+    [HttpGet]
+    public async Task<IActionResult> UsuariosDados()
+    {
+        var client = _httpClientFactory.CreateClient("ApiClient");
+        var resp = await client.GetAsync("/api/Usuarios");
+        var content = await resp.Content.ReadAsStringAsync();
+        return Content(content, "application/json");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> UsuariosAlternarStatus([FromBody] AlternarStatusUsuarioRequest req)
+    {
+        if (req == null || string.IsNullOrWhiteSpace(req.Id))
+        {
+            return BadRequest(new { sucesso = false, mensagem = "ID de usuário inválido." });
+        }
+
+        var client = _httpClientFactory.CreateClient("ApiClient");
+        HttpResponseMessage resp;
+        if (req.Ativar)
+        {
+            resp = await client.PutAsync($"/api/Usuarios/{req.Id}/ativar", null);
+        }
+        else
+        {
+            resp = await client.DeleteAsync($"/api/Usuarios/{req.Id}");
+        }
+
+        var content = await resp.Content.ReadAsStringAsync();
+        return StatusCode((int)resp.StatusCode, content);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> UsuariosHistorico([FromQuery] string clienteId)
+    {
+        if (string.IsNullOrWhiteSpace(clienteId))
+        {
+            return BadRequest(new { sucesso = false, mensagem = "ID do cliente é obrigatório." });
+        }
+
+        var client = _httpClientFactory.CreateClient("ApiClient");
+        var resp = await client.GetAsync($"/api/Agendamentos/cliente/{clienteId}");
+        var content = await resp.Content.ReadAsStringAsync();
+        return Content(content, "application/json");
     }
 }

@@ -22,6 +22,14 @@ const state = {
         selecionadoId: null,
         buscaTermo: "",
         modoModal: "novo" // "novo" ou "editar"
+    },
+
+    // Estado da Seção Usuários
+    usuarios: {
+        lista: [],
+        selecionadoId: null,
+        buscaTermo: "",
+        filtroRole: "todos"
     }
 };
 
@@ -894,13 +902,405 @@ function toggleTheme() {
     }
 }
 
+/* ===================================================================
+   SEÇÃO USUÁRIOS E EQUIPE (REPRODUÇÃO UCUSUARIOS + FORMHISTORICOCLIENTE)
+   =================================================================== */
+
+async function carregarUsuarios() {
+    const loadingEl = document.getElementById("usuariosLoading");
+    const tableWrap = document.getElementById("usuariosTableWrap");
+    const emptyEl = document.getElementById("usuariosEmpty");
+    const refreshIcon = document.getElementById("refreshIconUsuarios");
+
+    if (refreshIcon) {
+        refreshIcon.style.transition = "transform .6s ease";
+        refreshIcon.style.transform = "rotate(360deg)";
+        setTimeout(() => { refreshIcon.style.transform = "rotate(0deg)"; }, 600);
+    }
+
+    if (loadingEl) loadingEl.classList.add("show");
+    if (tableWrap) tableWrap.classList.add("hide");
+    if (emptyEl) emptyEl.classList.remove("show");
+
+    try {
+        const resp = await fetch("/Admin/Admin/UsuariosDados", {
+            method: "GET",
+            headers: { "Accept": "application/json" }
+        });
+
+        if (!resp.ok) {
+            throw new Error(`HTTP error! status: ${resp.status}`);
+        }
+
+        const res = await resp.json();
+        if (!res || res.sucesso === false) {
+            throw new Error(res ? res.mensagem : "Erro ao carregar usuários da API.");
+        }
+
+        state.usuarios.lista = res.dados || [];
+        renderUsuariosTabela();
+    } catch (err) {
+        console.error("Erro ao carregar usuários:", err);
+        showToast("Erro ao carregar lista de usuários da API.");
+        if (loadingEl) loadingEl.classList.remove("show");
+        if (emptyEl) {
+            emptyEl.classList.add("show");
+            emptyEl.textContent = "Erro ao carregar usuários da API. Verifique a conexão.";
+        }
+    }
+}
+
+function renderUsuariosTabela() {
+    const tabelaBody = document.getElementById("usuariosTabelaBody");
+    const tableWrap = document.getElementById("usuariosTableWrap");
+    const emptyEl = document.getElementById("usuariosEmpty");
+    const loadingEl = document.getElementById("usuariosLoading");
+    const contadorEl = document.getElementById("usuariosContador");
+
+    if (!tabelaBody) return;
+    if (loadingEl) loadingEl.classList.remove("show");
+
+    const todos = state.usuarios.lista || [];
+    const termo = (state.usuarios.buscaTermo || "").trim().toLowerCase();
+    const filtroRole = state.usuarios.filtroRole;
+
+    const filtrados = todos.filter(u => {
+        // Filtro por Perfil / Role
+        if (filtroRole !== "todos") {
+            const roles = u.roles || [];
+            const hasRole = roles.some(r => r.toLowerCase().includes(filtroRole));
+            if (!hasRole) return false;
+        }
+
+        // Filtro de Busca (Nome / Email / Telefone)
+        if (!termo) return true;
+        const nomeMatch = u.nome && u.nome.toLowerCase().includes(termo);
+        const emailMatch = u.email && u.email.toLowerCase().includes(termo);
+        const telMatch = u.phoneNumber && u.phoneNumber.toLowerCase().includes(termo);
+        return nomeMatch || emailMatch || telMatch;
+    });
+
+    if (contadorEl) {
+        contadorEl.textContent = `${filtrados.length} usuário(s) encontrado(s).`;
+    }
+
+    if (filtrados.length === 0) {
+        if (tableWrap) tableWrap.classList.add("hide");
+        if (emptyEl) {
+            emptyEl.classList.add("show");
+            emptyEl.textContent = termo 
+                ? `Nenhum usuário encontrado para a busca "${escaparHtml(termo)}".`
+                : "Nenhum usuário cadastrado até o momento.";
+        }
+        tabelaBody.innerHTML = "";
+        deselecionarUsuario();
+        return;
+    }
+
+    if (tableWrap) tableWrap.classList.remove("hide");
+    if (emptyEl) emptyEl.classList.remove("show");
+
+    tabelaBody.innerHTML = filtrados.map(u => {
+        const telFmt = u.phoneNumber ? escaparHtml(u.phoneNumber) : '<span style="color:var(--text-faint)">—</span>';
+        const perfisFmt = (u.roles && u.roles.length) ? escaparHtml(u.roles.join(", ")) : '<span style="color:var(--text-faint)">Cliente</span>';
+        
+        let dataCadastroFmt = "—";
+        if (u.dataCadastro) {
+            const dt = new Date(u.dataCadastro);
+            if (!isNaN(dt.getTime())) {
+                dataCadastroFmt = dt.toLocaleDateString("pt-BR");
+            }
+        }
+
+        const statusBadge = u.ativo
+            ? '<span class="badge-status badge-status-concluido">Ativo</span>'
+            : '<span class="badge-status badge-status-falta">Inativo</span>';
+
+        const isSelected = state.usuarios.selecionadoId === u.id;
+
+        return `
+        <tr data-id="${u.id}" class="${isSelected ? "row-selected" : ""}" onclick="selecionarUsuario('${u.id}')">
+            <td style="font-weight:600;color:var(--text);">${escaparHtml(u.nome)}</td>
+            <td class="tabular" style="color:var(--text-dim);">${escaparHtml(u.email || "—")}</td>
+            <td class="tabular">${telFmt}</td>
+            <td><span style="font-size:12px;font-weight:500;">${perfisFmt}</span></td>
+            <td class="tabular">${dataCadastroFmt}</td>
+            <td>${statusBadge}</td>
+            <td style="text-align:center;">
+                <span class="table-action-link" onclick="event.stopPropagation(); abrirModalHistorico('${u.id}', '${escaparHtml(u.nome)}')">
+                    Ver histórico
+                </span>
+            </td>
+        </tr>
+        `;
+    }).join("");
+
+    atualizarBotoesAcaoUsuario();
+}
+
+function selecionarUsuario(id) {
+    if (state.usuarios.selecionadoId === id) {
+        state.usuarios.selecionadoId = null;
+    } else {
+        state.usuarios.selecionadoId = id;
+    }
+
+    document.querySelectorAll("#usuariosTabelaBody tr").forEach(tr => {
+        const rowId = tr.dataset.id;
+        tr.classList.toggle("row-selected", rowId === state.usuarios.selecionadoId);
+    });
+
+    atualizarBotoesAcaoUsuario();
+}
+
+function deselecionarUsuario() {
+    state.usuarios.selecionadoId = null;
+    atualizarBotoesAcaoUsuario();
+}
+
+function atualizarBotoesAcaoUsuario() {
+    const temSelecao = state.usuarios.selecionadoId !== null;
+    const btnStatus = document.getElementById("btnAlternarStatusUsuario");
+    const btnHistorico = document.getElementById("btnVerHistoricoUsuario");
+
+    if (btnStatus) btnStatus.disabled = !temSelecao;
+    if (btnHistorico) btnHistorico.disabled = !temSelecao;
+
+    if (temSelecao && btnStatus) {
+        const usuario = state.usuarios.lista.find(u => u.id === state.usuarios.selecionadoId);
+        if (usuario) {
+            btnStatus.innerHTML = usuario.ativo
+                ? `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg> Desativar`
+                : `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Reativar`;
+        }
+    }
+}
+
+async function alternarStatusUsuario() {
+    if (!state.usuarios.selecionadoId) return;
+    const usuario = state.usuarios.lista.find(u => u.id === state.usuarios.selecionadoId);
+    if (!usuario) return;
+
+    // Trava de segurança: não permitir auto-desativação do usuário logado
+    const panelWrap = document.querySelector(".usuarios-section-panel");
+    const emailLogado = (panelWrap?.dataset?.usuarioLogado || "").trim().toLowerCase();
+
+    if (usuario.ativo && emailLogado && usuario.email && usuario.email.trim().toLowerCase() === emailLogado) {
+        alert("Ação não permitida: Você não pode desativar seu próprio usuário logado.");
+        return;
+    }
+
+    const novaAcao = usuario.ativo ? "desativar" : "reativar";
+    const confirmMsg = usuario.ativo
+        ? `Deseja realmente desativar o usuário "${usuario.nome}" (${usuario.email})? Ele não conseguirá mais acessar o sistema.`
+        : `Deseja reativar o usuário "${usuario.nome}"?`;
+
+    if (!confirm(confirmMsg)) return;
+
+    try {
+        const resp = await fetch("/Admin/Admin/UsuariosAlternarStatus", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: usuario.id,
+                ativar: !usuario.ativo
+            })
+        });
+
+        const res = await resp.json();
+        if (resp.ok && res.sucesso) {
+            showToast(`Usuário ${novaAcao === "desativar" ? "desativado" : "reativado"} com sucesso!`);
+            await carregarUsuarios();
+        } else {
+            showToast(res.mensagem || "Erro ao atualizar status do usuário na API.");
+        }
+    } catch (err) {
+        console.error("Erro ao alternar status do usuário:", err);
+        showToast("Erro de comunicação com o servidor.");
+    }
+}
+
+function abrirHistoricoUsuarioSelecionado() {
+    if (!state.usuarios.selecionadoId) return;
+    const usuario = state.usuarios.lista.find(u => u.id === state.usuarios.selecionadoId);
+    if (usuario) {
+        abrirModalHistorico(usuario.id, usuario.nome);
+    }
+}
+
+async function abrirModalHistorico(usuarioId, nome) {
+    const modal = document.getElementById("modalHistoricoBackdrop");
+    const tituloEl = document.getElementById("modalHistoricoTitulo");
+    const loadingEl = document.getElementById("historicoLoading");
+    const tableWrap = document.getElementById("historicoTableWrap");
+    const emptyEl = document.getElementById("historicoEmpty");
+    const tabelaBody = document.getElementById("historicoTabelaBody");
+    const contadorEl = document.getElementById("historicoContador");
+
+    const perfilNome = document.getElementById("perfilNome");
+    const perfilEmail = document.getElementById("perfilEmail");
+    const perfilTelefone = document.getElementById("perfilTelefone");
+    const perfilNascimento = document.getElementById("perfilNascimento");
+    const perfilCadastro = document.getElementById("perfilCadastro");
+    const perfilObservacoes = document.getElementById("perfilObservacoes");
+    const badgeStatus = document.getElementById("perfilStatusBadge");
+
+    if (tituloEl) tituloEl.textContent = `Perfil e Histórico de ${nome}`;
+
+    // 1. Preencher Bloco DADOS DO CLIENTE a partir do objeto já carregado
+    const usuario = state.usuarios.lista.find(u => u.id === usuarioId);
+    if (usuario) {
+        if (perfilNome) perfilNome.textContent = usuario.nome || nome;
+        if (perfilEmail) perfilEmail.textContent = usuario.email || "—";
+        if (perfilTelefone) perfilTelefone.textContent = usuario.phoneNumber || "Não informado";
+        
+        let nascTexto = "Não informado";
+        if (usuario.dataNascimento) {
+            const dtNasc = new Date(usuario.dataNascimento);
+            if (!isNaN(dtNasc.getTime())) nascTexto = dtNasc.toLocaleDateString("pt-BR");
+        }
+        if (perfilNascimento) perfilNascimento.textContent = nascTexto;
+
+        let cadTexto = "Não informado";
+        if (usuario.dataCadastro) {
+            const dtCad = new Date(usuario.dataCadastro);
+            if (!isNaN(dtCad.getTime())) cadTexto = dtCad.toLocaleDateString("pt-BR");
+        }
+        if (perfilCadastro) perfilCadastro.textContent = cadTexto;
+
+        if (perfilObservacoes) {
+            perfilObservacoes.textContent = usuario.preferenciasNotas || "Nenhuma observação registrada.";
+        }
+
+        if (badgeStatus) {
+            badgeStatus.textContent = usuario.ativo ? "Ativo" : "Inativo";
+            badgeStatus.className = `badge-status ${usuario.ativo ? "badge-status-concluido" : "badge-status-falta"}`;
+        }
+    } else {
+        if (perfilNome) perfilNome.textContent = nome;
+        if (perfilEmail) perfilEmail.textContent = "—";
+        if (perfilTelefone) perfilTelefone.textContent = "—";
+        if (perfilNascimento) perfilNascimento.textContent = "—";
+        if (perfilCadastro) perfilCadastro.textContent = "—";
+        if (perfilObservacoes) perfilObservacoes.textContent = "Nenhuma observação registrada.";
+    }
+
+    // 2. Abrir o modal
+    if (modal) modal.classList.remove("hidden");
+
+    // 3. Buscar histórico de agendamentos na API
+    if (loadingEl) loadingEl.classList.add("show");
+    if (tableWrap) tableWrap.classList.add("hide");
+    if (emptyEl) emptyEl.classList.remove("show");
+    if (tabelaBody) tabelaBody.innerHTML = "";
+
+    try {
+        const resp = await fetch(`/Admin/Admin/UsuariosHistorico?clienteId=${encodeURIComponent(usuarioId)}`, {
+            method: "GET",
+            headers: { "Accept": "application/json" }
+        });
+
+        if (!resp.ok) {
+            throw new Error(`HTTP error! status: ${resp.status}`);
+        }
+
+        const res = await resp.json();
+        const agendamentos = (res && res.sucesso && res.dados) ? res.dados : [];
+
+        if (contadorEl) {
+            contadorEl.textContent = `${agendamentos.length} agendamento(s) encontrado(s).`;
+        }
+
+        if (loadingEl) loadingEl.classList.remove("show");
+
+        if (agendamentos.length === 0) {
+            if (emptyEl) emptyEl.classList.add("show");
+            if (tableWrap) tableWrap.classList.add("hide");
+            return;
+        }
+
+        if (tableWrap) tableWrap.classList.remove("hide");
+        if (emptyEl) emptyEl.classList.remove("show");
+
+        tabelaBody.innerHTML = agendamentos.map(a => {
+            let dataHoraFmt = "—";
+            if (a.dataHoraInicio) {
+                const dt = new Date(a.dataHoraInicio);
+                if (!isNaN(dt.getTime())) {
+                    dataHoraFmt = `${dt.toLocaleDateString("pt-BR")} ${dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+                }
+            }
+
+            const servicosFmt = (a.itens && a.itens.length) 
+                ? a.itens.map(i => i.nomeServico).join(", ")
+                : (a.servicosFormatados || "Serviço");
+
+            const valorFmt = "R$ " + Number(a.valorTotal || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+            
+            // Mapear status enum da API para status textual
+            const statusKey = mapearEnumStatus(a.status);
+            const meta = STATUS_META[statusKey] || { label: "Agendado", badgeCls: "badge-status-confirmado" };
+
+            return `
+            <tr>
+                <td class="tabular font-bold">${dataHoraFmt}</td>
+                <td>${escaparHtml(a.nomeBarbeiro || "Barbeiro")}</td>
+                <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escaparHtml(servicosFmt)}">
+                    ${escaparHtml(servicosFmt)}
+                </td>
+                <td class="money tabular">${valorFmt}</td>
+                <td><span class="badge-status ${meta.badgeCls}">${meta.label}</span></td>
+            </tr>
+            `;
+        }).join("");
+
+    } catch (err) {
+        console.error("Erro ao buscar histórico do cliente:", err);
+        if (loadingEl) loadingEl.classList.remove("show");
+        if (emptyEl) {
+            emptyEl.classList.add("show");
+            emptyEl.textContent = "Erro ao carregar o histórico do cliente da API.";
+        }
+    }
+}
+
+function fecharModalHistorico() {
+    const modal = document.getElementById("modalHistoricoBackdrop");
+    if (modal) modal.classList.add("hidden");
+}
+
+function mapearEnumStatus(status) {
+    if (typeof status === "string") {
+        const s = status.toLowerCase();
+        if (s.includes("pendente")) return "pendente";
+        if (s.includes("confirmado")) return "confirmado";
+        if (s.includes("ematendimento") || s.includes("atendimento")) return "em_atendimento";
+        if (s.includes("concluido")) return "concluido";
+        if (s.includes("cancelado")) return "cancelado";
+        if (s.includes("nao") || s.includes("falta")) return "nao_compareceu";
+    } else if (typeof status === "number") {
+        switch (status) {
+            case 1: return "pendente";
+            case 2: return "confirmado";
+            case 3: return "em_atendimento";
+            case 4: return "concluido";
+            case 5: return "cancelado";
+            case 6: return "nao_compareceu";
+        }
+    }
+    return "confirmado";
+}
+
 /* ---------------- EVENTOS DE INICIALIZAÇÃO ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
-    // Detectar seção ativa: "servicos", "agenda" ou "visao-geral"
+    // Detectar seção ativa: "usuarios", "servicos", "agenda" ou "visao-geral"
+    const secaoUsuariosEl = document.querySelector(".usuarios-section-panel");
     const secaoServicosEl = document.querySelector(".servicos-section-panel");
     const secaoAgendaEl = document.querySelector(".agenda-section-panel");
 
-    if (secaoServicosEl || document.getElementById("servicosTabela")) {
+    if (secaoUsuariosEl || document.getElementById("usuariosTabela")) {
+        state.secao = "usuarios";
+    } else if (secaoServicosEl || document.getElementById("servicosTabela")) {
         state.secao = "servicos";
     } else if (secaoAgendaEl || document.getElementById("agendaTabela")) {
         state.secao = "agenda";
@@ -908,7 +1308,36 @@ document.addEventListener("DOMContentLoaded", () => {
         state.secao = "visao-geral";
     }
 
-    if (state.secao === "servicos") {
+    if (state.secao === "usuarios") {
+        // Inicialização da Seção Usuários
+        const buscaInput = document.getElementById("usuariosBusca");
+        if (buscaInput) {
+            buscaInput.addEventListener("input", (e) => {
+                state.usuarios.buscaTermo = e.target.value;
+                renderUsuariosTabela();
+            });
+        }
+
+        const filtroRoleSelect = document.getElementById("usuariosFiltroRole");
+        if (filtroRoleSelect) {
+            filtroRoleSelect.addEventListener("change", (e) => {
+                state.usuarios.filtroRole = e.target.value;
+                renderUsuariosTabela();
+            });
+        }
+
+        // Fechar modal histórico ao clicar fora
+        const modalHistoricoBackdrop = document.getElementById("modalHistoricoBackdrop");
+        if (modalHistoricoBackdrop) {
+            modalHistoricoBackdrop.addEventListener("click", (e) => {
+                if (e.target === modalHistoricoBackdrop) {
+                    fecharModalHistorico();
+                }
+            });
+        }
+
+        carregarUsuarios();
+    } else if (state.secao === "servicos") {
         // Inicialização da Seção Serviços
         const buscaInput = document.getElementById("servicosBusca");
         if (buscaInput) {
@@ -928,7 +1357,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // Carregamento inicial de serviços
         carregarServicos();
     } else if (state.secao === "agenda") {
         // Inicialização da Seção Agenda
@@ -1016,3 +1444,4 @@ document.addEventListener("DOMContentLoaded", () => {
         carregarDados();
     }
 });
+
