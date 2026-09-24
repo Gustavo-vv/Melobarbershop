@@ -141,7 +141,7 @@ public class AgendamentoService : IAgendamentoService
                 DataHoraFim = dataHoraFim,
                 Origem = dto.Origem,
                 Observacoes = dto.Observacoes,
-                Status = StatusAgendamento.Pendente,
+                Status = StatusAgendamento.Confirmado,
                 DataCriacao = DateTime.UtcNow,
                 Itens = servicos.Select(s => new AgendamentoItem
                 {
@@ -210,8 +210,8 @@ public class AgendamentoService : IAgendamentoService
             if (agendamento == null)
                 return ApiResposta<AgendamentoDto>.Falha($"Agendamento com ID {agendamentoId} nao encontrado.");
 
-            if (agendamento.Status != StatusAgendamento.EmAtendimento)
-                return ApiResposta<AgendamentoDto>.Falha("Somente agendamentos em atendimento podem ser concluidos.");
+            if (agendamento.Status != StatusAgendamento.Confirmado && agendamento.Status != StatusAgendamento.EmAtendimento)
+                return ApiResposta<AgendamentoDto>.Falha("Somente agendamentos confirmados podem ser concluidos.");
 
             agendamento.Status = StatusAgendamento.Concluido;
             await _agendamentoRepository.AtualizarAsync(agendamento);
@@ -310,7 +310,7 @@ public class AgendamentoService : IAgendamentoService
             agendamento.BarbeiroId = barbeiroId;
             agendamento.DataHoraInicio = dto.NovoDataHoraInicio;
             agendamento.DataHoraFim = novoDataHoraFim;
-            agendamento.Status = StatusAgendamento.Pendente;
+            agendamento.Status = StatusAgendamento.Confirmado;
 
             await _agendamentoRepository.AtualizarAsync(agendamento);
             return await ObterPorIdAsync(agendamento.Id);
