@@ -389,9 +389,7 @@ function renderAgendaTabela() {
 function atualizarContadoresChips(lista) {
     const contadores = {
         todos: lista.length,
-        pendente: 0,
         confirmado: 0,
-        em_atendimento: 0,
         concluido: 0,
         cancelado: 0,
         nao_compareceu: 0
