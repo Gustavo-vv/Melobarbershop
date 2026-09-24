@@ -18,5 +18,10 @@ namespace Melobarbershop.Desktop.Services
         {
             return await ApiClient.PutAsync<object, bool>($"/api/usuarios/{id}/ativar", new { });
         }
+
+        public async Task<ApiResposta<UsuarioDto>> AtualizarAsync(string id, AtualizarDadosClienteDto dto)
+        {
+            return await ApiClient.PutAsync<AtualizarDadosClienteDto, UsuarioDto>($"/api/usuarios/{id}", dto);
+        }
     }
 }

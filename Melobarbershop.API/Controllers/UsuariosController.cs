@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
@@ -87,6 +87,40 @@ namespace Melobarbershop.API.Controllers
             {
                 var usuarioAtualizado = await _usuarioService.AtualizarDadosClienteAsync(userId, dto);
                 return Ok(ApiResposta<UsuarioDto>.Ok(usuarioAtualizado, "Dados atualizados com sucesso!"));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResposta<UsuarioDto>.Falha(ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ApiResposta<UsuarioDto>.Falha(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResposta<UsuarioDto>.Falha($"Erro interno ao atualizar os dados: {ex.Message}"));
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> AtualizarCliente(string id, [FromBody] AtualizarDadosClienteDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(ApiResposta<UsuarioDto>.Falha("ID do usuário inválido."));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var erros = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(ApiResposta<UsuarioDto>.FalhaValidacao(erros, "Erro na validação dos dados."));
+            }
+
+            try
+            {
+                var usuarioAtualizado = await _usuarioService.AtualizarDadosClienteAsync(id, dto);
+                return Ok(ApiResposta<UsuarioDto>.Ok(usuarioAtualizado, "Dados do cliente atualizados com sucesso!"));
             }
             catch (KeyNotFoundException ex)
             {

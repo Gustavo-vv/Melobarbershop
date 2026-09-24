@@ -148,6 +148,21 @@ namespace Melobarbershop.Desktop.Models
         public string RolesFormatadas => Roles != null && Roles.Count > 0 ? string.Join(", ", Roles) : "Sem perfil";
     }
 
+    public class AtualizarDadosClienteDto
+    {
+        [JsonPropertyName("nome")]
+        public string Nome { get; set; } = string.Empty;
+
+        [JsonPropertyName("telefone")]
+        public string? Telefone { get; set; }
+
+        [JsonPropertyName("dataNascimento")]
+        public DateTime? DataNascimento { get; set; }
+
+        [JsonPropertyName("preferenciasNotas")]
+        public string? PreferenciasNotas { get; set; }
+    }
+
     public enum StatusAgendamentoDto
     {
         Pendente = 1,
