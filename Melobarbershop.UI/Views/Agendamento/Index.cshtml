@@ -1,12 +1,12 @@
-@model Melobarbershop.UI.ViewModels.AgendamentoViewModel
+﻿@model Melobarbershop.UI.ViewModels.AgendamentoViewModel
 @{
     Layout = null;
     var servico = Model.ServicoSelecionado;
     var servicoNome = servico?.Nome ?? "Corte";
-    var servicoDuracao = servico != null ? $"{servico.DuracaoMinutos} min" : "45 min";
+    var servicoDuracao = servico != null ? $"{servico.DuracaoMinutos} min" : "30 min";
     var servicoPrecoFormatado = servico?.PrecoFormatado ?? "R$ 40,00";
     var servicoPrecoInvariante = servico?.PrecoInvariante ?? "40.00";
-    var servicoDuracaoMin = servico?.DuracaoMinutos ?? 45;
+    var servicoDuracaoMin = servico?.DuracaoMinutos ?? 30;
     var servicoId = servico?.Id.ToString() ?? "";
 }
 <!doctype html>

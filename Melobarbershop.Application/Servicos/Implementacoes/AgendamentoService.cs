@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Melobarbershop.Application.DTOs;
 using Melobarbershop.Application.Servicos.Services;
 using Melobarbershop.Domain.Entidades;
@@ -124,6 +124,22 @@ public class AgendamentoService : IAgendamentoService
 
             var duracaoTotalMinutos = servicos.Sum(s => s.DuracaoMinutos);
             var dataHoraFim = dto.DataHoraInicio.AddMinutes(duracaoTotalMinutos);
+
+            var (aberturaExp, fechamentoExp) = ObterExpediente(dto.DataHoraInicio.DayOfWeek);
+            if (aberturaExp == null || fechamentoExp == null)
+                return ApiResposta<AgendamentoDto>.Falha("A barbearia nÃ£o abre aos domingos e segundas-feiras.");
+
+            var inicioExpediente = dto.DataHoraInicio.Date.Add(aberturaExp.Value);
+            var fimExpediente = dto.DataHoraInicio.Date.Add(fechamentoExp.Value);
+
+            if (dto.DataHoraInicio < inicioExpediente || dataHoraFim > fimExpediente)
+            {
+                var horarioDescricao = dto.DataHoraInicio.DayOfWeek is DayOfWeek.Friday or DayOfWeek.Saturday
+                    ? "Sexta e SÃ¡bado das 10h Ã s 21h30"
+                    : "TerÃ§a a Quinta das 10h Ã s 18h";
+
+                return ApiResposta<AgendamentoDto>.Falha($"O horÃ¡rio solicitado estÃ¡ fora do expediente da barbearia ({horarioDescricao}).");
+            }
 
             var possuiBloqueio = await _usuarioRepository.ExisteBloqueioNoPeriodoAsync(dto.BarbeiroId, dto.DataHoraInicio, dataHoraFim);
             if (possuiBloqueio)
@@ -299,6 +315,22 @@ public class AgendamentoService : IAgendamentoService
             var duracaoOriginal = agendamento.DataHoraFim - agendamento.DataHoraInicio;
             var novoDataHoraFim = dto.NovoDataHoraInicio.Add(duracaoOriginal);
 
+            var (novoAberturaExp, novoFechamentoExp) = ObterExpediente(dto.NovoDataHoraInicio.DayOfWeek);
+            if (novoAberturaExp == null || novoFechamentoExp == null)
+                return ApiResposta<AgendamentoDto>.Falha("A barbearia nÃ£o abre aos domingos e segundas-feiras.");
+
+            var novoInicioExpediente = dto.NovoDataHoraInicio.Date.Add(novoAberturaExp.Value);
+            var novoFimExpediente = dto.NovoDataHoraInicio.Date.Add(novoFechamentoExp.Value);
+
+            if (dto.NovoDataHoraInicio < novoInicioExpediente || novoDataHoraFim > novoFimExpediente)
+            {
+                var horarioDescricao = dto.NovoDataHoraInicio.DayOfWeek is DayOfWeek.Friday or DayOfWeek.Saturday
+                    ? "Sexta e SÃ¡bado das 10h Ã s 21h30"
+                    : "TerÃ§a a Quinta das 10h Ã s 18h";
+
+                return ApiResposta<AgendamentoDto>.Falha($"O novo horÃ¡rio selecionado estÃ¡ fora do expediente da barbearia ({horarioDescricao}).");
+            }
+
             var possuiBloqueio = await _usuarioRepository.ExisteBloqueioNoPeriodoAsync(barbeiroId, dto.NovoDataHoraInicio, novoDataHoraFim);
             if (possuiBloqueio)
                 return ApiResposta<AgendamentoDto>.Falha("O barbeiro possui um bloqueio de agenda no novo horario selecionado.");
@@ -321,15 +353,44 @@ public class AgendamentoService : IAgendamentoService
         }
     }
 
+    /// <summary>
+    /// Retorna o horário de abertura e fechamento da barbearia conforme o dia da semana:
+    /// - Domingo e Segunda-feira: Fechado (null, null)
+    /// - Terça a Quinta: 10h00 às 18h00
+    /// - Sexta e Sábado: 10h00 às 21h30
+    /// </summary>
+    private static (TimeSpan? Abertura, TimeSpan? Fechamento) ObterExpediente(DayOfWeek dia)
+    {
+        return dia switch
+        {
+            DayOfWeek.Tuesday or DayOfWeek.Wednesday or DayOfWeek.Thursday => (new TimeSpan(10, 0, 0), new TimeSpan(18, 0, 0)),
+            DayOfWeek.Friday or DayOfWeek.Saturday => (new TimeSpan(10, 0, 0), new TimeSpan(21, 30, 0)),
+            _ => (null, null) // Domingo e Segunda: Fechado
+        };
+    }
+
     private static List<DateTime> GerarSlotsTeoricos(DateTime data, int duracaoTotalMinutos)
     {
-        var inicioExpediente = data.Date.AddHours(8);
-        var fimExpediente = data.Date.AddHours(19);
+        var (abertura, fechamento) = ObterExpediente(data.DayOfWeek);
+        if (abertura == null || fechamento == null)
+            return new List<DateTime>();
+
+        var inicioExpediente = data.Date.Add(abertura.Value);
+        var fimExpediente = data.Date.Add(fechamento.Value);
         var slots = new List<DateTime>();
 
-        for (var horario = inicioExpediente; horario.AddMinutes(duracaoTotalMinutos) <= fimExpediente; horario = horario.AddMinutes(45))
+        var duracao = duracaoTotalMinutos > 0 ? duracaoTotalMinutos : 30;
+
+        for (var horario = inicioExpediente; horario.AddMinutes(duracao) <= fimExpediente; horario = horario.AddMinutes(30))
         {
             slots.Add(horario);
+        }
+
+        var ultimoSlot = fimExpediente.AddMinutes(-duracao);
+        if (ultimoSlot >= inicioExpediente && !slots.Contains(ultimoSlot))
+        {
+            slots.Add(ultimoSlot);
+            slots.Sort();
         }
 
         return slots;
@@ -339,10 +400,12 @@ public class AgendamentoService : IAgendamentoService
     {
         try
         {
-            // Comparar sempre contra horário local BRT para não rejeitar
-            // o dia atual quando o servidor operar em UTC (ex.: UTC-3 = dia seguinte após 21h).
             var agoraBrt = AgoraBrt();
             if (data.Date < agoraBrt.Date)
+                return ApiResposta<IEnumerable<DateTime>>.Ok(Enumerable.Empty<DateTime>());
+
+            var (abertura, fechamento) = ObterExpediente(data.DayOfWeek);
+            if (abertura == null || fechamento == null)
                 return ApiResposta<IEnumerable<DateTime>>.Ok(Enumerable.Empty<DateTime>());
 
             var barbeiro = await _usuarioRepository.ObterPorIdAsync(barbeiroId);
@@ -353,10 +416,11 @@ public class AgendamentoService : IAgendamentoService
                 .Where(s => s.Ativo)
                 .ToList();
 
-            var duracaoTotalMinutos = servicos.Any() ? servicos.Sum(s => s.DuracaoMinutos) : 45;
+            var duracaoTotalMinutos = servicos.Any() ? servicos.Sum(s => s.DuracaoMinutos) : 30;
 
             var inicioDia = data.Date;
             var fimDia = data.Date.AddDays(1);
+            var fimExpediente = data.Date.Add(fechamento.Value);
 
             var agendamentosExistentes = (await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicioDia, fimDia))
                 .Where(a => a.Status != StatusAgendamento.Cancelado && a.Status != StatusAgendamento.NaoCompareceu)
@@ -374,6 +438,9 @@ public class AgendamentoService : IAgendamentoService
                     continue;
 
                 var terminoEstimado = horario.AddMinutes(duracaoTotalMinutos);
+                if (terminoEstimado > fimExpediente)
+                    continue;
+
                 var temConflito = agendamentosExistentes.Any(a => a.DataHoraInicio < terminoEstimado && a.DataHoraFim > horario);
                 var temBloqueio = bloqueios.Any(b => b.DataHoraInicio < terminoEstimado && b.DataHoraFim > horario);
 
@@ -393,6 +460,10 @@ public class AgendamentoService : IAgendamentoService
     {
         try
         {
+            var (abertura, fechamento) = ObterExpediente(data.DayOfWeek);
+            if (abertura == null || fechamento == null)
+                return ApiResposta<IEnumerable<HorarioSlotDto>>.Ok(Enumerable.Empty<HorarioSlotDto>());
+
             var barbeiro = await _usuarioRepository.ObterPorIdAsync(barbeiroId);
             if (barbeiro == null)
                 return ApiResposta<IEnumerable<HorarioSlotDto>>.Falha($"Barbeiro com ID '{barbeiroId}' nao encontrado.");
@@ -401,10 +472,11 @@ public class AgendamentoService : IAgendamentoService
                 .Where(s => s.Ativo)
                 .ToList();
 
-            var duracaoTotalMinutos = servicos.Any() ? servicos.Sum(s => s.DuracaoMinutos) : 45;
+            var duracaoTotalMinutos = servicos.Any() ? servicos.Sum(s => s.DuracaoMinutos) : 30;
 
             var inicioDia = data.Date;
             var fimDia = data.Date.AddDays(1);
+            var fimExpediente = data.Date.Add(fechamento.Value);
 
             var agendamentosExistentes = (await _agendamentoRepository.ObterPorBarbeiroEPeriodoAsync(barbeiroId, inicioDia, fimDia))
                 .Where(a => a.Status != StatusAgendamento.Cancelado && a.Status != StatusAgendamento.NaoCompareceu)
@@ -415,11 +487,11 @@ public class AgendamentoService : IAgendamentoService
 
             var slotsTeoricos = GerarSlotsTeoricos(data, duracaoTotalMinutos);
             var todosHorarios = new List<HorarioSlotDto>();
-            var agoraBrt = AgoraBrt(); // hora local BRT — fonte única de verdade
+            var agoraBrt = AgoraBrt(); // hora local BRT - fonte unica de verdade
 
             foreach (var horario in slotsTeoricos)
             {
-                // Se a data do agendamento for anterior a hoje, ou se for hoje e o horário já passou
+                // Se a data do agendamento for anterior a hoje, ou se for hoje e o horario ja passou
                 if (horario.Date < agoraBrt.Date || horario <= agoraBrt)
                 {
                     todosHorarios.Add(new HorarioSlotDto { Horario = horario, Disponivel = false });
@@ -427,7 +499,7 @@ public class AgendamentoService : IAgendamentoService
                 }
 
                 var terminoEstimado = horario.AddMinutes(duracaoTotalMinutos);
-                var estrapolaExpediente = terminoEstimado > fimDia.Date.AddHours(19);
+                var estrapolaExpediente = terminoEstimado > fimExpediente;
                 var temConflito = agendamentosExistentes.Any(a => a.DataHoraInicio < terminoEstimado && a.DataHoraFim > horario);
                 var temBloqueio = bloqueios.Any(b => b.DataHoraInicio < terminoEstimado && b.DataHoraFim > horario);
 

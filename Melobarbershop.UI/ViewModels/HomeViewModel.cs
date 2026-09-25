@@ -1,4 +1,4 @@
-// Nome do arquivo: HomeViewModel.cs
+﻿// Nome do arquivo: HomeViewModel.cs
 // Objetivo: Representar os dados necessários para exibição na página inicial (Home/Landing Page).
 // Camada: UI
 // Como participa: É preenchido pelo HomeController a partir de consultas na API via ApiClient
@@ -11,7 +11,7 @@ namespace Melobarbershop.UI.ViewModels
     public class HomeViewModel
     {
         public List<HomeServicoItemViewModel> Servicos { get; set; } = new();
-        public string HorarioFuncionamento { get; set; } = "10h às 21h";
+        public string HorarioFuncionamento { get; set; } = "Terça a Sábado";
         public string ClientesPorDia { get; set; } = "20+";
         public string AnoFundacao { get; set; } = "2024";
         public string? MensagemErro { get; set; }

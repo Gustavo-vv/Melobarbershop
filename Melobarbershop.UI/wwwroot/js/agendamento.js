@@ -1,4 +1,4 @@
-const bookingParams = new URLSearchParams(window.location.search);
+﻿const bookingParams = new URLSearchParams(window.location.search);
 const urlServiceId   = bookingParams.get('serviceId');
 const urlServiceName = bookingParams.get('serviceName');
 
@@ -6,7 +6,7 @@ const urlServiceName = bookingParams.get('serviceName');
 const serverServiceNameEl = document.querySelector('#serviceName');
 const initialServiceId = serverServiceNameEl?.dataset.serviceId || urlServiceId || null;
 const initialServiceName = serverServiceNameEl?.textContent?.trim() || urlServiceName || 'Corte';
-const initialDuration = Number(serverServiceNameEl?.dataset.serviceDuration) || Number(bookingParams.get('duration')) || 45;
+const initialDuration = Number(serverServiceNameEl?.dataset.serviceDuration) || Number(bookingParams.get('duration')) || 30;
 const initialPrice = Number(serverServiceNameEl?.dataset.servicePrice) || Number(bookingParams.get('price')) || 40;
 
 // Serviço em uso (inicializado com dados do servidor via ViewModel / URL)
@@ -186,11 +186,21 @@ function getSlotsHeuristicos(day) {
   const slots = [];
   const start = toMinutes(hours.start);
   const end = toMinutes(hours.end);
-  const duration = 45;
+  const duration = 30;
 
-  for (let minute = start; minute + duration <= end; minute += duration) {
+  for (let minute = start; minute + duration <= end; minute += 30) {
     slots.push(toTime(minute));
   }
+
+  const lastSlot = end - duration;
+  if (lastSlot >= start) {
+    const lastSlotTime = toTime(lastSlot);
+    if (!slots.includes(lastSlotTime)) {
+      slots.push(lastSlotTime);
+      slots.sort();
+    }
+  }
+
   return slots;
 }
 
