@@ -76,3 +76,13 @@ public class AlternarStatusUsuarioRequest
     public string Id { get; set; } = string.Empty;
     public bool Ativar { get; set; }
 }
+
+public class AtualizarUsuarioRequest
+{
+    public string Id { get; set; } = string.Empty;
+    public string Nome { get; set; } = string.Empty;
+    public string? Telefone { get; set; }
+    public DateTime? DataNascimento { get; set; }
+    public string? PreferenciasNotas { get; set; }
+}
+

@@ -1122,7 +1122,286 @@ function abrirHistoricoUsuarioSelecionado() {
     }
 }
 
+let usuarioEmEdicaoId = null;
+
+function aplicarMascaraTelefone(input, event) {
+    if (event && event.inputType && event.inputType.startsWith("delete")) {
+        return;
+    }
+
+    let v = input.value.replace(/\D/g, "");
+    if (v.length > 11) v = v.substring(0, 11);
+
+    if (v.length === 0) {
+        input.value = "";
+    } else if (v.length <= 2) {
+        input.value = `(${v}`;
+    } else if (v.length <= 6) {
+        input.value = `(${v.substring(0, 2)}) ${v.substring(2)}`;
+    } else if (v.length <= 10) {
+        input.value = `(${v.substring(0, 2)}) ${v.substring(2, 6)}-${v.substring(6)}`;
+    } else {
+        input.value = `(${v.substring(0, 2)}) ${v.substring(2, 7)}-${v.substring(7, 11)}`;
+    }
+}
+
+// Aplicar máscara ao campo de telefone quando existir
+document.addEventListener("DOMContentLoaded", () => {
+    const telInput = document.getElementById("perfilTelefoneInput");
+    if (telInput) {
+        telInput.addEventListener("input", (e) => aplicarMascaraTelefone(telInput, e));
+    }
+});
+
+function sairModoEdicaoCliente() {
+    const perfilNome = document.getElementById("perfilNome");
+    const perfilTelefone = document.getElementById("perfilTelefone");
+    const perfilNascimento = document.getElementById("perfilNascimento");
+    const perfilObservacoes = document.getElementById("perfilObservacoes");
+
+    const perfilNomeInput = document.getElementById("perfilNomeInput");
+    const perfilTelefoneInput = document.getElementById("perfilTelefoneInput");
+    const perfilNascimentoInput = document.getElementById("perfilNascimentoInput");
+    const perfilObservacoesInput = document.getElementById("perfilObservacoesInput");
+
+    const btnEditar = document.getElementById("btnEditarDadosCliente");
+    const btnFechar = document.getElementById("btnFecharModalHistorico");
+    const btnCancelar = document.getElementById("btnCancelarEdicaoCliente");
+    const btnSalvar = document.getElementById("btnSalvarEdicaoCliente");
+
+    if (perfilNome) perfilNome.classList.remove("hidden");
+    if (perfilTelefone) perfilTelefone.classList.remove("hidden");
+    if (perfilNascimento) perfilNascimento.classList.remove("hidden");
+    if (perfilObservacoes) perfilObservacoes.classList.remove("hidden");
+
+    if (perfilNomeInput) perfilNomeInput.classList.add("hidden");
+    if (perfilTelefoneInput) perfilTelefoneInput.classList.add("hidden");
+    if (perfilNascimentoInput) perfilNascimentoInput.classList.add("hidden");
+    if (perfilObservacoesInput) perfilObservacoesInput.classList.add("hidden");
+
+    if (btnEditar) btnEditar.classList.remove("hidden");
+    if (btnFechar) btnFechar.classList.remove("hidden");
+    if (btnCancelar) btnCancelar.classList.add("hidden");
+    if (btnSalvar) {
+        btnSalvar.classList.add("hidden");
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = "Salvar alterações";
+    }
+}
+
+function entrarModoEdicaoCliente() {
+    if (!usuarioEmEdicaoId) return;
+    const usuario = state.usuarios.lista.find(u => u.id === usuarioEmEdicaoId);
+    if (!usuario) return;
+
+    const perfilNomeInput = document.getElementById("perfilNomeInput");
+    const perfilTelefoneInput = document.getElementById("perfilTelefoneInput");
+    const perfilNascimentoInput = document.getElementById("perfilNascimentoInput");
+    const perfilObservacoesInput = document.getElementById("perfilObservacoesInput");
+
+    if (perfilNomeInput) perfilNomeInput.value = usuario.nome || "";
+    if (perfilTelefoneInput) perfilTelefoneInput.value = usuario.phoneNumber || "";
+    
+    if (perfilNascimentoInput) {
+        let dataIso = "";
+        if (usuario.dataNascimento) {
+            const dt = new Date(usuario.dataNascimento);
+            if (!isNaN(dt.getTime())) {
+                const ano = dt.getFullYear();
+                const mes = String(dt.getMonth() + 1).padStart(2, "0");
+                const dia = String(dt.getDate()).padStart(2, "0");
+                dataIso = `${ano}-${mes}-${dia}`;
+            }
+        }
+        perfilNascimentoInput.value = dataIso;
+    }
+
+    if (perfilObservacoesInput) {
+        perfilObservacoesInput.value = usuario.preferenciasNotas || "";
+    }
+
+    const perfilNome = document.getElementById("perfilNome");
+    const perfilTelefone = document.getElementById("perfilTelefone");
+    const perfilNascimento = document.getElementById("perfilNascimento");
+    const perfilObservacoes = document.getElementById("perfilObservacoes");
+
+    if (perfilNome) perfilNome.classList.add("hidden");
+    if (perfilTelefone) perfilTelefone.classList.add("hidden");
+    if (perfilNascimento) perfilNascimento.classList.add("hidden");
+    if (perfilObservacoes) perfilObservacoes.classList.add("hidden");
+
+    if (perfilNomeInput) perfilNomeInput.classList.remove("hidden");
+    if (perfilTelefoneInput) perfilTelefoneInput.classList.remove("hidden");
+    if (perfilNascimentoInput) perfilNascimentoInput.classList.remove("hidden");
+    if (perfilObservacoesInput) perfilObservacoesInput.classList.remove("hidden");
+
+    const btnEditar = document.getElementById("btnEditarDadosCliente");
+    const btnFechar = document.getElementById("btnFecharModalHistorico");
+    const btnCancelar = document.getElementById("btnCancelarEdicaoCliente");
+    const btnSalvar = document.getElementById("btnSalvarEdicaoCliente");
+
+    if (btnEditar) btnEditar.classList.add("hidden");
+    if (btnFechar) btnFechar.classList.add("hidden");
+    if (btnCancelar) btnCancelar.classList.remove("hidden");
+    if (btnSalvar) {
+        btnSalvar.classList.remove("hidden");
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = "Salvar alterações";
+    }
+
+    if (perfilNomeInput) perfilNomeInput.focus();
+}
+
+function cancelarEdicaoCliente() {
+    sairModoEdicaoCliente();
+}
+
+async function salvarEdicaoCliente() {
+    if (!usuarioEmEdicaoId) return;
+
+    const perfilNomeInput = document.getElementById("perfilNomeInput");
+    const perfilTelefoneInput = document.getElementById("perfilTelefoneInput");
+    const perfilNascimentoInput = document.getElementById("perfilNascimentoInput");
+    const perfilObservacoesInput = document.getElementById("perfilObservacoesInput");
+    const btnSalvar = document.getElementById("btnSalvarEdicaoCliente");
+
+    const novoNome = perfilNomeInput ? perfilNomeInput.value.trim() : "";
+    if (!novoNome) {
+        showToast("O nome do cliente é obrigatório.");
+        if (perfilNomeInput) perfilNomeInput.focus();
+        return;
+    }
+
+    const novoTelefone = perfilTelefoneInput ? perfilTelefoneInput.value.trim() : "";
+    if (novoTelefone) {
+        const digitos = novoTelefone.replace(/\D/g, "");
+        if (digitos.length < 10 || digitos.length > 11) {
+            showToast("Telefone inválido. Informe DDD + número (10 ou 11 dígitos).");
+            if (perfilTelefoneInput) perfilTelefoneInput.focus();
+            return;
+        }
+    }
+
+    const novoNascimento = perfilNascimentoInput && perfilNascimentoInput.value ? perfilNascimentoInput.value : null;
+    if (novoNascimento) {
+        const dtNasc = new Date(novoNascimento + "T00:00:00");
+        const hoje = new Date();
+        if (isNaN(dtNasc.getTime()) || dtNasc.getFullYear() < 1900 || dtNasc > hoje) {
+            showToast("Data de nascimento inválida.");
+            if (perfilNascimentoInput) perfilNascimentoInput.focus();
+            return;
+        }
+    }
+
+    const novasObservacoes = perfilObservacoesInput ? perfilObservacoesInput.value.trim() : "";
+
+    const payload = {
+        id: usuarioEmEdicaoId,
+        nome: novoNome,
+        telefone: novoTelefone || null,
+        dataNascimento: novoNascimento || null,
+        preferenciasNotas: novasObservacoes || null
+    };
+
+    if (btnSalvar) {
+        btnSalvar.disabled = true;
+        btnSalvar.textContent = "Salvando...";
+    }
+
+    try {
+        const resp = await fetch("/Admin/Admin/UsuariosAtualizar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        let res = null;
+        try {
+            res = await resp.json();
+        } catch (e) {
+            // Pode não ser JSON
+        }
+
+        if (!resp.ok || (res && res.sucesso === false)) {
+            let mensagemErro = "Erro ao atualizar dados do cliente.";
+            if (res) {
+                if (res.mensagem) {
+                    mensagemErro = res.mensagem;
+                } else if (res.erros && Array.isArray(res.erros) && res.erros.length > 0) {
+                    mensagemErro = res.erros.join(" ");
+                } else if (res.errors) {
+                    // Erros do ModelState padrão ASP.NET
+                    mensagemErro = Object.values(res.errors).flat().join(" ");
+                }
+            }
+            showToast(mensagemErro);
+            if (btnSalvar) {
+                btnSalvar.disabled = false;
+                btnSalvar.textContent = "Salvar alterações";
+            }
+            return;
+        }
+
+        // Sucesso: atualizar state.usuarios.lista
+        const usuario = state.usuarios.lista.find(u => u.id === usuarioEmEdicaoId);
+        if (usuario) {
+            usuario.nome = novoNome;
+            usuario.phoneNumber = novoTelefone || null;
+            usuario.dataNascimento = novoNascimento || null;
+            usuario.preferenciasNotas = novasObservacoes || null;
+        }
+
+        // Renderizar tabela para refletir novo nome/telefone
+        renderUsuariosTabela();
+
+        // Voltar ao modo de leitura
+        sairModoEdicaoCliente();
+
+        // Atualizar os spans do modal
+        const perfilNome = document.getElementById("perfilNome");
+        const perfilTelefone = document.getElementById("perfilTelefone");
+        const perfilNascimento = document.getElementById("perfilNascimento");
+        const perfilObservacoes = document.getElementById("perfilObservacoes");
+        const tituloEl = document.getElementById("modalHistoricoTitulo");
+
+        if (perfilNome) perfilNome.textContent = novoNome;
+        if (perfilTelefone) perfilTelefone.textContent = novoTelefone || "Não informado";
+
+        let nascTexto = "Não informado";
+        if (novoNascimento) {
+            const dtNasc = new Date(novoNascimento);
+            if (!isNaN(dtNasc.getTime())) {
+                nascTexto = dtNasc.toLocaleDateString("pt-BR", { timeZone: "UTC" });
+            }
+        }
+        if (perfilNascimento) perfilNascimento.textContent = nascTexto;
+
+        if (perfilObservacoes) {
+            perfilObservacoes.textContent = novasObservacoes || "Nenhuma observação registrada.";
+        }
+
+        if (tituloEl) {
+            tituloEl.textContent = `Perfil e Histórico de ${novoNome}`;
+        }
+
+        showToast("Dados do cliente atualizados com sucesso.");
+    } catch (err) {
+        console.error("Erro ao salvar dados do cliente:", err);
+        showToast("Erro de comunicação ao salvar os dados.");
+        if (btnSalvar) {
+            btnSalvar.disabled = false;
+            btnSalvar.textContent = "Salvar alterações";
+        }
+    }
+}
+
 async function abrirModalHistorico(usuarioId, nome) {
+    usuarioEmEdicaoId = usuarioId;
+    sairModoEdicaoCliente();
+
     const modal = document.getElementById("modalHistoricoBackdrop");
     const tituloEl = document.getElementById("modalHistoricoTitulo");
     const loadingEl = document.getElementById("historicoLoading");
@@ -1151,7 +1430,7 @@ async function abrirModalHistorico(usuarioId, nome) {
         let nascTexto = "Não informado";
         if (usuario.dataNascimento) {
             const dtNasc = new Date(usuario.dataNascimento);
-            if (!isNaN(dtNasc.getTime())) nascTexto = dtNasc.toLocaleDateString("pt-BR");
+            if (!isNaN(dtNasc.getTime())) nascTexto = dtNasc.toLocaleDateString("pt-BR", { timeZone: "UTC" });
         }
         if (perfilNascimento) perfilNascimento.textContent = nascTexto;
 
@@ -1259,6 +1538,7 @@ async function abrirModalHistorico(usuarioId, nome) {
 }
 
 function fecharModalHistorico() {
+    sairModoEdicaoCliente();
     const modal = document.getElementById("modalHistoricoBackdrop");
     if (modal) modal.classList.add("hidden");
 }

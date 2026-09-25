@@ -188,6 +188,39 @@ public class AdminController : Controller
         return StatusCode((int)resp.StatusCode, content);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> UsuariosAtualizar([FromBody] AtualizarUsuarioRequest req)
+    {
+        if (req == null || string.IsNullOrWhiteSpace(req.Id))
+        {
+            return BadRequest(new { sucesso = false, mensagem = "ID de usuário inválido." });
+        }
+
+        if (string.IsNullOrWhiteSpace(req.Nome))
+        {
+            return BadRequest(new { sucesso = false, mensagem = "O nome do cliente é obrigatório." });
+        }
+
+        var client = _httpClientFactory.CreateClient("ApiClient");
+        var token = User.FindFirst("jwt_token")?.Value;
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+
+        var resp = await client.PutAsJsonAsync($"/api/Usuarios/{req.Id}", new
+        {
+            nome = req.Nome,
+            telefone = req.Telefone,
+            dataNascimento = req.DataNascimento,
+            preferenciasNotas = req.PreferenciasNotas
+        });
+
+        var content = await resp.Content.ReadAsStringAsync();
+        Response.StatusCode = (int)resp.StatusCode;
+        return Content(content, "application/json");
+    }
+
     [HttpGet]
     public async Task<IActionResult> UsuariosHistorico([FromQuery] string clienteId)
     {

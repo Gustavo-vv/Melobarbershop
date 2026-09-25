@@ -167,19 +167,46 @@ new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"))
                 <div class="cliente-perfil-card">
                     <div class="perfil-card-header">
                         <h4>DADOS DO CLIENTE</h4>
-                        <span id="perfilStatusBadge" class="badge-status badge-status-concluido">Ativo</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button type="button" class="btn-ghost" id="btnEditarDadosCliente" onclick="entrarModoEdicaoCliente()" style="padding: 4px 8px; font-size: 12px; display: inline-flex; align-items: center; gap: 5px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; stroke: currentColor;">
+                                    <path d="M12 20h9" />
+                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                </svg>
+                                Editar
+                            </button>
+                            <span id="perfilStatusBadge" class="badge-status badge-status-concluido">Ativo</span>
+                        </div>
                     </div>
                     <div class="perfil-card-grid">
-                        <div class="perfil-info-item"><strong>Nome:</strong> <span id="perfilNome">—</span></div>
-                        <div class="perfil-info-item"><strong>E-mail:</strong> <span id="perfilEmail">—</span></div>
-                        <div class="perfil-info-item"><strong>Telefone:</strong> <span id="perfilTelefone">—</span></div>
-                        <div class="perfil-info-item"><strong>Nascimento:</strong> <span id="perfilNascimento">—</span>
+                        <div class="perfil-info-item">
+                            <strong>Nome:</strong>
+                            <span id="perfilNome">—</span>
+                            <input type="text" id="perfilNomeInput" class="input-form hidden" placeholder="Nome completo" style="margin-top: 4px; width: 100%;" />
                         </div>
-                        <div class="perfil-info-item"><strong>Cadastro:</strong> <span id="perfilCadastro">—</span></div>
+                        <div class="perfil-info-item">
+                            <strong>E-mail:</strong>
+                            <span id="perfilEmail">—</span>
+                        </div>
+                        <div class="perfil-info-item">
+                            <strong>Telefone:</strong>
+                            <span id="perfilTelefone">—</span>
+                            <input type="tel" id="perfilTelefoneInput" class="input-form hidden" placeholder="(00) 00000-0000" maxlength="15" style="margin-top: 4px; width: 100%;" />
+                        </div>
+                        <div class="perfil-info-item">
+                            <strong>Nascimento:</strong>
+                            <span id="perfilNascimento">—</span>
+                            <input type="date" id="perfilNascimentoInput" class="input-form hidden" min="1900-01-01" max="2026-12-31" style="margin-top: 4px; width: 100%;" />
+                        </div>
+                        <div class="perfil-info-item">
+                            <strong>Cadastro:</strong>
+                            <span id="perfilCadastro">—</span>
+                        </div>
                     </div>
                     <div class="perfil-info-obs">
                         <strong>Preferências / Observações:</strong>
                         <p id="perfilObservacoes">Nenhuma observação registrada.</p>
+                        <textarea id="perfilObservacoesInput" class="input-form textarea-form hidden" rows="3" placeholder="Preferências ou observações sobre o cliente..." style="margin-top: 4px; width: 100%;"></textarea>
                     </div>
                 </div>
 
@@ -219,7 +246,9 @@ new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"))
             </div>
 
             <div class="modal-foot">
-                <button type="button" class="btn-ghost" onclick="fecharModalHistorico()">Fechar</button>
+                <button type="button" class="btn-ghost hidden" id="btnCancelarEdicaoCliente" onclick="cancelarEdicaoCliente()">Cancelar</button>
+                <button type="button" class="btn-primary hidden" id="btnSalvarEdicaoCliente" onclick="salvarEdicaoCliente()">Salvar alterações</button>
+                <button type="button" class="btn-ghost" id="btnFecharModalHistorico" onclick="fecharModalHistorico()">Fechar</button>
             </div>
         </div>
     </div>
