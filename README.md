@@ -6,50 +6,7 @@ O cliente agenda pelo site escolhendo serviço, barbeiro e horário; a barbearia
 
 ---
 
-## Arquitetura
 
-O projeto segue **Clean Architecture**, com as dependências sempre apontando para dentro: as camadas externas conhecem as internas, nunca o contrário.
-
-```
-┌─────────────────┐  ┌─────────────────┐
-│ Melobarbershop  │  │ Melobarbershop  │   Clientes
-│      .UI        │  │    .Desktop     │   (site MVC e painel WinForms)
-│  (site/cliente) │  │  (painel admin) │
-└────────┬────────┘  └────────┬────────┘
-         │      HTTP / JSON   │
-         └─────────┬──────────┘
-                   ▼
-         ┌───────────────────┐
-         │ Melobarbershop    │             Camada de apresentação da API
-         │      .API         │             (controllers REST + JWT + Swagger)
-         └─────────┬─────────┘
-                   ▼
-         ┌───────────────────┐
-         │ Melobarbershop    │             Casos de uso, serviços de aplicação,
-         │   .Application    │             DTOs e interfaces
-         └─────────┬─────────┘
-                   ▼
-         ┌───────────────────┐
-         │ Melobarbershop    │             Entidades, enums e contratos
-         │     .Domain       │             (sem dependência externa)
-         └───────────────────┘
-                   ▲
-         ┌─────────┴─────────┐
-         │ Melobarbershop    │             EF Core, Identity, repositórios,
-         │  .Infrastructure  │             migrations e seed
-         └───────────────────┘
-```
-
-| Projeto | Responsabilidade |
-|---|---|
-| **Domain** | Entidades (`Agendamento`, `Servico`, `Venda`, `Produto`...), enums e interfaces de repositório. Não depende de nenhuma outra camada nem de framework. |
-| **Application** | Serviços de aplicação (`AgendamentoService`, `VendaService`...), DTOs e contratos. Orquestra as regras de negócio. |
-| **Infrastructure** | Implementação da persistência com EF Core, ASP.NET Identity, repositórios, migrations e seed de dados inicial. |
-| **API** | Expõe a aplicação como API REST. Autenticação JWT e documentação via Swagger. |
-| **UI** | Site do cliente (ASP.NET Core MVC): vitrine de serviços, login e fluxo de agendamento online. |
-| **Desktop** | Painel administrativo (Windows Forms): dashboard, fila do dia, agendamentos, serviços e usuários. |
-
-O ponto central da arquitetura é que **a regra de negócio vive em um lugar só**. O site e o desktop não replicam lógica: ambos consomem a mesma API, então um agendamento criado no site aparece imediatamente no painel administrativo.
 
 ---
 
