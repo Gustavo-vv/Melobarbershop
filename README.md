@@ -4,7 +4,6 @@ Sistema de gestão para barbearia, composto por uma API REST, um site de agendam
 
 O cliente agenda pelo site escolhendo serviço, barbeiro e horário; a barbearia acompanha e opera a agenda pelo painel desktop, do check-in até a conclusão do atendimento.
 
----
 
 
 
