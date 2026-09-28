@@ -85,9 +85,9 @@ const themeIcon = document.querySelector('.theme-icon');
 function updateThemeButton() {
   if (!themeToggle || !themeText || !themeIcon) return;
   const dark = document.body.classList.contains('dark-theme');
-  themeText.textContent = dark ? 'Tema branco' : 'Tema preto';
+  themeText.textContent = dark ? 'Tema claro' : 'Tema escuro';
   themeIcon.textContent = dark ? '☀' : '☾';
-  themeToggle.setAttribute('aria-label', dark ? 'Mudar para tema branco' : 'Mudar para tema preto');
+  themeToggle.setAttribute('aria-label', dark ? 'Mudar para tema claro' : 'Mudar para tema escuro');
 }
 
 const savedTheme = localStorage.getItem('melo-agendamento-theme');
