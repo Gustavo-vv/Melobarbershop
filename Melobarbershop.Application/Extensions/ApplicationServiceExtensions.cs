@@ -21,7 +21,7 @@ public static class ApplicationServiceExtensions
 
         services.AddSingleton<IMapper>(mapperConfig.CreateMapper());
 
-        // ServiÃ§os de AplicaÃ§Ã£o
+        // Serviços de Aplicação
         services.AddScoped<IServicoService, ServicoService>();
         services.AddScoped<IProdutoService, ProdutoService>();
         services.AddScoped<IAgendamentoService, AgendamentoService>();
