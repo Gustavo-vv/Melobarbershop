@@ -4,7 +4,7 @@
     }
 
     .header-cta {
-        display: none;
+        display: none!important;
     }
 
     .about-grid,
@@ -26,6 +26,10 @@
 }
 
 @media (max-width: 760px) {
+    .user-logged-box {
+        padding-top: 20px;
+    }
+
     .container {
         width: min(100% - 28px, var(--container));
     }
@@ -140,16 +144,8 @@
 
     .hero-overlay {
         background:
-            linear-gradient(
-                90deg,
-                rgba(5, 6, 7, 0.95),
-                rgba(5, 6, 7, 0.68)
-            ),
-            linear-gradient(
-                0deg,
-                rgba(5, 6, 7, 0.5),
-                transparent
-            );
+            linear-gradient(90deg, rgba(5, 6, 7, 0.95), rgba(5, 6, 7, 0.68)),
+            linear-gradient(0deg, rgba(5, 6, 7, 0.5), transparent);
     }
 
     .hero-content > p {

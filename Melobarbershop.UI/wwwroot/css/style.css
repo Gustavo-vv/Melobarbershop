@@ -166,15 +166,24 @@ img {
     padding: 31px 0;
 }
 
-.menu a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 22px;
-    width: 0;
-    height: 2px;
-    background: var(--blue);
-    transition: 0.25s;
+.menu > li > a {
+  position: relative; /* necessário para o ::after se posicionar em relação ao link */
+}
+
+.menu > li > a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 22px;
+  width: 0;
+  height: 2px;
+  background: var(--blue);
+  transition: 0.25s;
+}
+
+.menu > li > a:hover::after,
+.menu > li > a.active::after {
+  width: 100%;
 }
 
 .menu a:hover {
@@ -239,25 +248,27 @@ img {
 }
 
 .user-logged-box {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: 10px;
+    display: inline-flex!important;
+    align-items: center!important;
+    gap: 8px!important;
+    margin-left: 10px!important;
 }
 
 .user-name-badge {
-    display: inline-flex;
+    display: inline-flex!important;
     align-items: center;
     gap: 6px;
     background: rgba(22, 140, 255, 0.12);
     border: 1px solid rgba(22, 140, 255, 0.35);
-    padding: 6px 12px;
+    padding: 6px 12px!important;
     border-radius: 20px;
     color: #fff;
     font-size: 12px;
     font-weight: 700;
     text-decoration: none;
+    text-transform: none!important;
     transition: 0.2s ease;
+    
 }
 
 .user-name-badge:hover {
@@ -275,7 +286,7 @@ img {
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: #a8b2bc;
-    padding: 6px 10px;
+    padding: 6px 10px!important;
     border-radius: 8px;
     font-size: 11px;
     font-weight: 700;
@@ -1329,7 +1340,7 @@ img {
 
 .header-cta {
     min-height: 48px;
-    padding: 0 18px;
+    padding: 0 18px!important;
     gap: 8px;
     white-space: nowrap;
 }
