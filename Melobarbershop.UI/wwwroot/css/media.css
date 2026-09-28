@@ -364,3 +364,9 @@
         grid-column: auto;
     }
 }
+
+@media (min-width: 1177px) {
+    #themeLabel {
+        display: inline-block;
+    }
+}

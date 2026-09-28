@@ -376,7 +376,7 @@ function renderAgendaTabela() {
             <td class="tabular font-bold">${horarioFmt}</td>
             <td class="money tabular">${valorFmt}</td>
             <td><span class="badge-status ${meta.badgeCls}">${meta.label}</span></td>
-            <td style="text-align:center;">${botaoAcaoHtml}</td>
+            <td style="text-align:end;">${botaoAcaoHtml}</td>
         </tr>
         `;
     }).join("");
@@ -894,7 +894,27 @@ function toggleTheme() {
     if (label) {
         label.textContent = isLight ? "Tema escuro" : "Tema claro";
     }
+    // Atualiza também o ícone (usa Material Symbols)
+    const icon = document.getElementById("themeIcon");
+    if (icon) {
+        // isLight representa o estado ANTES do toggle; após o toggle o tema atual é (isLight ? 'dark' : 'light')
+        icon.textContent = isLight ? "dark_mode" : "light_mode";
+    }
 }
+
+// Sincroniza o estado inicial do botão de tema com o atributo data-theme do documento
+(function syncInitialThemeToggleUI() {
+    try {
+        const root = document.documentElement;
+        const current = root.getAttribute("data-theme") === "light" ? "light" : "dark";
+        const label = document.getElementById("themeLabel");
+        const icon = document.getElementById("themeIcon");
+        if (label) label.textContent = current === "light" ? "Tema claro" : "Tema escuro";
+        if (icon) icon.textContent = current === "light" ? "light_mode" : "dark_mode";
+    } catch (e) {
+        // não bloquear caso o DOM ainda não esteja pronto
+    }
+})();
 
 /* ===================================================================
    SEÇÃO USUÁRIOS E EQUIPE (REPRODUÇÃO UCUSUARIOS + FORMHISTORICOCLIENTE)
@@ -1064,8 +1084,8 @@ function atualizarBotoesAcaoUsuario() {
         const usuario = state.usuarios.lista.find(u => u.id === state.usuarios.selecionadoId);
         if (usuario) {
             btnStatus.innerHTML = usuario.ativo
-                ? `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg> Desativar`
-                : `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Reativar`;
+                ? `<span class="material-symbols-outlined">block</span> Desativar`
+                : `<span class="material-symbols-outlined">check</span> Reativar`;
         }
     }
 }

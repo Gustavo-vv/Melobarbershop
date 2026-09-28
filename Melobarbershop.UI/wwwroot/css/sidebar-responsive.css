@@ -1,0 +1,43 @@
+@media (max-width: 1176px) {
+    /* Ajustes para o sidebar no dashboard */
+    .brand {
+        padding: 0 12px 22px 12px;
+        justify-content: center;
+        border: none;
+    }
+
+    .sidebar {
+        max-width: 60px;
+    }
+
+    .brand-mark {
+        width: 30px;
+        height: 30px;
+    }
+
+    .topbar {
+        border-bottom: none;
+    }
+
+    .sidebar-foot {
+        border-top: none;
+    }
+
+    #themeLabel {
+        display: none;
+    }
+
+    .home-dash {
+        justify-content: center!important;
+    }
+
+    .servicos-search-wrap {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 490px) {
+    .input-search {
+        max-width: 260px;
+    }
+}

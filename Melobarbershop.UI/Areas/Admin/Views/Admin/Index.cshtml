@@ -1,3 +1,7 @@
+@section Styles {
+    <link href="~/css/sidebar-responsive.css" rel="stylesheet" asp-append-version="true" />
+}
+
 @{
     var secao = ViewData["Secao"] as string ?? "visao-geral";
     var isAgenda = secao == "agenda";
@@ -76,20 +80,14 @@ new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"))
             <div class="servicos-actions-left">
                 <button class="btn-ghost btn-action-item" id="btnAlternarStatusUsuario" onclick="alternarStatusUsuario()"
                         disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         style="width:15px;height:15px;">
-                        <rect x="1" y="5" width="22" height="14" rx="7" ry="7"></rect>
-                        <circle cx="16" cy="12" r="3"></circle>
-                    </svg>
-                    Ativar / Desativar
+                    <span class="material-symbols-outlined">check</span>
+                    Ativar
                 </button>
                 <button class="btn-ghost btn-action-item" id="btnVerHistoricoUsuario"
                         onclick="abrirHistoricoUsuarioSelecionado()" disabled>
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         style="width:15px;height:15px;">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
+                    <span class="material-symbols-outlined">
+                        list_alt
+                    </span>
                     Ver Histórico
                 </button>
                 <div class="filter-field" style="margin-left: 8px;">
@@ -105,10 +103,7 @@ new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"))
 
             <button class="btn-ghost" id="btnRecarregarUsuarios" onclick="carregarUsuarios()"
                     title="Recarregar usuários da API">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     id="refreshIconUsuarios" style="width:16px;height:16px;">
-                    <path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" />
-                </svg>
+                <span style="font-size: 16px!important;" class="material-symbols-outlined">refresh</span>
                 Recarregar
             </button>
         </div>
@@ -178,8 +173,11 @@ new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"))
                     <div class="perfil-card-header">
                         <h4>DADOS DO CLIENTE</h4>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <button type="button" class="btn-ghost" id="btnEditarDadosCliente" onclick="entrarModoEdicaoCliente()" style="padding: 4px 8px; font-size: 12px; display: inline-flex; align-items: center; gap: 5px;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; stroke: currentColor;">
+                            <button type="button" class="btn-ghost" id="btnEditarDadosCliente"
+                                    onclick="entrarModoEdicaoCliente()"
+                                    style="padding: 4px 8px; font-size: 12px; display: inline-flex; align-items: center; gap: 5px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" style="width: 14px; height: 14px; stroke: currentColor;">
                                     <path d="M12 20h9" />
                                     <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                                 </svg>
@@ -192,7 +190,8 @@ new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"))
                         <div class="perfil-info-item">
                             <strong>Nome:</strong>
                             <span id="perfilNome">—</span>
-                            <input type="text" id="perfilNomeInput" class="input-form hidden" placeholder="Nome completo" style="margin-top: 4px; width: 100%;" />
+                            <input type="text" id="perfilNomeInput" class="input-form hidden" placeholder="Nome completo"
+                                   style="margin-top: 4px; width: 100%;" />
                         </div>
                         <div class="perfil-info-item">
                             <strong>E-mail:</strong>
@@ -201,12 +200,14 @@ new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"))
                         <div class="perfil-info-item">
                             <strong>Telefone:</strong>
                             <span id="perfilTelefone">—</span>
-                            <input type="tel" id="perfilTelefoneInput" class="input-form hidden" placeholder="(00) 00000-0000" maxlength="15" style="margin-top: 4px; width: 100%;" />
+                            <input type="tel" id="perfilTelefoneInput" class="input-form hidden"
+                                   placeholder="(00) 00000-0000" maxlength="15" style="margin-top: 4px; width: 100%;" />
                         </div>
                         <div class="perfil-info-item">
                             <strong>Nascimento:</strong>
                             <span id="perfilNascimento">—</span>
-                            <input type="date" id="perfilNascimentoInput" class="input-form hidden" min="1900-01-01" max="2026-12-31" style="margin-top: 4px; width: 100%;" />
+                            <input type="date" id="perfilNascimentoInput" class="input-form hidden" min="1900-01-01"
+                                   max="2026-12-31" style="margin-top: 4px; width: 100%;" />
                         </div>
                         <div class="perfil-info-item">
                             <strong>Cadastro:</strong>
@@ -216,7 +217,9 @@ new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"))
                     <div class="perfil-info-obs">
                         <strong>Preferências / Observações:</strong>
                         <p id="perfilObservacoes">Nenhuma observação registrada.</p>
-                        <textarea id="perfilObservacoesInput" class="input-form textarea-form hidden" rows="3" placeholder="Preferências ou observações sobre o cliente..." style="margin-top: 4px; width: 100%;"></textarea>
+                        <textarea id="perfilObservacoesInput" class="input-form textarea-form hidden" rows="3"
+                                  placeholder="Preferências ou observações sobre o cliente..."
+                                  style="margin-top: 4px; width: 100%;"></textarea>
                     </div>
                 </div>
 
@@ -256,9 +259,12 @@ new System.Globalization.CultureInfo("pt-BR")) + " — sincronizado com a API"))
             </div>
 
             <div class="modal-foot">
-                <button type="button" class="btn-ghost hidden" id="btnCancelarEdicaoCliente" onclick="cancelarEdicaoCliente()">Cancelar</button>
-                <button type="button" class="btn-primary hidden" id="btnSalvarEdicaoCliente" onclick="salvarEdicaoCliente()">Salvar alterações</button>
-                <button type="button" class="btn-ghost" id="btnFecharModalHistorico" onclick="fecharModalHistorico()">Fechar</button>
+                <button type="button" class="btn-ghost hidden" id="btnCancelarEdicaoCliente"
+                        onclick="cancelarEdicaoCliente()">Cancelar</button>
+                <button type="button" class="btn-primary hidden" id="btnSalvarEdicaoCliente"
+                        onclick="salvarEdicaoCliente()">Salvar alterações</button>
+                <button type="button" class="btn-ghost" id="btnFecharModalHistorico"
+                        onclick="fecharModalHistorico()">Fechar</button>
             </div>
         </div>
     </div>
@@ -523,10 +529,7 @@ else
 
             <button class="btn-ghost" id="btnRecarregarAgenda" onclick="carregarDados()"
                     title="Recarregar agendamentos da API">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     id="refreshIcon">
-                    <path d="M4 4v5h.6M20 20v-5h-.6M4.6 9A8 8 0 0 1 19 7.5M19.4 15A8 8 0 0 1 5 16.5" />
-                </svg>
+                <span style="font-size: 16px!important;" class="material-symbols-outlined">refresh</span>
                 Recarregar
             </button>
         </div>

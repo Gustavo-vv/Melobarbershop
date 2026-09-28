@@ -276,6 +276,16 @@ input {
     height: 15px;
 }
 
+/* Suporte para ícones Material Symbols usados no botão de tema */
+.theme-toggle .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-size: 15px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* ---------- Topbar ---------- */
 .main {
     min-width: 0;
