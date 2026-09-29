@@ -16,10 +16,11 @@ namespace Melobarbershop.Desktop.Services
 
         static ApiClient()
         {
+            var baseUrl = AppConfig.ApiBaseUrl.TrimEnd('/') + "/";
             _httpClient = new HttpClient
             {
-                BaseAddress = new Uri(AppConfig.ApiBaseUrl),
-                Timeout = TimeSpan.FromSeconds(15)
+                BaseAddress = new Uri(baseUrl),
+                Timeout = TimeSpan.FromSeconds(20)
             };
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -32,7 +33,13 @@ namespace Melobarbershop.Desktop.Services
 
         public static void AtualizarBaseAddress()
         {
-            _httpClient.BaseAddress = new Uri(AppConfig.ApiBaseUrl);
+            var baseUrl = AppConfig.ApiBaseUrl.TrimEnd('/') + "/";
+            _httpClient.BaseAddress = new Uri(baseUrl);
+        }
+
+        private static string FormatarEndpoint(string endpoint)
+        {
+            return endpoint.TrimStart('/');
         }
 
         public static void DefinirSessao(LoginRespostaDto loginInfo)
@@ -55,7 +62,7 @@ namespace Melobarbershop.Desktop.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync(endpoint);
+                var response = await _httpClient.GetAsync(FormatarEndpoint(endpoint));
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (!string.IsNullOrWhiteSpace(content))
@@ -118,7 +125,7 @@ namespace Melobarbershop.Desktop.Services
                 var json = JsonSerializer.Serialize(data, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync(endpoint, content);
+                var response = await _httpClient.PostAsync(FormatarEndpoint(endpoint), content);
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 if (!string.IsNullOrWhiteSpace(responseString))
@@ -172,7 +179,7 @@ namespace Melobarbershop.Desktop.Services
                 var json = JsonSerializer.Serialize(data, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync(endpoint, content);
+                var response = await _httpClient.PutAsync(FormatarEndpoint(endpoint), content);
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 if (!string.IsNullOrWhiteSpace(responseString))
@@ -215,7 +222,7 @@ namespace Melobarbershop.Desktop.Services
         {
             try
             {
-                var response = await _httpClient.DeleteAsync(endpoint);
+                var response = await _httpClient.DeleteAsync(FormatarEndpoint(endpoint));
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 if (!string.IsNullOrWhiteSpace(responseString))
@@ -261,7 +268,7 @@ namespace Melobarbershop.Desktop.Services
                 var json = JsonSerializer.Serialize(data, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PatchAsync(endpoint, content);
+                var response = await _httpClient.PatchAsync(FormatarEndpoint(endpoint), content);
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 if (!string.IsNullOrWhiteSpace(responseString))

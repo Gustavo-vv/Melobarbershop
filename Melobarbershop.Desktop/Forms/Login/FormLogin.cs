@@ -12,6 +12,9 @@ namespace Melobarbershop.Desktop.Forms.Login
 
         public FormLogin()
         {
+            AppConfig.CarregarConfiguracao();
+            ApiClient.AtualizarBaseAddress();
+
             InitializeComponent();
             ConfigurarEstilo();
 

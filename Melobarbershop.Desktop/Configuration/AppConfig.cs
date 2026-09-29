@@ -2,7 +2,7 @@ namespace Melobarbershop.Desktop.Configuration
 {
     public static class AppConfig
     {
-        public static string ApiBaseUrl { get; set; } = "http://localhost:5223";
+        public static string ApiBaseUrl { get; set; } = "https://app-melobarbershop-api-fbh6fphkh6fvdhc3.brazilsouth-01.azurewebsites.net";
         public static bool ModoClaro { get; set; } = false;
 
         static AppConfig()
@@ -50,7 +50,7 @@ namespace Melobarbershop.Desktop.Configuration
             catch
             {
                 // Fallback para localhost:5223
-                ApiBaseUrl = "http://localhost:5223";
+                ApiBaseUrl = "https://app-melobarbershop-api-fbh6fphkh6fvdhc3.brazilsouth-01.azurewebsites.net";
             }
         }
 
