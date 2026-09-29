@@ -1,34 +1,92 @@
-@media (max-width: 1176px) {
-    /* Ajustes para o sidebar colapsado em tablets e telas intermediárias */
-    .brand {
-        padding: 0 12px 22px 12px;
-        justify-content: center;
-        border: none;
+/* =========================================================
+   AJUSTES PARA SIDEBAR COLAPSADA (Telas entre 701px e 1176px)
+   ========================================================= */
+@media (min-width: 701px) and (max-width: 1176px) {
+    .shell {
+        grid-template-columns: 68px 1fr !important;
     }
 
     .sidebar {
-        max-width: 60px;
+        width: 68px !important;
+        max-width: 68px !important;
+        padding: 16px 0 !important;
+        align-items: center !important;
+    }
+
+    .brand {
+        padding: 0 0 16px 0 !important;
+        justify-content: center !important;
+        width: 100% !important;
+        border-bottom: 1px solid var(--border) !important;
+        margin-bottom: 14px !important;
     }
 
     .brand-mark {
-        width: 30px;
-        height: 30px;
+        width: 32px !important;
+        height: 32px !important;
     }
 
     .topbar {
-        border-bottom: none;
+        border-bottom: 1px solid var(--border) !important;
+    }
+
+    .sidebar .nav {
+        width: 100% !important;
+        padding: 0 8px !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex: 1 !important;
+    }
+
+    .sidebar .nav-item {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 44px !important;
+        height: 44px !important;
+        padding: 0 !important;
+        border-radius: var(--radius-s) !important;
+        margin: 0 auto !important;
+    }
+
+    .sidebar .nav-item svg {
+        width: 20px !important;
+        height: 20px !important;
+        margin: 0 !important;
+    }
+
+    .sidebar .nav-item span {
+        display: none !important;
     }
 
     .sidebar-foot {
-        border-top: none;
+        width: 100% !important;
+        padding: 14px 8px 0 8px !important;
+        border-top: 1px solid var(--border) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .sidebar-foot .nav-item.home-dash {
+        justify-content: center !important;
+        width: 44px !important;
+        height: 44px !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
+    }
+
+    .sidebar-foot .theme-toggle {
+        justify-content: center !important;
+        width: 44px !important;
+        height: 44px !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
     }
 
     #themeLabel {
-        display: none;
-    }
-
-    .home-dash {
-        justify-content: center !important;
+        display: none !important;
     }
 
     .servicos-search-wrap {
@@ -43,11 +101,11 @@
     .shell {
         display: block !important;
         min-height: 100vh;
-        padding-bottom: calc(72px + env(safe-area-inset-bottom, 12px));
+        padding-bottom: calc(72px + env(safe-area-inset-bottom, 12px)) !important;
     }
 
     .main {
-        width: 100%;
+        width: 100% !important;
     }
 
     /* Oculta marca superior e separadores na sidebar mobile */
@@ -65,13 +123,13 @@
         top: auto !important;
         width: 100% !important;
         max-width: 100% !important;
-        height: auto !important;
+        height: 64px !important;
         z-index: 9999 !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        justify-content: space-around !important;
-        padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 8px)) 10px !important;
+        justify-content: space-between !important;
+        padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 6px)) 6px !important;
         background: color-mix(in srgb, var(--panel) 88%, transparent) !important;
         backdrop-filter: blur(20px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
@@ -80,56 +138,71 @@
         border-left: none !important;
         border-bottom: none !important;
         box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.45) !important;
+        box-sizing: border-box !important;
     }
 
-    /* Lista de navegação horizontal */
-    .sidebar .nav {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-around !important;
-        width: 100% !important;
+    /* Transforma nav e sidebar-foot em contents para que todos os 5 itens sejam irmãos diretos e igualmente distribuídos */
+    .sidebar .nav,
+    .sidebar-foot {
+        display: contents !important;
         padding: 0 !important;
         margin: 0 !important;
-        gap: 4px !important;
     }
 
-    .sidebar .nav-item {
+    /* Cada um dos 5 itens recebe exatamente 20% do espaço da barra */
+    .sidebar .nav-item,
+    .sidebar-foot .nav-item.home-dash {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
         flex: 1 1 0 !important;
-        padding: 6px 4px !important;
-        gap: 4px !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        max-width: 20% !important;
+        height: 52px !important;
+        padding: 6px 2px !important;
+        margin: 0 !important;
+        gap: 3px !important;
         border-radius: var(--radius-s) !important;
         border: none !important;
         background: transparent !important;
         color: var(--text-dim) !important;
-        min-width: 0 !important;
         text-align: center !important;
-        transition: transform 0.15s ease, color 0.15s ease, background 0.15s ease !important;
+        transition: color 0.15s ease, background 0.15s ease, transform 0.12s ease !important;
         -webkit-tap-highlight-color: transparent !important;
+        box-sizing: border-box !important;
     }
 
-    .sidebar .nav-item svg {
+    .sidebar .nav-item:active,
+    .sidebar-foot .nav-item.home-dash:active {
+        transform: scale(0.94) !important;
+    }
+
+    .sidebar .nav-item svg,
+    .sidebar-foot .nav-item.home-dash svg {
         width: 20px !important;
         height: 20px !important;
-        margin: 0 !important;
-        transition: transform 0.15s ease !important;
+        margin: 0 auto !important;
+        display: block !important;
+        flex-shrink: 0 !important;
     }
 
-    /* Rótulo dos itens visível no mobile */
-    .sidebar .nav-item span {
+    /* Rótulo dos itens visível e proporcional */
+    .sidebar .nav-item span,
+    .sidebar-foot .nav-item.home-dash span {
         display: block !important;
         font-size: 10px !important;
         font-weight: 600 !important;
+        line-height: 1.1 !important;
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
+        width: 100% !important;
         max-width: 100% !important;
-        line-height: 1 !important;
+        text-align: center !important;
         letter-spacing: -0.2px !important;
+        padding: 0 2px !important;
     }
 
     /* Efeito de item ativo na barra inferior */
@@ -140,44 +213,47 @@
 
     .sidebar .nav-item.active svg {
         stroke: var(--blue) !important;
-        transform: translateY(-1px) scale(1.08) !important;
+        transform: translateY(-1px) scale(1.05) !important;
     }
 
     .sidebar .nav-item.active::before {
         display: none !important;
     }
 
-    /* Ações de rodapé da sidebar (Voltar e Trocar Tema) na barra inferior */
-    .sidebar-foot {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        border: none !important;
-        gap: 4px !important;
-        flex: 0 0 auto !important;
-    }
-
-    .sidebar-foot .nav-item.home-dash {
-        padding: 6px 8px !important;
-        flex: 0 0 auto !important;
-    }
-
+    /* Botão de Tema Flutuante no canto inferior direito */
     .sidebar-foot .theme-toggle {
-        padding: 6px 8px !important;
-        border-radius: var(--radius-s) !important;
-        border: 1px solid var(--border) !important;
-        background: var(--panel-2) !important;
-        color: var(--text-dim) !important;
+        position: fixed !important;
+        right: 18px !important;
+        bottom: calc(74px + env(safe-area-inset-bottom, 12px)) !important;
+        z-index: 10000 !important;
+        width: 44px !important;
+        height: 44px !important;
+        padding: 0 !important;
+        border-radius: 12px !important;
+        border: 1px solid var(--border-strong) !important;
+        background: color-mix(in srgb, var(--panel-2) 90%, transparent) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        color: var(--text) !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+        cursor: pointer !important;
+        transition: transform 0.15s ease, background 0.15s ease !important;
+    }
+
+    .sidebar-foot .theme-toggle:active {
+        transform: scale(0.92) !important;
+    }
+
+    .sidebar-foot .theme-toggle #themeLabel {
+        display: none !important;
     }
 
     .sidebar-foot .theme-toggle .material-symbols-outlined {
-        font-size: 18px !important;
+        font-size: 20px !important;
+        margin: 0 !important;
     }
 }
 
@@ -186,4 +262,5 @@
         max-width: 260px;
     }
 }
+
 
